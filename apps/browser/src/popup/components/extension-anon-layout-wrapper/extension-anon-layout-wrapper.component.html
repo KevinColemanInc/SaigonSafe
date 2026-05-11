@@ -6,7 +6,13 @@
     [pageTitle]="''"
   >
     <div class="tw-w-32">
-      <bit-svg *ngIf="showLogo" [content]="logo" [ariaLabel]="'appLogoLabel' | i18n"></bit-svg>
+      <ng-container *ngIf="showLogo">
+        <img
+          src="images/logo-dark@2x.png"
+          class="tw-block tw-w-full tw-h-auto tw-filter tw-brightness-0 tw-invert"
+          [alt]="'appLogoLabel' | i18n"
+        />
+      </ng-container>
     </div>
 
     <ng-container slot="end">

@@ -91,7 +91,7 @@
         <Application Id="bitwardendesktop" Executable="${executable}"
             EntryPoint="Windows.FullTrustApplication">
             <uap:VisualElements
-                BackgroundColor="#175DDC"
+                BackgroundColor="#082C5F"
                 DisplayName="${displayName}"
                 Square150x150Logo="assets\Square150x150Logo.png"
                 Square44x44Logo="assets\Square44x44Logo.png"

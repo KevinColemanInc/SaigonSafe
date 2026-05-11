@@ -9,6 +9,10 @@ import { shareReplay } from "rxjs";
 import { JslibModule } from "@bitwarden/angular/jslib.module";
 import { CipherRepromptType } from "@bitwarden/common/vault/enums";
 import {
+  buildNotesWithSearchPin,
+  parseSearchPinFromNotes,
+} from "@bitwarden/common/vault/utils/search-pin-utils";
+import {
   CardComponent,
   CheckboxModule,
   FormFieldModule,
@@ -47,6 +51,7 @@ export class AdditionalOptionsSectionComponent implements OnInit {
 
   additionalOptionsForm = this.formBuilder.group({
     notes: [null as string],
+    searchPin: [null as string],
     reprompt: [false],
   });
 
@@ -79,7 +84,7 @@ export class AdditionalOptionsSectionComponent implements OnInit {
 
     this.additionalOptionsForm.valueChanges.pipe(takeUntilDestroyed()).subscribe((value) => {
       this.cipherFormContainer.patchCipher((cipher) => {
-        cipher.notes = value.notes;
+        cipher.notes = buildNotesWithSearchPin(value.notes, value.searchPin);
         cipher.reprompt = value.reprompt ? CipherRepromptType.Password : CipherRepromptType.None;
         return cipher;
       });
@@ -90,8 +95,11 @@ export class AdditionalOptionsSectionComponent implements OnInit {
     const prefillCipher = this.cipherFormContainer.getInitialCipherView();
 
     if (prefillCipher) {
+      const { visibleNotes, searchPin } = parseSearchPinFromNotes(prefillCipher.notes);
+
       this.additionalOptionsForm.patchValue({
-        notes: prefillCipher.notes,
+        notes: visibleNotes,
+        searchPin,
         reprompt: prefillCipher.reprompt === CipherRepromptType.Password,
       });
     }

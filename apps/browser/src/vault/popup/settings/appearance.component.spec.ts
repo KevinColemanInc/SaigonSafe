@@ -22,6 +22,10 @@ import { PopupCompactModeService } from "../../../platform/popup/layout/popup-co
 import { PopupHeaderComponent } from "../../../platform/popup/layout/popup-header.component";
 import { PopupPageComponent } from "../../../platform/popup/layout/popup-page.component";
 import { PopupSizeService } from "../../../platform/popup/layout/popup-size.service";
+import {
+  PopupColorPalettes,
+  PopupColorPaletteService,
+} from "../../../platform/popup/theming/popup-color-palette.service";
 import { VaultPopupCopyButtonsService } from "../services/vault-popup-copy-buttons.service";
 
 import { AppearanceComponent } from "./appearance.component";
@@ -60,12 +64,14 @@ describe("AppearanceComponent", () => {
   const showFavicons$ = new BehaviorSubject<boolean>(true);
   const enableBadgeCounter$ = new BehaviorSubject<boolean>(true);
   const selectedTheme$ = new BehaviorSubject<ThemeType>(ThemeType.Light);
+  const selectedPalette$ = new BehaviorSubject(PopupColorPalettes.ContemporaryRealism);
   const enableRoutingAnimation$ = new BehaviorSubject<boolean>(true);
   const enableCompactMode$ = new BehaviorSubject<boolean>(false);
   const showQuickCopyActions$ = new BehaviorSubject<boolean>(false);
   const featureFlag$ = new BehaviorSubject<boolean>(false);
   const hasPremiumFromAnySource$ = new BehaviorSubject<boolean>(false);
   const setSelectedTheme = jest.fn().mockResolvedValue(undefined);
+  const setSelectedPalette = jest.fn().mockResolvedValue(undefined);
   const setShowFavicons = jest.fn().mockResolvedValue(undefined);
   const setEnableBadgeCounter = jest.fn().mockResolvedValue(undefined);
   const setEnableRoutingAnimation = jest.fn().mockResolvedValue(undefined);
@@ -81,6 +87,7 @@ describe("AppearanceComponent", () => {
 
   beforeEach(async () => {
     setSelectedTheme.mockClear();
+    setSelectedPalette.mockClear();
     setShowFavicons.mockClear();
     setEnableBadgeCounter.mockClear();
     setEnableRoutingAnimation.mockClear();
@@ -106,6 +113,10 @@ describe("AppearanceComponent", () => {
         { provide: I18nService, useValue: { t: (key: string) => key } },
         { provide: DomainSettingsService, useValue: { showFavicons$, setShowFavicons } },
         { provide: ThemeStateService, useValue: { selectedTheme$, setSelectedTheme } },
+        {
+          provide: PopupColorPaletteService,
+          useValue: { selectedPalette$, setSelectedPalette },
+        },
         {
           provide: AnimationControlService,
           useValue: { enableRoutingAnimation$, setEnableRoutingAnimation },
@@ -178,6 +189,7 @@ describe("AppearanceComponent", () => {
       enableFavicon: true,
       enableBadgeCounter: true,
       theme: ThemeType.Light,
+      palette: PopupColorPalettes.ContemporaryRealism,
       enableCompactMode: false,
       showQuickCopyActions: false,
       width: "default",
@@ -191,6 +203,12 @@ describe("AppearanceComponent", () => {
       component.appearanceForm.controls.theme.setValue(ThemeType.Light);
 
       expect(setSelectedTheme).toHaveBeenCalledWith(ThemeType.Light);
+    });
+
+    it("updates the users color palette", () => {
+      component.appearanceForm.controls.palette.setValue(PopupColorPalettes.Verism);
+
+      expect(setSelectedPalette).toHaveBeenCalledWith(PopupColorPalettes.Verism);
     });
 
     it("updates the users favicon setting", () => {

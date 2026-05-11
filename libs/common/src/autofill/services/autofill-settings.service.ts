@@ -88,6 +88,15 @@ const ENABLE_CONTEXT_MENU = new KeyDefinition(AUTOFILL_SETTINGS_DISK, "enableCon
   deserializer: (value: boolean) => value ?? true,
 });
 
+const GENERATED_LOGIN_DEFAULT_EMAIL = new UserKeyDefinition(
+  AUTOFILL_SETTINGS_DISK,
+  "generatedLoginDefaultEmail",
+  {
+    deserializer: (value: string) => value ?? "",
+    clearOn: [],
+  },
+);
+
 const CLEAR_CLIPBOARD_DELAY = new UserKeyDefinition(
   AUTOFILL_SETTINGS_DISK_LOCAL,
   "clearClipboardDelay",
@@ -135,6 +144,8 @@ export abstract class AutofillSettingsServiceAbstraction {
   setShowInlineMenuCards: (newValue: boolean) => Promise<void>;
   enableContextMenu$: Observable<boolean>;
   setEnableContextMenu: (newValue: boolean) => Promise<void>;
+  generatedLoginDefaultEmail$: Observable<string>;
+  setGeneratedLoginDefaultEmail: (newValue: string) => Promise<void>;
   clearClipboardDelay$: Observable<ClearClipboardDelaySetting>;
   setClearClipboardDelay: (newValue: ClearClipboardDelaySetting) => Promise<void>;
   hadPreMigrationClipboardValue$: Observable<boolean>;
@@ -172,6 +183,9 @@ export class AutofillSettingsService implements AutofillSettingsServiceAbstracti
 
   private enableContextMenuState: GlobalState<boolean>;
   readonly enableContextMenu$: Observable<boolean>;
+
+  private generatedLoginDefaultEmailState: ActiveUserState<string>;
+  readonly generatedLoginDefaultEmail$: Observable<string>;
 
   private clearClipboardDelayState: ActiveUserState<ClearClipboardDelaySetting>;
   readonly clearClipboardDelay$: Observable<ClearClipboardDelaySetting>;
@@ -247,6 +261,13 @@ export class AutofillSettingsService implements AutofillSettingsServiceAbstracti
     this.enableContextMenuState = this.stateProvider.getGlobal(ENABLE_CONTEXT_MENU);
     this.enableContextMenu$ = this.enableContextMenuState.state$.pipe(map((x) => x ?? true));
 
+    this.generatedLoginDefaultEmailState = this.stateProvider.getActive(
+      GENERATED_LOGIN_DEFAULT_EMAIL,
+    );
+    this.generatedLoginDefaultEmail$ = this.generatedLoginDefaultEmailState.state$.pipe(
+      map((x) => x ?? ""),
+    );
+
     this.clearClipboardDelayState = this.stateProvider.getActive(CLEAR_CLIPBOARD_DELAY);
     this.clearClipboardDelay$ = this.clearClipboardDelayState.state$.pipe(
       map((x) => x ?? ClearClipboardDelay.FiveMinutes),
@@ -313,6 +334,10 @@ export class AutofillSettingsService implements AutofillSettingsServiceAbstracti
 
   async setEnableContextMenu(newValue: boolean): Promise<void> {
     await this.enableContextMenuState.update(() => newValue);
+  }
+
+  async setGeneratedLoginDefaultEmail(newValue: string): Promise<void> {
+    await this.generatedLoginDefaultEmailState.update(() => newValue);
   }
 
   async setClearClipboardDelay(newValue: ClearClipboardDelaySetting): Promise<void> {

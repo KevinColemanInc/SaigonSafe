@@ -78,5 +78,54 @@ describe("SearchService", () => {
 
       expect(result).toEqual(ciphers);
     });
+
+    it("hides ciphers with a search pin from regular search results", async () => {
+      const visibleCipher = createCipherView("cipher-1", "Github");
+      const hiddenCipher = createCipherView("cipher-2", "Github");
+      hiddenCipher.notes = "Visible note\n<!--BW-SEARCH-PIN:1234-->";
+
+      const result = await service.searchCiphers(userId, null, "github", [
+        visibleCipher,
+        hiddenCipher,
+      ]);
+
+      expect(result).toEqual([visibleCipher]);
+    });
+
+    it("reveals ciphers with a search pin on an exact pin search", async () => {
+      const hiddenCipher = createCipherView("cipher-1", "Github");
+      hiddenCipher.notes = "Visible note\n<!--BW-SEARCH-PIN:1234-->";
+
+      const result = await service.searchCiphers(userId, null, "1234", [hiddenCipher]);
+
+      expect(result).toEqual([hiddenCipher]);
+    });
+
+    it("does not reveal ciphers with partial search pin matches", async () => {
+      const hiddenCipher = createCipherView("cipher-1", "Github");
+      hiddenCipher.notes = "Visible note\n<!--BW-SEARCH-PIN:1234-->";
+
+      const result = await service.searchCiphers(userId, null, "123", [hiddenCipher]);
+
+      expect(result).toEqual([]);
+    });
+
+    it("reveals ciphers with a one-character search pin even when the query is normally too short", async () => {
+      const hiddenCipher = createCipherView("cipher-1", "Github");
+      hiddenCipher.notes = "Visible note\n<!--BW-SEARCH-PIN:1-->";
+
+      const result = await service.searchCiphers(userId, null, "1", [hiddenCipher]);
+
+      expect(result).toEqual([hiddenCipher]);
+    });
+  });
+
+  describe("searchCiphersBasic", () => {
+    it("adds exact search pin matches even when the regular search fields do not match", () => {
+      const hiddenCipher = createCipherView("cipher-1", "Github");
+      hiddenCipher.notes = "Visible note\n<!--BW-SEARCH-PIN:1234-->";
+
+      expect(service.searchCiphersBasic([hiddenCipher], "1234")).toEqual([hiddenCipher]);
+    });
   });
 });

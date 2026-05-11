@@ -374,6 +374,12 @@ describe("VaultItemCopyActionsComponent", () => {
       expect(component.hasSecureNoteValue).toBe(false);
     });
 
+    it("does not count a hidden search pin as a secure note value", () => {
+      (component.cipher() as CipherView).notes = "<!--BW-SEARCH-PIN:1234-->" as any;
+
+      expect(component.hasSecureNoteValue).toBe(false);
+    });
+
     it("computes hasSshKeyValues from sshKey fields", () => {
       (component.cipher() as CipherView).sshKey = {
         privateKey: "priv",

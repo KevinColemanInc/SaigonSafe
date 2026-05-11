@@ -198,6 +198,20 @@ describe("CopyCipherFieldDirective", () => {
         copyCipherFieldDirective.cipher,
       );
     });
+
+    it("strips the hidden search pin from the copied note", async () => {
+      const cipher = copyCipherFieldDirective.cipher as CipherView;
+      cipher.notes = "test-secure-note\n<!--BW-SEARCH-PIN:1234-->";
+      copyCipherFieldDirective.action = "secureNote";
+
+      await copyCipherFieldDirective.copy();
+
+      expect(copyFieldService.copy).toHaveBeenCalledWith(
+        "test-secure-note",
+        "secureNote",
+        copyCipherFieldDirective.cipher,
+      );
+    });
   });
 
   describe("ssh key", () => {

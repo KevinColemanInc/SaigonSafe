@@ -3,7 +3,7 @@ import os.log
 import LocalAuthentication
 
 let SFExtensionMessageKey = "message"
-let ServiceName = "Bitwarden"
+let ServiceName = "Saigon Safe"
 let ServiceNameBiometric = ServiceName + "_biometric"
 
 class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {

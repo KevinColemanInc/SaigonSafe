@@ -74,12 +74,6 @@ export class UnifiedUpgradePromptService {
    * @returns A promise that resolves to the dialog result if shown, or null if not shown
    */
   async displayUpgradePromptConditionally(): Promise<UnifiedUpgradeDialogResult | null> {
-    const shouldShow = await firstValueFrom(this.shouldShowPrompt$);
-
-    if (shouldShow) {
-      return this.launchUpgradeDialog();
-    }
-
     return null;
   }
 

@@ -1,16 +1,16 @@
 {
   "appName": {
-    "message": "Bitwarden"
+    "message": "Saigon Safe"
   },
   "appLogoLabel": {
-    "message": "Bitwarden logotips"
+    "message": "Saigon Safe logotips"
   },
   "extName": {
-    "message": "Bitwarden paroļu pārvaldnieks",
+    "message": "Kevinwarden Password Manager",
     "description": "Extension name, MUST be less than 40 characters (Safari restriction)"
   },
   "extDesc": {
-    "message": "Bitwarden viegli aizsargā visas paroles, paroļu atslēgas un jutīgu informāciju mājās, darbā vai ceļā",
+    "message": "Saigon Safe viegli aizsargā visas paroles, paroļu atslēgas un jutīgu informāciju mājās, darbā vai ceļā",
     "description": "Extension description, MUST be less than 112 characters (Safari restriction)"
   },
   "loginOrCreateNewAccount": {
@@ -23,7 +23,7 @@
     "message": "Izveidot kontu"
   },
   "newToBitwarden": {
-    "message": "Bitwarden iepriekš nav izmantots?"
+    "message": "Saigon Safe iepriekš nav izmantots?"
   },
   "logInWithPasskey": {
     "message": "Pieteikties ar piekļuves atslēgu"
@@ -300,22 +300,22 @@
     "message": "Pāriet uz tīmekļa lietotni?"
   },
   "continueToWebAppDesc": {
-    "message": "Vairāk sava Bitwarden konta iespēju var izpētīt tīmekļa vietnē."
+    "message": "Vairāk sava Saigon Safe konta iespēju var izpētīt tīmekļa vietnē."
   },
   "continueToHelpCenter": {
     "message": "Pāriet uz palīdzības centru?"
   },
   "continueToHelpCenterDesc": {
-    "message": "Vairāk par to, kā izmantot Bitwarden, var uzzināt palīdzības centrā."
+    "message": "Vairāk par to, kā izmantot Saigon Safe, var uzzināt palīdzības centrā."
   },
   "continueToBrowserExtensionStore": {
     "message": "Turpināt pārlūka paplašinājumu veikalā?"
   },
   "continueToBrowserExtensionStoreDesc": {
-    "message": "Var palīdzēt citiem noskaidrot, vai Bitwarden viņiem der. To var izdarīt pārlūka lietotņu veikalā, atstājot vērtējumu."
+    "message": "Var palīdzēt citiem noskaidrot, vai Saigon Safe viņiem der. To var izdarīt pārlūka lietotņu veikalā, atstājot vērtējumu."
   },
   "changeMasterPasswordOnWebConfirmation": {
-    "message": "Savu galveno paroli var mainīt Bitwarden tīmekļa lietotnē."
+    "message": "Savu galveno paroli var mainīt Saigon Safe tīmekļa lietotnē."
   },
   "fingerprintPhrase": {
     "message": "Atpazīšanas vārdkopa",
@@ -332,43 +332,43 @@
     "message": "Atteikties"
   },
   "aboutBitwarden": {
-    "message": "Par Bitwarden"
+    "message": "Par Saigon Safe"
   },
   "about": {
     "message": "Par"
   },
   "moreFromBitwarden": {
-    "message": "Vairāk no Bitwarden"
+    "message": "Vairāk no Saigon Safe"
   },
   "continueToBitwardenDotCom": {
-    "message": "Pāriet uz bitwarden.com?"
+    "message": "Pāriet uz saigonsafe.com?"
   },
   "bitwardenForBusiness": {
-    "message": "Bitwarden uzņēmējdarbībai"
+    "message": "Saigon Safe uzņēmējdarbībai"
   },
   "bitwardenAuthenticator": {
-    "message": "Bitwarden autentificētājs"
+    "message": "Saigon Safe autentificētājs"
   },
   "continueToAuthenticatorPageDesc": {
-    "message": "Bitwarden autentificētājs ļauj glabāt autentificētāja atslēgas un izveidot TOTP kodus divpakāpju apliecināšanas plūsmām. Vairāk var uzzināt tīmekļvietnē bitwarden.com"
+    "message": "Saigon Safe autentificētājs ļauj glabāt autentificētāja atslēgas un izveidot TOTP kodus divpakāpju apliecināšanas plūsmām. Vairāk var uzzināt tīmekļvietnē saigonsafe.com"
   },
   "bitwardenSecretsManager": {
-    "message": "Bitwarden noslēpumu pārvaldnieks"
+    "message": "Saigon Safe noslēpumu pārvaldnieks"
   },
   "continueToSecretsManagerPageDesc": {
-    "message": "Droša izstrādātāju noslēpumu uzglabāšana, pārvaldīšana un kopīgošana ar Bitwarden noslēpumu pārvaldnieku. Vairāk var uzzināt tīmekļvietnē bitwarden.com."
+    "message": "Droša izstrādātāju noslēpumu uzglabāšana, pārvaldīšana un kopīgošana ar Saigon Safe noslēpumu pārvaldnieku. Vairāk var uzzināt tīmekļvietnē saigonsafe.com."
   },
   "passwordlessDotDev": {
     "message": "Passwordless.dev"
   },
   "continueToPasswordlessDotDevPageDesc": {
-    "message": "Plūdenu un drošu pieteikšanās pieredžu, kas ir brīvas no ierastajām parolēm, izveidošana ar Passwordless.dev. Vairāk var uzzināt tīmekļvietnē bitwarden.com."
+    "message": "Plūdenu un drošu pieteikšanās pieredžu, kas ir brīvas no ierastajām parolēm, izveidošana ar Passwordless.dev. Vairāk var uzzināt tīmekļvietnē saigonsafe.com."
   },
   "freeBitwardenFamilies": {
-    "message": "Bezmaksas Bitwarden ģimenēm"
+    "message": "Bezmaksas Saigon Safe ģimenēm"
   },
   "freeBitwardenFamiliesPageDesc": {
-    "message": "Tev ir tiesības uz bezmaksas Bitwarden ģimenēm. Šo piedāvājumu šodien var pieņemt tīmekļa lietotnē."
+    "message": "Tev ir tiesības uz bezmaksas Saigon Safe ģimenēm. Šo piedāvājumu šodien var pieņemt tīmekļa lietotnē."
   },
   "version": {
     "message": "Laidiens"
@@ -428,13 +428,13 @@
     "message": "Palīdzība un atsauksmes"
   },
   "helpCenter": {
-    "message": "Bitwarden palīdzības centrs"
+    "message": "Saigon Safe palīdzības centrs"
   },
   "communityForums": {
-    "message": "Izpētīt Bitwarden kopienas forumus"
+    "message": "Izpētīt Saigon Safe kopienas forumus"
   },
   "contactSupport": {
-    "message": "Sazināties ar Bitwarden atbalstu"
+    "message": "Sazināties ar Saigon Safe atbalstu"
   },
   "sync": {
     "message": "Sinhronizēt"
@@ -456,7 +456,7 @@
     "message": "Automātiski veido spēcīgas, neatkārtojamas paroles visiem pieteikšanās vienumiem."
   },
   "bitWebVaultApp": {
-    "message": "Bitwarden tīmekļa lietotne"
+    "message": "Saigon Safe tīmekļa lietotne"
   },
   "select": {
     "message": "Izvēlēties"
@@ -919,10 +919,10 @@
     "message": "Padarīt divpakāpju apliecināšanu plūdenu"
   },
   "totpHelper": {
-    "message": "Bitwarden var glabāt un aizpildīt divpakāpju apliecinājuma kodus. Atslēga jāievieto starpliktuvē un jāielīmē šajā laukā."
+    "message": "Saigon Safe var glabāt un aizpildīt divpakāpju apliecinājuma kodus. Atslēga jāievieto starpliktuvē un jāielīmē šajā laukā."
   },
   "totpHelperWithCapture": {
-    "message": "Bitwarden var glabāt un aizpildīt divpakāpju apliecinājuma kodus. Jāizvēlas kameras ikona, lai veiktu tīmekļvietnes autentificētāja kvadrātkoda ekrānuzņēmumu, vai jāievieto starpliktuvē atslēga un jāielīmē šajā laukā."
+    "message": "Saigon Safe var glabāt un aizpildīt divpakāpju apliecinājuma kodus. Jāizvēlas kameras ikona, lai veiktu tīmekļvietnes autentificētāja kvadrātkoda ekrānuzņēmumu, vai jāievieto starpliktuvē atslēga un jāielīmē šajā laukā."
   },
   "learnMoreAboutAuthenticators": {
     "message": "Uzzināt vairāk par autentificētājiem"
@@ -943,7 +943,7 @@
     "message": "Pieteikties"
   },
   "logInToBitwarden": {
-    "message": "Pieteikties Bitwarden"
+    "message": "Pieteikties Saigon Safe"
   },
   "enterTheCodeSentToYourEmail": {
     "message": "Jāievada e-pastā nosūtītais kods"
@@ -1003,10 +1003,10 @@
     "message": "Pievienoja mapi"
   },
   "twoStepLoginConfirmation": {
-    "message": "Divpakāpju pieteikšanās padara kontu krietni drošāku, pieprasot apstiprināt pieteikšanos ar tādu citu ierīču vai pakalpojumu starpniecību kā drošības atslēga, autentificētāja lietotne, īsziņa, tālruņa zvans vai e-pasts. Divpakāpju pieteikšanos var iespējot bitwarden.com tīmekļa glabātavā. Vai tagad apmeklēt tīmekļvietni?"
+    "message": "Divpakāpju pieteikšanās padara kontu krietni drošāku, pieprasot apstiprināt pieteikšanos ar tādu citu ierīču vai pakalpojumu starpniecību kā drošības atslēga, autentificētāja lietotne, īsziņa, tālruņa zvans vai e-pasts. Divpakāpju pieteikšanos var iespējot saigonsafe.com tīmekļa glabātavā. Vai tagad apmeklēt tīmekļvietni?"
   },
   "twoStepLoginConfirmationContent": {
-    "message": "Savu kontu var padarīt drošāku ar divpakāpju pieteikšanās uzstādīšanu Bitwarden tīmekļa lietotnē."
+    "message": "Savu kontu var padarīt drošāku ar divpakāpju pieteikšanās uzstādīšanu Saigon Safe tīmekļa lietotnē."
   },
   "twoStepLoginConfirmationTitle": {
     "message": "Pāriet uz tīmekļa lietotni?"
@@ -1158,7 +1158,7 @@
     "message": "Jump to setting"
   },
   "notificationAddDesc": {
-    "message": "Vai Bitwarden atcerēties šo paroli?"
+    "message": "Vai Saigon Safe atcerēties šo paroli?"
   },
   "notificationAddSave": {
     "message": "Jā, saglabāt"
@@ -1194,11 +1194,11 @@
     }
   },
   "notificationLoginSaveConfirmation": {
-    "message": "saglabāts Bitwarden.",
+    "message": "saglabāts Saigon Safe.",
     "description": "Shown to user after item is saved."
   },
   "notificationLoginUpdatedConfirmation": {
-    "message": "atjaunināts Bitwarden.",
+    "message": "atjaunināts Saigon Safe.",
     "description": "Shown to user after item is updated."
   },
   "selectItemAriaLabel": {
@@ -1296,13 +1296,13 @@
     "message": "Vaicāt, vai saglabāt jaunas piekļuves atslēgas vai pieteikties ar glabātavā esošajām piekļuves atslēgām. Attiecas uz visiem kontiem, kuri ir pieteikušies."
   },
   "notificationChangeDesc": {
-    "message": "Vai atjaunināt šo paroli Bitwarden?"
+    "message": "Vai atjaunināt šo paroli Saigon Safe?"
   },
   "notificationChangeSave": {
     "message": "Jā, atjaunināt"
   },
   "notificationUnlockDesc": {
-    "message": "Jāatslēdz Bitwarden glabātava, lai pabeigtu automātiskās aizpildes pieprasījumu."
+    "message": "Jāatslēdz Saigon Safe glabātava, lai pabeigtu automātiskās aizpildes pieprasījumu."
   },
   "notificationUnlock": {
     "message": "Atslēgt"
@@ -1378,10 +1378,10 @@
     "message": "Šī parole tiks izmantota, lai izgūtu un ievietotu šo datni"
   },
   "accountRestrictedOptionDescription": {
-    "message": "Jāizmanto konta šifrēšanas atslēga, kas iegūta no lietotājvārda un galvenās paroles, lai šifrētu izguvi un atļautu ievietošanu tikai pašreizējā Bitwarden kontā."
+    "message": "Jāizmanto konta šifrēšanas atslēga, kas iegūta no lietotājvārda un galvenās paroles, lai šifrētu izguvi un atļautu ievietošanu tikai pašreizējā Saigon Safe kontā."
   },
   "passwordProtectedOptionDescription": {
-    "message": "Uzstādīt paroli, lai šifrētu izguvi un tad to ievietotu jebkurā Bitwarden kontā, izmantojot atšifrēšanas paroli."
+    "message": "Uzstādīt paroli, lai šifrētu izguvi un tad to ievietotu jebkurā Saigon Safe kontā, izmantojot atšifrēšanas paroli."
   },
   "exportTypeHeading": {
     "message": "Izgūšanas veids"
@@ -1410,7 +1410,7 @@
     "message": "Šī izguve šifrē datus ar konta šifrēšanas atslēgu. Ja tā jebkad tiks mainīta, izvadi vajadzētu veikt vēlreiz, jo vairs nebūs iespējams atšifrēt šo datni."
   },
   "encExportAccountWarningDesc": {
-    "message": "Katram Bitwarden kontam ir neatkārtojamas šifrēšanas atslēgas, tādēļ nav iespējams ievietot šifrētu izguvi citā kontā."
+    "message": "Katram Saigon Safe kontam ir neatkārtojamas šifrēšanas atslēgas, tādēļ nav iespējams ievietot šifrētu izguvi citā kontā."
   },
   "exportMasterPassword": {
     "message": "Ievadīt galveno paroli, lai izgūtu glabātavas saturu."
@@ -1419,7 +1419,7 @@
     "message": "Kopīgots"
   },
   "bitwardenForBusinessPageDesc": {
-    "message": "Bitwarden uzņēmējdarbībai nodrošina iespēju kopīgot savas glabātavas vienumus ar citiem, kad tiek izmantota apvienība. Vairāk var uzzināt tīmekļvietnē bitwarden.com."
+    "message": "Saigon Safe uzņēmējdarbībai nodrošina iespēju kopīgot savas glabātavas vienumus ar citiem, kad tiek izmantota apvienība. Vairāk var uzzināt tīmekļvietnē saigonsafe.com."
   },
   "moveToOrganization": {
     "message": "Pārvietot uz apvienību"
@@ -1531,7 +1531,7 @@
     "message": "Pārvaldīt dalību"
   },
   "premiumManageAlert": {
-    "message": "Dalību ir iespējams pārvaldīt bitwarden.com tīmekļa glabātavā. Vai tagad apmeklēt tīmekļvietni?"
+    "message": "Dalību ir iespējams pārvaldīt saigonsafe.com tīmekļa glabātavā. Vai tagad apmeklēt tīmekļvietni?"
   },
   "premiumRefresh": {
     "message": "Atjaunot dalību"
@@ -1585,13 +1585,13 @@
     "message": "Iegādāties Premium"
   },
   "premiumPurchaseAlertV2": {
-    "message": "Premium var iegādāties Bitwarden tīmekļa lietotnē sava konta iestatījumos."
+    "message": "Premium var iegādāties Saigon Safe tīmekļa lietotnē sava konta iestatījumos."
   },
   "premiumCurrentMember": {
     "message": "Tu esi Premium dalībnieks!"
   },
   "premiumCurrentMemberThanks": {
-    "message": "Paldies, ka atbalsti Bitwarden!"
+    "message": "Paldies, ka atbalsti Saigon Safe!"
   },
   "premiumFeatures": {
     "message": "Uzlabo uz \"Premium\" un saņem:"
@@ -1697,7 +1697,7 @@
     "message": "Autentificētāja lietotne"
   },
   "authenticatorAppDescV2": {
-    "message": "Jāievada autentificētāja lietotnes, piemēram, Bitwarden Authenticator, izveidots kods.",
+    "message": "Jāievada autentificētāja lietotnes, piemēram, Saigon Safe Authenticator, izveidots kods.",
     "description": "'Bitwarden Authenticator' is a product name and should not be translated."
   },
   "yubiKeyTitleV2": {
@@ -1730,7 +1730,7 @@
     "message": "Pašmitināta vide"
   },
   "selfHostedBaseUrlHint": {
-    "message": "Jānorāda sava pašizvietotā Bitward servera pamata URL. Piemērs: https://bitwarden.uznemums.lv"
+    "message": "Jānorāda sava pašizvietotā Saigon Safe servera pamata URL. Piemērs: https://Saigon Safe.uznemums.lv"
   },
   "selfHostedCustomEnvHeader": {
     "message": "Papildu konfigurācijā ir iespējams norādīt URL katram pakalpojumam atsevišķi."
@@ -1780,7 +1780,7 @@
     "message": "Viegla automātiskās aizpildes ieteikumu atrašana"
   },
   "autofillSpotlightDesc": {
-    "message": "Jāizslēdz sava pārlūka automātiskās aizpildes iestatījumi, lai tie nebūtu pretrunā ar Bitwarden."
+    "message": "Jāizslēdz sava pārlūka automātiskās aizpildes iestatījumi, lai tie nebūtu pretrunā ar Saigon Safe."
   },
   "turnOffBrowserAutofill": {
     "message": "Izslēgt $BROWSER$ automātisko aizpildi",
@@ -1825,7 +1825,7 @@
     "message": "Rādīt automātiskās aizpildes ieteikumuis veidlapu laukos"
   },
   "howDoesBitwardenProtectFromPhishing": {
-    "message": "Kā Bitwarden aizsargā datus no pikšķerēšanas?"
+    "message": "Kā Saigon Safe aizsargā datus no pikšķerēšanas?"
   },
   "currentWebsite": {
     "message": "Pašreizējā tīmekļvietne"
@@ -2466,7 +2466,7 @@
     "message": "Vāja galvenā parole"
   },
   "weakMasterPasswordDesc": {
-    "message": "Jūsu izvēlētā galvenā parole ir vāja. Jums vajadzētu izmantot drošu galveno paroli (vai paroles vārdkopu), lai pienācīgi aizsargātu savu Bitwarden kontu. Vai tiešām vēlaties izmantot šo galveno paroli?"
+    "message": "Jūsu izvēlētā galvenā parole ir vāja. Jums vajadzētu izmantot drošu galveno paroli (vai paroles vārdkopu), lai pienācīgi aizsargātu savu Saigon Safe kontu. Vai tiešām vēlaties izmantot šo galveno paroli?"
   },
   "rotateAccountEncKey": {
     "message": "Also rotate my account's encryption key"
@@ -2478,7 +2478,7 @@
     "message": "Are you sure you want to rotate your account's encryption key?"
   },
   "updateEncryptionKeyWarning": {
-    "message": "After updating your encryption key, you are required to log out and back in to all Bitwarden applications that you are currently using (such as the mobile app or browser extensions). Failure to log out and back in (which downloads your new encryption key) may result in data corruption. We will attempt to log you out automatically, however, it may be delayed."
+    "message": "After updating your encryption key, you are required to log out and back in to all Saigon Safe applications that you are currently using (such as the mobile app or browser extensions). Failure to log out and back in (which downloads your new encryption key) may result in data corruption. We will attempt to log you out automatically, however, it may be delayed."
   },
   "updateEncryptionKeyAccountExportWarning": {
     "message": "Any account restricted exports you have saved will become invalid."
@@ -2506,10 +2506,10 @@
     "message": "Iestatīt PIN"
   },
   "setYourPinCode": {
-    "message": "Iestatīt PIN kodu Bitwarden atslēgšanai. PIN iestatījumi tiks atiestatīti pēc pilnīgas izrakstīšanās no lietotnes."
+    "message": "Iestatīt PIN kodu Saigon Safe atslēgšanai. PIN iestatījumi tiks atiestatīti pēc pilnīgas izrakstīšanās no lietotnes."
   },
   "setPinCode": {
-    "message": "Šo PIN var izmantot, lai atslēgtu Bitwarden. PIN tiks atiestatīts pēc pilnīgas atteikšanās lietotnē."
+    "message": "Šo PIN var izmantot, lai atslēgtu Saigon Safe. PIN tiks atiestatīts pēc pilnīgas atteikšanās lietotnē."
   },
   "pinRequired": {
     "message": "Ir nepieciešams PIN kods."
@@ -2530,7 +2530,7 @@
     "message": "Tiek gaidīts apstiprinājums no darbvirsmas"
   },
   "awaitDesktopDesc": {
-    "message": "Lūgums apstiprināt ar biometriju Bitwarden darbvirsmas lietotnē, lai iespējotu biometriju pārlūkā."
+    "message": "Lūgums apstiprināt ar biometriju Saigon Safe darbvirsmas lietotnē, lai iespējotu biometriju pārlūkā."
   },
   "lockWithMasterPassOnRestart": {
     "message": "Aizslēgt ar galveno paroli pēc pārlūka atsāknēšanas"
@@ -2654,7 +2654,7 @@
     }
   },
   "topLayerHijackWarning": {
-    "message": "Šī lapa traucē Bitwarden darbību. Bitwarden iekļautā izvēlne ir īslaicīgi atspējot kā drošības mērs."
+    "message": "Šī lapa traucē Saigon Safe darbību. Saigon Safe iekļautā izvēlne ir īslaicīgi atspējot kā drošības mērs."
   },
   "setMasterPassword": {
     "message": "Uzstādīt galveno paroli"
@@ -2711,7 +2711,7 @@
     "message": "Jaunā galvenā parole neatbilst nosacījumu prasībām."
   },
   "receiveMarketingEmailsV2": {
-    "message": "Iegūt savā iesūtnē padomus, paziņojumus un izpētes iespējas no Bitwarden."
+    "message": "Iegūt savā iesūtnē padomus, paziņojumus un izpētes iespējas no Saigon Safe."
   },
   "unsubscribe": {
     "message": "Atteikt abonēšanu"
@@ -2762,13 +2762,13 @@
     "message": "Savienojums ar pārlūku nav iespējots"
   },
   "desktopIntegrationDisabledDesc": {
-    "message": "Savienojums ar pārlūku nav iespējots Bitwarden darbvirsmas lietotnē. Lūgums iespējot to darbvirsmas lietotnes iestatījumos."
+    "message": "Savienojums ar pārlūku nav iespējots Saigon Safe darbvirsmas lietotnē. Lūgums iespējot to darbvirsmas lietotnes iestatījumos."
   },
   "startDesktopTitle": {
-    "message": "Palaist Bitwarden darbvirsmas lietotni"
+    "message": "Palaist Saigon Safe darbvirsmas lietotni"
   },
   "startDesktopDesc": {
-    "message": "Bitwarden darbvirsmas lietotnei ir jābūt sāknētai, pirms šī iespēja var tikt izmantota."
+    "message": "Saigon Safe darbvirsmas lietotnei ir jābūt sāknētai, pirms šī iespēja var tikt izmantota."
   },
   "errorEnableBiometricTitle": {
     "message": "Nevar iespējot biometriju"
@@ -2822,13 +2822,13 @@
     "message": "Biometrija neizdevās"
   },
   "biometricsFailedDesc": {
-    "message": "Biometriju nevar pabeigt, jāapsver galvenās paroles izmantošana vai atteikšanās. Ja tas turpinās, lūgums sazināties ar Bitwarden atbalstu."
+    "message": "Biometriju nevar pabeigt, jāapsver galvenās paroles izmantošana vai atteikšanās. Ja tas turpinās, lūgums sazināties ar Saigon Safe atbalstu."
   },
   "nativeMessaginPermissionErrorTitle": {
     "message": "Atļauja nav nodrošināta"
   },
   "nativeMessaginPermissionErrorDesc": {
-    "message": "Bez atļaujas sazināties ar Bitwarden darbvirsmas lietotni mēs nevaram nodrošināt biometriju pārlūka paplašinājumā. Lūgums mēģināt vēlreiz."
+    "message": "Bez atļaujas sazināties ar Saigon Safe darbvirsmas lietotni mēs nevaram nodrošināt biometriju pārlūka paplašinājumā. Lūgums mēģināt vēlreiz."
   },
   "nativeMessaginPermissionSidebarTitle": {
     "message": "Atļaujas pieprasījuma kļūda"
@@ -2865,7 +2865,7 @@
     "message": "Izņēmuma domēni"
   },
   "excludedDomainsDesc": {
-    "message": "Bitwarden nevaicās saglabāt pieteikšanās datus šiem domēniem. Ir jāpārlādē lapa, lai izmaiņas iedarbotos."
+    "message": "Saigon Safe nevaicās saglabāt pieteikšanās datus šiem domēniem. Ir jāpārlādē lapa, lai izmaiņas iedarbotos."
   },
   "blockedDomainsDesc": {
     "message": "Automātiskā aizpilde un citas saistītās iespējas šajās tīmekļvietnēs netiks piedāvātas. Ir jāatsvaidzina lapa, lai izmaiņas iedarbotos."
@@ -2981,24 +2981,24 @@
     "message": "Riskam pakļauto pieteikšanās vienumu saraksta attēlojums."
   },
   "welcomeDialogGraphicAlt": {
-    "message": "Illustration of the layout of the Bitwarden vault page."
+    "message": "Illustration of the layout of the Saigon Safe vault page."
   },
   "generatePasswordSlideDesc": {
     "message": "Riskam pakļauto vienumu vietnē ar automātiskās aizpildes izvēlni var ātri izveidot stipru, neatkārtojamu paroli.",
     "description": "Description of the generate password slide on the at-risk password page carousel"
   },
   "generatePasswordSlideImgAltPeriod": {
-    "message": "Bitwarden automātiskās izvēlnes attēlojums, kurā ir redzama izveidota parole."
+    "message": "Saigon Safe automātiskās izvēlnes attēlojums, kurā ir redzama izveidota parole."
   },
   "updateInBitwarden": {
-    "message": "Atjaunināt Bitwarden"
+    "message": "Atjaunināt Saigon Safe"
   },
   "updateInBitwardenSlideDesc": {
-    "message": "Bitwarden tad vaicās atjaunināt paroli paroļu pārvaldniekā.",
+    "message": "Saigon Safe tad vaicās atjaunināt paroli paroļu pārvaldniekā.",
     "description": "Description of the update in Bitwarden slide on the at-risk password page carousel"
   },
   "updateInBitwardenSlideImgAltPeriod": {
-    "message": "Bitwarden paziņojuma, kas aicina lietotāju atjaunināt pieteikšanās vienumu, attēlojums."
+    "message": "Saigon Safe paziņojuma, kas aicina lietotāju atjaunināt pieteikšanās vienumu, attēlojums."
   },
   "turnOnAutofill": {
     "message": "Ieslēgt automātisko aizpildi"
@@ -3524,7 +3524,7 @@
     "message": "Kļūda automātiskās aizpildes datu iegūšanā"
   },
   "couldNotDecryptVaultItemsBelow": {
-    "message": "Bitwarden nevarēja atšifrēt zemāk uzskaitītos glabātavas vienumus."
+    "message": "Saigon Safe nevarēja atšifrēt zemāk uzskaitītos glabātavas vienumus."
   },
   "contactCSToAvoidDataLossPart1": {
     "message": "Jāsazinās ar klientu atbalstu,",
@@ -3628,11 +3628,11 @@
     }
   },
   "forwarderGeneratedBy": {
-    "message": "Izveidoja Bitwarden.",
+    "message": "Izveidoja Saigon Safe.",
     "description": "Displayed with the address on the forwarding service's configuration screen."
   },
   "forwarderGeneratedByWithWebsite": {
-    "message": "Tīmekļvietne: $WEBSITE$. Izveidoja Bitwarden.",
+    "message": "Tīmekļvietne: $WEBSITE$. Izveidoja Saigon Safe.",
     "description": "Displayed with the address on the forwarding service's configuration screen.",
     "placeholders": {
       "WEBSITE": {
@@ -3825,7 +3825,7 @@
     "message": "Uz ierīci ir nosūtīts paziņojums."
   },
   "notificationSentDevicePart1": {
-    "message": "Bitwarden jāatslēdz savā ierīcē vai"
+    "message": "Saigon Safe jāatslēdz savā ierīcē vai"
   },
   "notificationSentDeviceAnchor": {
     "message": "tīmekļa lietotnē"
@@ -4328,15 +4328,15 @@
     "message": "Pāriet uz saturu"
   },
   "bitwardenOverlayButton": {
-    "message": "Bitwarden automātiskās aizpildes izvēlnes poga",
+    "message": "Saigon Safe automātiskās aizpildes izvēlnes poga",
     "description": "Page title for the iframe containing the overlay button"
   },
   "toggleBitwardenVaultOverlay": {
-    "message": "Pārslēgt Bitwarden automātiskās aizpildes izvēlni",
+    "message": "Pārslēgt Saigon Safe automātiskās aizpildes izvēlni",
     "description": "Screen reader and tool tip label for the overlay button"
   },
   "bitwardenVault": {
-    "message": "Bitwarden automātiskās aizpildes izvēlne",
+    "message": "Saigon Safe automātiskās aizpildes izvēlne",
     "description": "Page title in overlay"
   },
   "unlockYourAccountToViewMatchingLogins": {
@@ -4408,7 +4408,7 @@
     "description": "Screen reader text (aria-label) for new identity button within inline menu"
   },
   "bitwardenOverlayMenuAvailable": {
-    "message": "Ir pieejama Bitwarden automātiskās aizpildes izvēlne. Jānospiež poga ar bultu uz leju, lai atlasītu.",
+    "message": "Ir pieejama Saigon Safe automātiskās aizpildes izvēlne. Jānospiež poga ar bultu uz leju, lai atlasītu.",
     "description": "Screen reader text for announcing when the overlay opens on the page"
   },
   "turnOn": {
@@ -4726,7 +4726,7 @@
     "message": "Pašlaik izmantotais konts"
   },
   "bitwardenAccount": {
-    "message": "Bitwarden konts"
+    "message": "Saigon Safe konts"
   },
   "availableAccounts": {
     "message": "Pieejamie konti"
@@ -4772,7 +4772,7 @@
     "description": "Label indicating the most common import formats"
   },
   "uriMatchDefaultStrategyHint": {
-    "message": "URI atbilstības noteikšana ir veids, kā Bitwarden atpazīst automātiskās aizpildes ieteikumus.",
+    "message": "URI atbilstības noteikšana ir veids, kā Saigon Safe atpazīst automātiskās aizpildes ieteikumus.",
     "description": "Explains to the user that URI match detection determines how Bitwarden suggests autofill options, and clarifies that this default strategy applies when no specific match detection is set for a login item."
   },
   "regExAdvancedOptionWarning": {
@@ -4816,23 +4816,23 @@
     "description": "Body content for dialog which asks if the user wants to proceed to the browser's keyboard shortcut settings page"
   },
   "overrideDefaultBrowserAutofillTitle": {
-    "message": "Padarīt Bitwarden par noklusējuma paroļu pārvaldnieku?",
+    "message": "Padarīt Saigon Safe par noklusējuma paroļu pārvaldnieku?",
     "description": "Dialog title facilitating the ability to override a chrome browser's default autofill behavior"
   },
   "overrideDefaultBrowserAutofillDescription": {
-    "message": "Šīs iespējas neņemšana vērā var radīt nesaderības starp Bitwarden automātiskās aizpildes izvēlni un pārlūka.",
+    "message": "Šīs iespējas neņemšana vērā var radīt nesaderības starp Saigon Safe automātiskās aizpildes izvēlni un pārlūka.",
     "description": "Dialog message facilitating the ability to override a chrome browser's default autofill behavior"
   },
   "overrideDefaultBrowserAutoFillSettings": {
-    "message": "Padarīt Bitwarden par noklusējuma paroļu pārvaldnieku",
+    "message": "Padarīt Saigon Safe par noklusējuma paroļu pārvaldnieku",
     "description": "Label for the setting that allows overriding the default browser autofill settings"
   },
   "privacyPermissionAdditionNotGrantedTitle": {
-    "message": "Nebija iespējams iestatīt Bitwarden kā noklusējuma paroļu pārvaldnieku",
+    "message": "Nebija iespējams iestatīt Saigon Safe kā noklusējuma paroļu pārvaldnieku",
     "description": "Title for the dialog that appears when the user has not granted the extension permission to set privacy settings"
   },
   "privacyPermissionAdditionNotGrantedDescription": {
-    "message": "Ir nepieciešams Bitwarden nodrošināt pārlūka privātuma atļaujas, lai iestatītu to kā noklusējuma paroļu pārvaldnieku.",
+    "message": "Ir nepieciešams Saigon Safe nodrošināt pārlūka privātuma atļaujas, lai iestatītu to kā noklusējuma paroļu pārvaldnieku.",
     "description": "Description for the dialog that appears when the user has not granted the extension permission to set privacy settings"
   },
   "makeDefault": {
@@ -5173,16 +5173,16 @@
     "message": "Lejupielādēt pielikumu"
   },
   "downloadBitwarden": {
-    "message": "Lejupielādē Bitwarden"
+    "message": "Lejupielādē Saigon Safe"
   },
   "downloadBitwardenOnAllDevices": {
-    "message": "Lejupielādē Bitwarden visās ierīcēs"
+    "message": "Lejupielādē Saigon Safe visās ierīcēs"
   },
   "getTheMobileApp": {
     "message": "Iegūsti viedierīču lietotni"
   },
   "getTheMobileAppDesc": {
-    "message": "Piekļūsti savām parolēm kustībā ar Bitwarden viedierīču lietotni!"
+    "message": "Piekļūsti savām parolēm kustībā ar Saigon Safe viedierīču lietotni!"
   },
   "getTheDesktopApp": {
     "message": "Iegūsti darbvirsmas lietotni"
@@ -5191,7 +5191,7 @@
     "message": "Piekļūsti savai glabātavai bez pārlūka, tad iestati atslēgšanu ar biometriju, lai paātrinātu atslēgšanu gan darbvirsmas lietotnē, gan pārlūka paplašinājumā!"
   },
   "downloadFromBitwardenNow": {
-    "message": "Lejupielādē no bitwarden.com tagad"
+    "message": "Lejupielādē no saigonsafe.com tagad"
   },
   "getItOnGooglePlay": {
     "message": "Iegūt to Google Play"
@@ -5656,10 +5656,10 @@
     "message": "Atslēgšana ar biometriju nav pieejama nepareizi konfigurētu sistēmas datņu dēļ."
   },
   "biometricsStatusHelptextDesktopDisconnected": {
-    "message": "Atslēgšana ar biometriju nav pieejama, jo Bitwarden darbvirsmas lietotne ir aizvērta."
+    "message": "Atslēgšana ar biometriju nav pieejama, jo Saigon Safe darbvirsmas lietotne ir aizvērta."
   },
   "biometricsStatusHelptextNotEnabledInDesktop": {
-    "message": "Atslēgšana ar biometriju nav pieejama, jo tā nav iespējota $EMAIL$ Bitwarden darbvirsmas lietotnē.",
+    "message": "Atslēgšana ar biometriju nav pieejama, jo tā nav iespējota $EMAIL$ Saigon Safe darbvirsmas lietotnē.",
     "placeholders": {
       "email": {
         "content": "$1",
@@ -5694,7 +5694,7 @@
     "description": "Notification message for when a password has been regenerated"
   },
   "saveToBitwarden": {
-    "message": "Saglabāt Bitwarden",
+    "message": "Saglabāt Saigon Safe",
     "description": "Confirmation message for saving a login to Bitwarden"
   },
   "spaceCharacterDescriptor": {
@@ -5920,13 +5920,13 @@
     "message": "Glabātava aizsargā vairāk kā tikai paroles. Drošā veidā glabā šeit pieteikšanās vienumus, identitātes, kartes un piezīmes!"
   },
   "introCarouselLabel": {
-    "message": "Laipni lūdzam Bitwarden"
+    "message": "Laipni lūdzam Saigon Safe"
   },
   "securityPrioritized": {
     "message": "Drošība pirmajā vietā"
   },
   "securityPrioritizedBody": {
-    "message": "Pieteikšanās vienumu, karšu un identitāšu glabāšana savā drošajā glabātavā. Bitwarden izmanto nulles zināšanu pilnīgu šifrēšanu, lai aizsargātu to, kas Tev ir svarīgs."
+    "message": "Pieteikšanās vienumu, karšu un identitāšu glabāšana savā drošajā glabātavā. Saigon Safe izmanto nulles zināšanu pilnīgu šifrēšanu, lai aizsargātu to, kas Tev ir svarīgs."
   },
   "quickLogin": {
     "message": "Ātra un vienkārša pieteikšanās"
@@ -5944,7 +5944,7 @@
     "message": "Tavi dati, kad un kur vien tie ir nepieciešami"
   },
   "secureDevicesBody": {
-    "message": "Neierobežotu paroļu skaitu var saglabāt neierobežotā ierīdžu daudzumā ar Bitwarden viedtālruņa, pārlūka un darbvirsmas lietotni."
+    "message": "Neierobežotu paroļu skaitu var saglabāt neierobežotā ierīdžu daudzumā ar Saigon Safe viedtālruņa, pārlūka un darbvirsmas lietotni."
   },
   "nudgeBadgeAria": {
     "message": "1 paziņojums"
@@ -5953,7 +5953,7 @@
     "message": "Ievietot esošas paroles"
   },
   "emptyVaultNudgeBody": {
-    "message": "Ievietotājs ir izmantojams, lai pieteikšanās vienumus ātri pārnest uz Bitwarden bez pašrocīgas to pievienošanas."
+    "message": "Ievietotājs ir izmantojams, lai pieteikšanās vienumus ātri pārnest uz Saigon Safe bez pašrocīgas to pievienošanas."
   },
   "emptyVaultNudgeButton": {
     "message": "Ievietot tagad"
@@ -6072,13 +6072,13 @@
     "message": "Par šo iestatījumu"
   },
   "permitCipherDetailsDescription": {
-    "message": "Bitwarden izmantos saglabātos pieteikšanās vienuma URI, lai noteiktu, kuru ikonu vai paroles nomaiņas URL izmantot, lai uzlabotu pieredzi. Šī pakalpojuma izmantošanas laikā nekāda informācija netiek ievākta vai saglabāta."
+    "message": "Saigon Safe izmantos saglabātos pieteikšanās vienuma URI, lai noteiktu, kuru ikonu vai paroles nomaiņas URL izmantot, lai uzlabotu pieredzi. Šī pakalpojuma izmantošanas laikā nekāda informācija netiek ievākta vai saglabāta."
   },
   "noPermissionsViewPage": {
     "message": "Nav atļaujas apskatīt šo lapu. Jāmēģina pieteikties ar citu kontu."
   },
   "wasmNotSupported": {
-    "message": "WebAssembly šajā pārlūkā netiek atbalstīts vai nav iespējots. WebAssebly ir nepieciešams, lai izmantotu Bitwarden lietotni.",
+    "message": "WebAssembly šajā pārlūkā netiek atbalstīts vai nav iespējots. WebAssebly ir nepieciešams, lai izmantotu Saigon Safe lietotni.",
     "description": "'WebAssembly' is a technical term and should not be translated."
   },
   "showMore": {
@@ -6153,7 +6153,7 @@
     "message": "Error: Cannot decrypt"
   },
   "removeMasterPasswordForOrgUserKeyConnector": {
-    "message": "Apvienība vairs neizmanto galvenās paroles, lai pieteiktos Bitwarden. Lai turpinātu, jāapliecina apvienība un domēns."
+    "message": "Apvienība vairs neizmanto galvenās paroles, lai pieteiktos Saigon Safe. Lai turpinātu, jāapliecina apvienība un domēns."
   },
   "continueWithLogIn": {
     "message": "Turpināt ar pieteikšanos"
@@ -6239,7 +6239,7 @@
     "message": "Set an unlock method to change your timeout action"
   },
   "sessionTimeoutSuppressedByConnectedDevice": {
-    "message": "Managed by the Bitwarden desktop app. Open the desktop app to edit."
+    "message": "Managed by the Saigon Safe desktop app. Open the desktop app to edit."
   },
   "percentageCompleted": {
     "message": "$PERCENT$% complete",
@@ -6335,13 +6335,13 @@
     "message": "Enter multiple emails by separating with a comma."
   },
   "emailPlaceholder": {
-    "message": "user@bitwarden.com , user@acme.com"
+    "message": "user@saigonsafe.com , user@acme.com"
   },
   "emailPlaceholderMultiple": {
-    "message": "user@bitwarden.com, user@acme.com"
+    "message": "user@saigonsafe.com, user@acme.com"
   },
   "downloadBitwardenApps": {
-    "message": "Download Bitwarden apps"
+    "message": "Download Saigon Safe apps"
   },
   "emailProtected": {
     "message": "Email protected"

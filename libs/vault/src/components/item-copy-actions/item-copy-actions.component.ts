@@ -7,6 +7,7 @@ import {
   CipherViewLike,
   CipherViewLikeUtils,
 } from "@bitwarden/common/vault/utils/cipher-view-like-utils";
+import { getVisibleNotes } from "@bitwarden/common/vault/utils/search-pin-utils";
 import { IconButtonModule, ItemModule, MenuModule } from "@bitwarden/components";
 import { CopyableCipherFields } from "@bitwarden/sdk-internal";
 
@@ -152,10 +153,15 @@ export class VaultItemCopyActionsComponent {
   /** Sets the number of populated secure note values for the cipher */
   private getNumberOfSecureNoteValues(cipher: CipherViewLike): number {
     if (CipherViewLikeUtils.isCipherListView(cipher)) {
-      return cipher.copyableFields.includes("SecureNotes") ? 1 : 0;
+      const notes = (cipher as { notes?: string | null }).notes;
+      if (notes !== undefined) {
+        return getVisibleNotes(notes).length > 0 ? 1 : 0;
+      }
+
+      return cipher.copyableFields?.includes("SecureNotes") ? 1 : 0;
     }
 
-    return cipher.notes ? 1 : 0;
+    return getVisibleNotes(cipher.notes).length > 0 ? 1 : 0;
   }
 
   /** Sets the number of populated SSH key values for the cipher */

@@ -14,6 +14,16 @@
 
 This repository houses all Bitwarden client applications except the mobile applications ([iOS](https://github.com/bitwarden/ios) | [android](https://github.com/bitwarden/android)).
 
+## This fork adds
+
+- `SaigonSafe` branding across the main app surfaces.
+- A large right-side browser panel on Chrome and Firefox instead of the small toolbar popup.
+- A `Generate` button in the vault header that creates, saves, and autofills a login for the current site.
+- A default email setting for generated logins, with automatic fallback to your most-used username.
+- Extra popup appearance controls such as theme, color palette, width, compact mode, and animations.
+- A hidden `Search PIN` field for exact-match vault lookup without exposing the value in visible notes.
+- Fewer upgrade, install-extension, and welcome nags in the browser, web, and desktop apps.
+
 Please refer to the [Clients section](https://contributing.bitwarden.com/getting-started/clients/) of the [Contributing Documentation](https://contributing.bitwarden.com/) for build instructions, recommended tooling, code style tips, and lots of other great information to get you started.
 
 ## Related projects:

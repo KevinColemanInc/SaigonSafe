@@ -10,6 +10,7 @@ import {
   CipherViewLike,
   CipherViewLikeUtils,
 } from "@bitwarden/common/vault/utils/cipher-view-like-utils";
+import { getVisibleNotes } from "@bitwarden/common/vault/utils/search-pin-utils";
 import { MenuItemComponent, BitIconButtonComponent } from "@bitwarden/components";
 import { CopyAction, CopyCipherFieldService } from "@bitwarden/vault";
 
@@ -133,7 +134,7 @@ export class CopyCipherFieldDirective implements OnChanges {
       case "address":
         return _cipher.identity?.fullAddressForCopy;
       case "secureNote":
-        return _cipher.notes;
+        return getVisibleNotes(_cipher.notes);
       case "privateKey":
         return _cipher.sshKey?.privateKey;
       case "publicKey":

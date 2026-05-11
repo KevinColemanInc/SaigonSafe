@@ -85,7 +85,7 @@ export const USER_CLOUD_REGION_KEY = new UserKeyDefinition<CloudRegion>(
 export const PRODUCTION_REGIONS: RegionConfig[] = [
   {
     key: Region.US,
-    domain: "bitwarden.com",
+    domain: "Saigon Safe",
     urls: {
       base: null,
       api: "https://api.bitwarden.com",
@@ -99,7 +99,7 @@ export const PRODUCTION_REGIONS: RegionConfig[] = [
   },
   {
     key: Region.EU,
-    domain: "bitwarden.eu",
+    domain: "Saigon Safe EU",
     urls: {
       base: null,
       api: "https://api.bitwarden.eu",
@@ -461,7 +461,7 @@ export class CloudEnvironment extends UrlEnvironment {
   }
 
   /**
-   * Cloud always returns nice urls, i.e. bitwarden.com instead of vault.bitwarden.com.
+   * Cloud always returns a user-facing region label instead of the raw web vault hostname.
    */
   getHostname() {
     return this.config.domain;

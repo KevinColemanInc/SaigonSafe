@@ -84,6 +84,7 @@ import { FieldView } from "../models/view/field.view";
 import { PasswordHistoryView } from "../models/view/password-history.view";
 import { AddEditCipherInfo } from "../types/add-edit-cipher-info";
 import { CipherViewLike, CipherViewLikeUtils } from "../utils/cipher-view-like-utils";
+import { hasSearchPin } from "../utils/search-pin-utils";
 
 import {
   ADD_EDIT_CIPHER_INFO_KEY,
@@ -592,6 +593,10 @@ export class CipherService implements CipherServiceAbstraction {
       }
 
       if (CipherViewLikeUtils.isArchived(cipher)) {
+        return false;
+      }
+
+      if (hasSearchPin(cipher.notes)) {
         return false;
       }
 

@@ -269,6 +269,20 @@
             <input formControlName="enableAutoTotpCopy" bitCheckbox id="totp" type="checkbox" />
             <bit-label for="totp">{{ "enableAutoTotpCopy" | i18n }}</bit-label>
           </bit-form-control>
+          <bit-form-field>
+            <bit-label for="generatedLoginDefaultEmail">
+              {{ "generatedLoginDefaultEmail" | i18n }}
+            </bit-label>
+            <input
+              formControlName="generatedLoginDefaultEmail"
+              bitInput
+              id="generatedLoginDefaultEmail"
+              type="text"
+            />
+            <bit-hint class="tw-text-sm">
+              {{ "generatedLoginDefaultEmailDesc" | i18n }}
+            </bit-hint>
+          </bit-form-field>
           <bit-form-field
             id="clearClipboardField"
             [disableMargin]="isDefaultUriMatchDisabledByPolicy"

@@ -13,6 +13,7 @@ import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/pl
 // FIXME (PM-22628): Popup imports are forbidden in background
 // eslint-disable-next-line no-restricted-imports
 import { openUnlockPopout } from "../auth/popup/utils/auth-popout-window";
+import type { LockedVaultPendingNotificationsData } from "../autofill/background/abstractions/notification.background";
 import { BrowserApi } from "../platform/browser/browser-api";
 
 import MainBackground from "./main.background";
@@ -44,8 +45,11 @@ export default class CommandsBackground {
     });
 
     if (chrome && chrome.commands) {
-      chrome.commands.onCommand.addListener(async (command: string) => {
-        await this.processCommand(command);
+      chrome.commands.onCommand.addListener(async (command: string, tab?: chrome.tabs.Tab) => {
+        await this.processCommand(
+          command,
+          tab ? ({ tab } as chrome.runtime.MessageSender) : undefined,
+        );
       });
     }
   }
@@ -99,22 +103,91 @@ export default class CommandsBackground {
     }
 
     if ((await this.authService.getAuthStatus()) < AuthenticationStatus.Unlocked) {
-      await openUnlockPopout(tab, {
-        commandToRetry: {
-          message: {
-            command:
-              commandSender === ExtensionCommand.AutofillCommand
-                ? ExtensionCommand.AutofillLogin
-                : commandSender,
-          },
-          sender: { tab: tab },
-        },
-        target: "commands.background",
-      });
+      const pendingNotification = this.buildLockedVaultPendingNotification(tab, commandSender);
+
+      if (await this.openLockedExtensionView(tab, pendingNotification)) {
+        return;
+      }
+
+      await openUnlockPopout(tab, pendingNotification);
       return;
     }
 
     await this.main.collectPageDetailsForContentScript(tab, commandSender);
+  }
+
+  private buildLockedVaultPendingNotification(
+    tab: chrome.tabs.Tab,
+    commandSender: ExtensionCommandType,
+  ): LockedVaultPendingNotificationsData {
+    return {
+      commandToRetry: {
+        message: {
+          command:
+            commandSender === ExtensionCommand.AutofillCommand
+              ? ExtensionCommand.AutofillLogin
+              : commandSender,
+        },
+        sender: { tab: tab },
+      },
+      target: "commands.background",
+    };
+  }
+
+  private async openLockedExtensionView(
+    tab: chrome.tabs.Tab,
+    pendingNotification: LockedVaultPendingNotificationsData,
+  ): Promise<boolean> {
+    try {
+      const extensionViewOpened = await this.openExtensionViewForLockedCommand(tab);
+      if (!extensionViewOpened) {
+        return false;
+      }
+    } catch (error) {
+      this.main.logService.error(error);
+      return false;
+    }
+
+    await BrowserApi.tabSendMessageData(
+      tab,
+      "addToLockedVaultPendingNotifications",
+      pendingNotification,
+    );
+    await BrowserApi.tabSendMessageData(tab, "bgUnlockPopoutOpened", {});
+    return true;
+  }
+
+  private async openExtensionViewForLockedCommand(tab: chrome.tabs.Tab): Promise<boolean> {
+    const sidebarAction = BrowserApi.getSidebarAction(self) as {
+      open?: () => Promise<void>;
+    } | null;
+
+    if (typeof sidebarAction?.open === "function") {
+      await sidebarAction.open();
+      return true;
+    }
+
+    const chromeWithSidePanel = chrome as typeof chrome & {
+      sidePanel?: {
+        open?: (options: { tabId?: number; windowId?: number }) => Promise<void>;
+      };
+    };
+
+    if (typeof chromeWithSidePanel.sidePanel?.open !== "function") {
+      return false;
+    }
+
+    if (tab.id != null) {
+      await chromeWithSidePanel.sidePanel.open({ tabId: tab.id });
+      return true;
+    }
+
+    if (tab.windowId != null) {
+      await chromeWithSidePanel.sidePanel.open({ windowId: tab.windowId });
+      return true;
+    }
+
+    return false;
   }
 
   private async openPopup() {

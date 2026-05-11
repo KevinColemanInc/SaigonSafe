@@ -80,11 +80,12 @@ describe("AdditionalOptionsSectionComponent", () => {
   it("patches 'additionalOptionsForm' changes to CipherFormContainer", () => {
     component.additionalOptionsForm.patchValue({
       notes: "new notes",
+      searchPin: "1234",
       reprompt: true,
     });
 
     const expectedCipher = new CipherView();
-    expectedCipher.notes = "new notes";
+    expectedCipher.notes = "new notes\n<!--BW-SEARCH-PIN:1234-->";
     expectedCipher.reprompt = CipherRepromptType.Password;
 
     expect(cipherFormProvider.patchCipher).toHaveBeenCalled();
@@ -108,7 +109,7 @@ describe("AdditionalOptionsSectionComponent", () => {
 
   it("initializes 'additionalOptionsForm' from `getInitialCipherValue`", () => {
     getInitialCipherView.mockReturnValueOnce({
-      notes: "original notes",
+      notes: "original notes\n<!--BW-SEARCH-PIN:1234-->",
       reprompt: 1,
     } as CipherView);
 
@@ -116,6 +117,7 @@ describe("AdditionalOptionsSectionComponent", () => {
 
     expect(component.additionalOptionsForm.value).toEqual({
       notes: "original notes",
+      searchPin: "1234",
       reprompt: true,
     });
   });

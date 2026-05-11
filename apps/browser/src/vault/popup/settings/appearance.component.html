@@ -21,6 +21,101 @@
       </bit-form-field>
 
       <bit-form-field>
+        <bit-label>Color palette</bit-label>
+        <bit-select formControlName="palette">
+          <bit-option
+            *ngFor="let option of paletteOptions"
+            [value]="option.value"
+            [label]="option.label"
+          ></bit-option>
+        </bit-select>
+      </bit-form-field>
+
+      @if (selectedPaletteOption; as palette) {
+        <div
+          class="tw-mb-4 tw-rounded-xl tw-border tw-border-solid tw-border-secondary-100 tw-bg-background-alt tw-p-3"
+        >
+          <div class="tw-flex tw-items-start tw-justify-between tw-gap-3">
+            <div>
+              <p class="tw-m-0 tw-text-sm tw-font-medium tw-text-main">{{ palette.label }}</p>
+              <p class="tw-m-0 tw-mt-1 tw-text-xs tw-text-muted">{{ palette.description }}</p>
+            </div>
+            <div class="tw-flex tw-gap-1.5">
+              <span
+                *ngFor="let swatch of palette.preview.light.swatches"
+                class="tw-h-3 tw-w-3 tw-rounded-full tw-border tw-border-solid tw-border-black/5"
+                [style.background-color]="swatch"
+              ></span>
+            </div>
+          </div>
+
+          <div class="tw-mt-3 tw-grid tw-gap-2 tw-min-[420px]:tw-grid-cols-2">
+            <div
+              class="tw-rounded-lg tw-border tw-border-solid tw-p-3"
+              [style.background-color]="palette.preview.light.surface"
+              [style.border-color]="palette.preview.light.surfaceAlt"
+              [style.color]="palette.preview.light.text"
+            >
+              <div class="tw-flex tw-items-center tw-justify-between tw-gap-2">
+                <p class="tw-m-0 tw-text-xs tw-font-medium">Light</p>
+                <div class="tw-flex tw-gap-1">
+                  <span
+                    *ngFor="let swatch of palette.preview.light.swatches"
+                    class="tw-h-2.5 tw-w-2.5 tw-rounded-full"
+                    [style.background-color]="swatch"
+                  ></span>
+                </div>
+              </div>
+              <div
+                class="tw-mt-3 tw-rounded-md tw-px-3 tw-py-2 tw-text-xs"
+                [style.background-color]="palette.preview.light.surfaceAlt"
+              >
+                Quiet surface
+              </div>
+              <span
+                class="tw-mt-2 tw-inline-flex tw-items-center tw-rounded-md tw-px-3 tw-py-1.5 tw-text-xs tw-font-medium"
+                [style.background-color]="palette.preview.light.accent"
+                style="color: #ffffff"
+              >
+                Primary action
+              </span>
+            </div>
+
+            <div
+              class="tw-rounded-lg tw-border tw-border-solid tw-p-3"
+              [style.background-color]="palette.preview.dark.surface"
+              [style.border-color]="palette.preview.dark.surfaceAlt"
+              [style.color]="palette.preview.dark.text"
+            >
+              <div class="tw-flex tw-items-center tw-justify-between tw-gap-2">
+                <p class="tw-m-0 tw-text-xs tw-font-medium">Dark</p>
+                <div class="tw-flex tw-gap-1">
+                  <span
+                    *ngFor="let swatch of palette.preview.dark.swatches"
+                    class="tw-h-2.5 tw-w-2.5 tw-rounded-full"
+                    [style.background-color]="swatch"
+                  ></span>
+                </div>
+              </div>
+              <div
+                class="tw-mt-3 tw-rounded-md tw-px-3 tw-py-2 tw-text-xs"
+                [style.background-color]="palette.preview.dark.surfaceAlt"
+              >
+                Quiet surface
+              </div>
+              <span
+                class="tw-mt-2 tw-inline-flex tw-items-center tw-rounded-md tw-px-3 tw-py-1.5 tw-text-xs tw-font-medium"
+                [style.background-color]="palette.preview.dark.accent"
+                [style.color]="palette.preview.dark.surface"
+              >
+                Primary action
+              </span>
+            </div>
+          </div>
+        </div>
+      }
+
+      <bit-form-field>
         <bit-label>{{ "extensionWidth" | i18n }}</bit-label>
         <bit-select formControlName="width" [items]="widthOptions"></bit-select>
       </bit-form-field>

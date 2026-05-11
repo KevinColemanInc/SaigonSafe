@@ -11,6 +11,7 @@ import { MigrationRunner } from "@bitwarden/common/platform/services/migration-r
 
 import BrowserPopupUtils from "../../platform/browser/browser-popup-utils";
 import { PopupSizeService } from "../../platform/popup/layout/popup-size.service";
+import { PopupColorPaletteService } from "../../platform/popup/theming/popup-color-palette.service";
 import { PopupViewCacheService } from "../../platform/popup/view-cache/popup-view-cache.service";
 
 @Injectable()
@@ -24,6 +25,7 @@ export class InitService {
     private twoFactorService: TwoFactorService,
     private logService: LogServiceAbstraction,
     private themingService: AbstractThemingService,
+    private popupColorPaletteService: PopupColorPaletteService,
     private sdkLoadService: SdkLoadService,
     private viewCacheService: PopupViewCacheService,
     private readonly migrationRunner: MigrationRunner,
@@ -41,6 +43,7 @@ export class InitService {
 
       const htmlEl = window.document.documentElement;
       this.themingService.applyThemeChangesTo(this.document);
+      this.popupColorPaletteService.init(this.document);
       htmlEl.classList.add("locale_" + this.i18nService.translationLocale);
 
       // Workaround for slow performance on external monitors on Chrome + MacOS

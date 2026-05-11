@@ -7,6 +7,7 @@ import { BehaviorSubject } from "rxjs";
 
 import { JslibModule } from "@bitwarden/angular/jslib.module";
 import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
+import { AutofillSettingsServiceAbstraction } from "@bitwarden/common/autofill/services/autofill-settings.service";
 import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import { Utils } from "@bitwarden/common/platform/misc/utils";
@@ -23,6 +24,7 @@ import { FakeGlobalStateProvider } from "@bitwarden/state-test-utils";
 
 import { BrowserApi } from "../../../../../platform/browser/browser-api";
 import BrowserPopupUtils from "../../../../../platform/browser/browser-popup-utils";
+import { GeneratedLoginItemService } from "../../../services/generated-login-item.service";
 
 import { NewItemDropdownComponent, NewItemInitialValues } from "./new-item-dropdown.component";
 
@@ -31,10 +33,13 @@ describe("NewItemDropdownComponent", () => {
   let fixture: ComponentFixture<NewItemDropdownComponent>;
   let dialogServiceMock: jest.Mocked<DialogService>;
   let configServiceMock: jest.Mocked<ConfigService>;
+  let generatedLoginItemServiceMock: jest.Mocked<GeneratedLoginItemService>;
   const browserApiMock: jest.Mocked<typeof BrowserApi> = mock<typeof BrowserApi>();
   let restrictedItemTypesServiceMock: jest.Mocked<RestrictedItemTypesService>;
+  let autofillSettingsServiceMock: jest.Mocked<AutofillSettingsServiceAbstraction>;
 
   const mockTab = { url: "https://example.com" };
+  const generatedLoginDefaultEmail$ = new BehaviorSubject("user@example.com");
 
   const featureFlagSubject = new BehaviorSubject<boolean>(false);
   let navigate: jest.SpyInstance;
@@ -51,6 +56,11 @@ describe("NewItemDropdownComponent", () => {
     configServiceMock = mock<ConfigService>();
     configServiceMock.getFeatureFlag$.mockReturnValue(featureFlagSubject.asObservable());
     featureFlagSubject.next(false);
+    generatedLoginItemServiceMock = mock<GeneratedLoginItemService>();
+    generatedLoginItemServiceMock.createAndAutofillLogin.mockResolvedValue(true);
+    autofillSettingsServiceMock = mock<AutofillSettingsServiceAbstraction>();
+    autofillSettingsServiceMock.generatedLoginDefaultEmail$ = generatedLoginDefaultEmail$;
+    generatedLoginDefaultEmail$.next("user@example.com");
 
     const activatedRouteMock = {
       snapshot: { paramMap: { get: jest.fn() } },
@@ -84,6 +94,8 @@ describe("NewItemDropdownComponent", () => {
         { provide: FolderService, useValue: folderServiceMock },
         { provide: FolderApiServiceAbstraction, useValue: folderApiServiceAbstractionMock },
         { provide: AccountService, useValue: accountServiceMock },
+        { provide: AutofillSettingsServiceAbstraction, useValue: autofillSettingsServiceMock },
+        { provide: GeneratedLoginItemService, useValue: generatedLoginItemServiceMock },
         { provide: RestrictedItemTypesService, useValue: restrictedItemTypesServiceMock },
         { provide: GlobalStateProvider, useValue: new FakeGlobalStateProvider() },
       ],
@@ -239,6 +251,63 @@ describe("NewItemDropdownComponent", () => {
           collectionId: undefined,
         },
       });
+    });
+  });
+
+  describe("generateLogin", () => {
+    it("creates and autofills a generated login using the current tab and initial values", async () => {
+      component.initialValues = {
+        folderId: "folder-1",
+        organizationId: "org-1" as any,
+        collectionId: "col-1" as any,
+      };
+
+      await component.ngOnInit();
+      await component.generateLogin();
+
+      expect(generatedLoginItemServiceMock.createAndAutofillLogin).toHaveBeenCalledWith(
+        "user@example.com",
+        component.initialValues,
+        mockTab,
+      );
+    });
+
+    it("passes an empty default email through so the service can fall back to history", async () => {
+      generatedLoginDefaultEmail$.next("   ");
+
+      await component.ngOnInit();
+      await component.generateLogin();
+
+      expect(generatedLoginItemServiceMock.createAndAutofillLogin).toHaveBeenCalledWith(
+        "",
+        component.initialValues,
+        mockTab,
+      );
+    });
+
+    it("does not disable generate when the current tab is available but the default email is blank", async () => {
+      generatedLoginDefaultEmail$.next("   ");
+
+      await component.ngOnInit();
+      fixture.detectChanges();
+
+      const buttons = fixture.debugElement.queryAll(By.css("button"));
+      const generateButton = buttons[1].nativeElement as HTMLButtonElement;
+
+      expect(generateButton.disabled).toBe(false);
+    });
+
+    it("still calls the service when there is no current tab so the failure reason can be shown", async () => {
+      jest.spyOn(BrowserPopupUtils, "inPopout").mockReturnValue(true);
+
+      await component.ngOnInit();
+      await component.generateLogin();
+
+      expect(generatedLoginItemServiceMock.createAndAutofillLogin).toHaveBeenCalledWith(
+        "user@example.com",
+        component.initialValues,
+        undefined,
+      );
     });
   });
 });

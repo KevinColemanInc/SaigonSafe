@@ -7,6 +7,7 @@ import { Router, RouterLink } from "@angular/router";
 import { map, Observable } from "rxjs";
 
 import { JslibModule } from "@bitwarden/angular/jslib.module";
+import { AutofillSettingsServiceAbstraction } from "@bitwarden/common/autofill/services/autofill-settings.service";
 import { FeatureFlag } from "@bitwarden/common/enums/feature-flag.enum";
 import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { CollectionId, OrganizationId } from "@bitwarden/common/types/guid";
@@ -18,6 +19,7 @@ import { AddEditFolderDialogComponent } from "@bitwarden/vault";
 
 import { BrowserApi } from "../../../../../platform/browser/browser-api";
 import BrowserPopupUtils from "../../../../../platform/browser/browser-popup-utils";
+import { GeneratedLoginItemService } from "../../../services/generated-login-item.service";
 import { AddEditQueryParams } from "../add-edit/add-edit.component";
 
 export interface NewItemInitialValues {
@@ -35,7 +37,8 @@ export interface NewItemInitialValues {
 })
 export class NewItemDropdownComponent implements OnInit {
   cipherType = CipherType;
-  private tab?: chrome.tabs.Tab;
+  protected tab?: chrome.tabs.Tab;
+  generatingLogin = false;
   /**
    * Optional initial values to pass to the add cipher form
    */
@@ -61,14 +64,35 @@ export class NewItemDropdownComponent implements OnInit {
     { initialValue: false },
   );
 
+  readonly canGenerateLogin = toSignal(
+    this.cipherMenuItems$.pipe(
+      map((menuItems) => menuItems.some((menuItem) => menuItem.type === CipherType.Login)),
+    ),
+    { initialValue: false },
+  );
+
+  readonly generatedLoginDefaultEmail = toSignal(
+    this.autofillSettingsService.generatedLoginDefaultEmail$.pipe(
+      map((defaultEmail) => defaultEmail.trim()),
+    ),
+    { initialValue: "" },
+  );
+
   constructor(
+    private autofillSettingsService: AutofillSettingsServiceAbstraction,
     private dialogService: DialogService,
+    private generatedLoginItemService: GeneratedLoginItemService,
     private restrictedItemTypeService: RestrictedItemTypesService,
     private configService: ConfigService,
     private router: Router,
   ) {}
 
   async ngOnInit() {
+    if (BrowserPopupUtils.inPopout(window)) {
+      this.tab = undefined;
+      return;
+    }
+
     this.tab = await BrowserApi.getTabFromCurrentWindow();
   }
 
@@ -94,6 +118,24 @@ export class NewItemDropdownComponent implements OnInit {
 
   openFolderDialog() {
     AddEditFolderDialogComponent.open(this.dialogService);
+  }
+
+  async generateLogin() {
+    if (this.generatingLogin || !this.canGenerateLogin()) {
+      return;
+    }
+
+    this.generatingLogin = true;
+
+    try {
+      await this.generatedLoginItemService.createAndAutofillLogin(
+        this.generatedLoginDefaultEmail(),
+        this.initialValues,
+        this.tab,
+      );
+    } finally {
+      this.generatingLogin = false;
+    }
   }
 
   navigateToNewItemPage(): void {

@@ -140,6 +140,7 @@ export class AutofillComponent implements OnInit {
     enableFillAssist: new FormControl(),
     enableContextMenuItem: new FormControl(),
     enableAutoTotpCopy: new FormControl(),
+    generatedLoginDefaultEmail: new FormControl("", { updateOn: "blur" }),
     clearClipboard: new FormControl(),
     defaultUriMatch: new FormControl(),
   });
@@ -325,6 +326,15 @@ export class AutofillComponent implements OnInit {
       emitEvent: false,
     });
 
+    const generatedLoginDefaultEmail = await firstValueFrom(
+      this.autofillSettingsService.generatedLoginDefaultEmail$,
+    );
+
+    this.additionalOptionsForm.controls.generatedLoginDefaultEmail.patchValue(
+      generatedLoginDefaultEmail,
+      { emitEvent: false },
+    );
+
     this.clearClipboard = await firstValueFrom(this.autofillSettingsService.clearClipboardDelay$);
 
     this.additionalOptionsForm.controls.clearClipboard.patchValue(this.clearClipboard, {
@@ -353,6 +363,20 @@ export class AutofillComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((value) => {
         void this.autofillSettingsService.setAutoCopyTotp(value);
+      });
+
+    this.additionalOptionsForm.controls.generatedLoginDefaultEmail.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((value) => {
+        const trimmedValue = value?.trim() ?? "";
+
+        if (trimmedValue !== value) {
+          this.additionalOptionsForm.controls.generatedLoginDefaultEmail.patchValue(trimmedValue, {
+            emitEvent: false,
+          });
+        }
+
+        void this.autofillSettingsService.setGeneratedLoginDefaultEmail(trimmedValue);
       });
 
     this.additionalOptionsForm.controls.clearClipboard.valueChanges

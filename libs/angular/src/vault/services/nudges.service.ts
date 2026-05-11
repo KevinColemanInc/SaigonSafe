@@ -86,7 +86,7 @@ export class NudgesService {
     [NudgeType.VaultSettingsImportNudge]: inject(VaultSettingsImportNudgeService),
     [NudgeType.AccountSecurity]: inject(AccountSecurityNudgeService),
     [NudgeType.AutofillNudge]: this.autofillNudgeService ?? this.noOpNudgeService,
-    [NudgeType.DownloadBitwarden]: this.newAcctNudgeService,
+    [NudgeType.DownloadBitwarden]: this.noOpNudgeService,
     [NudgeType.GeneratorNudgeStatus]: this.newAcctNudgeService,
     [NudgeType.NewLoginItemStatus]: this.newItemNudgeService,
     [NudgeType.NewCardItemStatus]: this.newItemNudgeService,
@@ -95,6 +95,7 @@ export class NudgesService {
     [NudgeType.NewSshItemStatus]: this.newItemNudgeService,
     [NudgeType.NewBankAccountItemStatus]: this.newItemNudgeService,
     [NudgeType.AutoConfirmNudge]: this.autoConfirmNudgeService ?? this.noOpNudgeService,
+    [NudgeType.PremiumUpgrade]: this.noOpNudgeService,
   };
 
   /**

@@ -1,16 +1,16 @@
 {
   "appName": {
-    "message": "Bitwarden"
+    "message": "Saigon Safe"
   },
   "appLogoLabel": {
-    "message": "Bitwarden-Logo"
+    "message": "Saigon Safe-Logo"
   },
   "extName": {
-    "message": "Bitwarden Passwortmanager",
+    "message": "Kevinwarden Password Manager",
     "description": "Extension name, MUST be less than 40 characters (Safari restriction)"
   },
   "extDesc": {
-    "message": "Bitwarden schützt alle deine Passwörter, Passkeys und vertrauliche Informationen - egal, wo du bist.",
+    "message": "Saigon Safe schützt alle deine Passwörter, Passkeys und vertrauliche Informationen - egal, wo du bist.",
     "description": "Extension description, MUST be less than 112 characters (Safari restriction)"
   },
   "loginOrCreateNewAccount": {
@@ -23,7 +23,7 @@
     "message": "Konto erstellen"
   },
   "newToBitwarden": {
-    "message": "Neu bei Bitwarden?"
+    "message": "Neu bei Saigon Safe?"
   },
   "logInWithPasskey": {
     "message": "Mit Passkey anmelden"
@@ -300,22 +300,22 @@
     "message": "Weiter zur Web-App?"
   },
   "continueToWebAppDesc": {
-    "message": "Entdecke weitere Funktionen deines Bitwarden-Kontos in der Web-App."
+    "message": "Entdecke weitere Funktionen deines Saigon Safe-Kontos in der Web-App."
   },
   "continueToHelpCenter": {
     "message": "Weiter zum Hilfezentrum?"
   },
   "continueToHelpCenterDesc": {
-    "message": "Erfahre mehr über die Verwendung von Bitwarden im Hilfezentrum."
+    "message": "Erfahre mehr über die Verwendung von Saigon Safe im Hilfezentrum."
   },
   "continueToBrowserExtensionStore": {
     "message": "Weiter zum Store für Browser-Erweiterungen?"
   },
   "continueToBrowserExtensionStoreDesc": {
-    "message": "Hilf anderen herauszufinden, ob Bitwarden für sie das Richtige ist. Besuch den Erweiterungs-Store deines Browsers und hinterlasse jetzt eine Bewertung."
+    "message": "Hilf anderen herauszufinden, ob Saigon Safe für sie das Richtige ist. Besuch den Erweiterungs-Store deines Browsers und hinterlasse jetzt eine Bewertung."
   },
   "changeMasterPasswordOnWebConfirmation": {
-    "message": "Du kannst dein Master-Passwort in der Bitwarden Web-App ändern."
+    "message": "Du kannst dein Master-Passwort in der Saigon Safe Web-App ändern."
   },
   "fingerprintPhrase": {
     "message": "Fingerabdruck-Phrase",
@@ -332,43 +332,43 @@
     "message": "Abmelden"
   },
   "aboutBitwarden": {
-    "message": "Über Bitwarden"
+    "message": "Über Saigon Safe"
   },
   "about": {
     "message": "Über uns"
   },
   "moreFromBitwarden": {
-    "message": "Mehr von Bitwarden"
+    "message": "Mehr von Saigon Safe"
   },
   "continueToBitwardenDotCom": {
-    "message": "Weiter zu bitwarden.com?"
+    "message": "Weiter zu saigonsafe.com?"
   },
   "bitwardenForBusiness": {
-    "message": "Bitwarden für Unternehmen"
+    "message": "Saigon Safe für Unternehmen"
   },
   "bitwardenAuthenticator": {
-    "message": "Bitwarden Authenticator"
+    "message": "Saigon Safe Authenticator"
   },
   "continueToAuthenticatorPageDesc": {
-    "message": "Mit dem Bitwarden Authenticator kannst du Authentifizierungsschlüssel speichern und TOTP-Codes für Zwei-Faktor-Verifizierungsprozesse generieren. Erfahre mehr auf der bitwarden.com Website"
+    "message": "Mit dem Saigon Safe Authenticator kannst du Authentifizierungsschlüssel speichern und TOTP-Codes für Zwei-Faktor-Verifizierungsprozesse generieren. Erfahre mehr auf der saigonsafe.com Website"
   },
   "bitwardenSecretsManager": {
-    "message": "Bitwarden Secrets Manager"
+    "message": "Saigon Safe Secrets Manager"
   },
   "continueToSecretsManagerPageDesc": {
-    "message": "Speicher, verwalte und teile Entwicklergeheimnisse sicher mit dem Bitwarden Secrets Manager. Erfahre mehr auf der bitwarden.com Website."
+    "message": "Speicher, verwalte und teile Entwicklergeheimnisse sicher mit dem Saigon Safe Secrets Manager. Erfahre mehr auf der saigonsafe.com Website."
   },
   "passwordlessDotDev": {
     "message": "Passwordless.dev"
   },
   "continueToPasswordlessDotDevPageDesc": {
-    "message": "Erstelle reibungslose und sichere Anmeldeerfahrungen ohne herkömmliche Passwörter mit Passwordless.dev. Erfahre mehr auf der bitwarden.com Website."
+    "message": "Erstelle reibungslose und sichere Anmeldeerfahrungen ohne herkömmliche Passwörter mit Passwordless.dev. Erfahre mehr auf der saigonsafe.com Website."
   },
   "freeBitwardenFamilies": {
-    "message": "Free Bitwarden Families"
+    "message": "Free Saigon Safe Families"
   },
   "freeBitwardenFamiliesPageDesc": {
-    "message": "Du bist für Free Bitwarden Families berechtigt. Löse dieses Angebot heute in der Web-App ein."
+    "message": "Du bist für Free Saigon Safe Families berechtigt. Löse dieses Angebot heute in der Web-App ein."
   },
   "version": {
     "message": "Version"
@@ -428,13 +428,13 @@
     "message": "Hilfe & Feedback"
   },
   "helpCenter": {
-    "message": "Bitwarden Hilfezentrum"
+    "message": "Saigon Safe Hilfezentrum"
   },
   "communityForums": {
-    "message": "Bitwarden Community-Foren erkunden"
+    "message": "Saigon Safe Community-Foren erkunden"
   },
   "contactSupport": {
-    "message": "Bitwarden Support kontaktieren"
+    "message": "Saigon Safe Support kontaktieren"
   },
   "sync": {
     "message": "Synchronisierung"
@@ -456,7 +456,7 @@
     "message": "Generiert automatisch ein starkes und einzigartiges Passwort."
   },
   "bitWebVaultApp": {
-    "message": "Bitwarden Web-App"
+    "message": "Saigon Safe Web-App"
   },
   "select": {
     "message": "Auswählen"
@@ -919,10 +919,10 @@
     "message": "Zwei-Faktor-Authentifizierung nahtlos gestalten"
   },
   "totpHelper": {
-    "message": "Bitwarden kann Zwei-Faktor-Authentifizierungsscodes speichern und ausfüllen. Kopiere und füge den Schlüssel in dieses Feld ein."
+    "message": "Saigon Safe kann Zwei-Faktor-Authentifizierungsscodes speichern und ausfüllen. Kopiere und füge den Schlüssel in dieses Feld ein."
   },
   "totpHelperWithCapture": {
-    "message": "Bitwarden kann Zwei-Faktor-Authentifizierungsscodes speichern und ausfüllen. Wähle das Kamerasymbol aus, um einen Screenshot des Authenticator-QR-Codes dieser Website zu machen oder kopiere und füge den Schlüssel in dieses Feld ein."
+    "message": "Saigon Safe kann Zwei-Faktor-Authentifizierungsscodes speichern und ausfüllen. Wähle das Kamerasymbol aus, um einen Screenshot des Authenticator-QR-Codes dieser Website zu machen oder kopiere und füge den Schlüssel in dieses Feld ein."
   },
   "learnMoreAboutAuthenticators": {
     "message": "Erfahre mehr über Authenticator-Apps"
@@ -943,7 +943,7 @@
     "message": "Anmelden"
   },
   "logInToBitwarden": {
-    "message": "Bei Bitwarden anmelden"
+    "message": "Bei Saigon Safe anmelden"
   },
   "enterTheCodeSentToYourEmail": {
     "message": "Gib den an deine E-Mail-Adresse gesendeten Code ein"
@@ -1003,10 +1003,10 @@
     "message": "Ordner hinzugefügt"
   },
   "twoStepLoginConfirmation": {
-    "message": "Mit der Zwei-Faktor-Authentifizierung wird dein Konto zusätzlich abgesichert, da jede Anmeldung mit einem anderen Gerät wie einem Sicherheitsschlüssel, einer Authentifizierungs-App, einer SMS, einem Anruf oder einer E-Mail verifiziert werden muss. Die Zwei-Faktor-Authentifizierung kann im bitwarden.com Web-Tresor aktiviert werden. Möchtest du die Website jetzt öffnen?"
+    "message": "Mit der Zwei-Faktor-Authentifizierung wird dein Konto zusätzlich abgesichert, da jede Anmeldung mit einem anderen Gerät wie einem Sicherheitsschlüssel, einer Authentifizierungs-App, einer SMS, einem Anruf oder einer E-Mail verifiziert werden muss. Die Zwei-Faktor-Authentifizierung kann im saigonsafe.com Web-Tresor aktiviert werden. Möchtest du die Website jetzt öffnen?"
   },
   "twoStepLoginConfirmationContent": {
-    "message": "Mache dein Konto sicherer, indem du eine Zwei-Faktor-Authentifizierung in der Bitwarden Web-App einrichtest."
+    "message": "Mache dein Konto sicherer, indem du eine Zwei-Faktor-Authentifizierung in der Saigon Safe Web-App einrichtest."
   },
   "twoStepLoginConfirmationTitle": {
     "message": "Weiter zur Web-App?"
@@ -1158,7 +1158,7 @@
     "message": "Zur Einstellung wechseln"
   },
   "notificationAddDesc": {
-    "message": "Soll Bitwarden sich dieses Passwort merken?"
+    "message": "Soll Saigon Safe sich dieses Passwort merken?"
   },
   "notificationAddSave": {
     "message": "Speichern"
@@ -1194,11 +1194,11 @@
     }
   },
   "notificationLoginSaveConfirmation": {
-    "message": "in Bitwarden gespeichert.",
+    "message": "in Saigon Safe gespeichert.",
     "description": "Shown to user after item is saved."
   },
   "notificationLoginUpdatedConfirmation": {
-    "message": "in Bitwarden aktualisiert.",
+    "message": "in Saigon Safe aktualisiert.",
     "description": "Shown to user after item is updated."
   },
   "selectItemAriaLabel": {
@@ -1296,13 +1296,13 @@
     "message": "Danach fragen neue Passkeys zu speichern oder sich mit in deinem Tresor gespeicherten Passkeys anmelden. Gilt für alle angemeldeten Konten."
   },
   "notificationChangeDesc": {
-    "message": "Möchtest du dieses Passwort in Bitwarden aktualisieren?"
+    "message": "Möchtest du dieses Passwort in Saigon Safe aktualisieren?"
   },
   "notificationChangeSave": {
     "message": "Aktualisieren"
   },
   "notificationUnlockDesc": {
-    "message": "Entsperre deinen Bitwarden Tresor, um die Auto-Ausfüllen-Anfrage abzuschließen."
+    "message": "Entsperre deinen Saigon Safe Tresor, um die Auto-Ausfüllen-Anfrage abzuschließen."
   },
   "notificationUnlock": {
     "message": "Entsperren"
@@ -1378,10 +1378,10 @@
     "message": "Dieses Passwort wird zum Exportieren und Importieren dieser Datei verwendet"
   },
   "accountRestrictedOptionDescription": {
-    "message": "Verwende den Verschlüsselungsschlüssel deines Kontos, abgeleitet vom Benutzernamen und Master-Passwort, um den Export zu verschlüsseln und den Import auf das aktuelle Bitwarden-Konto zu beschränken."
+    "message": "Verwende den Verschlüsselungsschlüssel deines Kontos, abgeleitet vom Benutzernamen und Master-Passwort, um den Export zu verschlüsseln und den Import auf das aktuelle Saigon Safe-Konto zu beschränken."
   },
   "passwordProtectedOptionDescription": {
-    "message": "Lege ein Dateipasswort fest, um den Export zu verschlüsseln und importiere ihn in ein beliebiges Bitwarden-Konto, wobei das Passwort zum Entschlüsseln genutzt wird."
+    "message": "Lege ein Dateipasswort fest, um den Export zu verschlüsseln und importiere ihn in ein beliebiges Saigon Safe-Konto, wobei das Passwort zum Entschlüsseln genutzt wird."
   },
   "exportTypeHeading": {
     "message": "Exporttyp"
@@ -1410,7 +1410,7 @@
     "message": "Dieser Export verschlüsselt deine Daten mit dem Verschlüsselungscode deines Kontos. Falls du deinen Verschlüsselungscode erneuerst, solltest du den Export erneut durchführen, da du die zuvor erstellte Datei ansonsten nicht mehr entschlüsseln kannst."
   },
   "encExportAccountWarningDesc": {
-    "message": "Die Verschlüsselungscodes eines Kontos sind für jedes Bitwarden Benutzerkonto einzigartig, deshalb kannst du keinen verschlüsselten Export in ein anderes Konto importieren."
+    "message": "Die Verschlüsselungscodes eines Kontos sind für jedes Saigon Safe Benutzerkonto einzigartig, deshalb kannst du keinen verschlüsselten Export in ein anderes Konto importieren."
   },
   "exportMasterPassword": {
     "message": "Gib das Masterpasswort ein, um deine Tresordaten zu exportieren."
@@ -1419,7 +1419,7 @@
     "message": "Geteilt"
   },
   "bitwardenForBusinessPageDesc": {
-    "message": "Bitwarden für Unternehmen erlaubt es dir, deine Tresor-Einträge mit anderen zu teilen, indem du eine Organisation verwendest. Erfahre mehr auf der bitwarden.com Website."
+    "message": "Saigon Safe für Unternehmen erlaubt es dir, deine Tresor-Einträge mit anderen zu teilen, indem du eine Organisation verwendest. Erfahre mehr auf der saigonsafe.com Website."
   },
   "moveToOrganization": {
     "message": "In Organisation verschieben"
@@ -1531,7 +1531,7 @@
     "message": "Mitgliedschaft verwalten"
   },
   "premiumManageAlert": {
-    "message": "Du kannst deine Mitgliedschaft im Bitwarden.com Webtresor verwalten. Möchtest du die Seite jetzt aufrufen?"
+    "message": "Du kannst deine Mitgliedschaft im Saigon Safe.com Webtresor verwalten. Möchtest du die Seite jetzt aufrufen?"
   },
   "premiumRefresh": {
     "message": "Mitgliedschaft erneuern"
@@ -1585,13 +1585,13 @@
     "message": "Premium-Mitgliedschaft kaufen"
   },
   "premiumPurchaseAlertV2": {
-    "message": "Du kannst Premium über deine Kontoeinstellungen in der Bitwarden Web-App kaufen."
+    "message": "Du kannst Premium über deine Kontoeinstellungen in der Saigon Safe Web-App kaufen."
   },
   "premiumCurrentMember": {
     "message": "Du bist jetzt Premium-Mitglied!"
   },
   "premiumCurrentMemberThanks": {
-    "message": "Vielen Dank, dass du Bitwarden unterstützt."
+    "message": "Vielen Dank, dass du Saigon Safe unterstützt."
   },
   "premiumFeatures": {
     "message": "Upgrade auf Premium und erhalte:"
@@ -1697,7 +1697,7 @@
     "message": "Authenticator App"
   },
   "authenticatorAppDescV2": {
-    "message": "Gib einen Code ein, der von einer Authentifizierungs-App wie dem Bitwarden Authenticator generiert wurde.",
+    "message": "Gib einen Code ein, der von einer Authentifizierungs-App wie dem Saigon Safe Authenticator generiert wurde.",
     "description": "'Bitwarden Authenticator' is a product name and should not be translated."
   },
   "yubiKeyTitleV2": {
@@ -1730,7 +1730,7 @@
     "message": "Selbst gehostete Umgebung"
   },
   "selfHostedBaseUrlHint": {
-    "message": "Gib die Basis-URL deiner vor Ort gehosteten Bitwarden-Installation an. Beispiel: https://bitwarden.company.com"
+    "message": "Gib die Basis-URL deiner vor Ort gehosteten Saigon Safe-Installation an. Beispiel: https://saigonsafe.company.com"
   },
   "selfHostedCustomEnvHeader": {
     "message": "Für eine erweiterte Konfiguration kannst du die Basis-URL jedes Dienstes unabhängig voneinander angeben."
@@ -1780,7 +1780,7 @@
     "message": "Auto-Ausfüllen-Vorschläge einfach finden"
   },
   "autofillSpotlightDesc": {
-    "message": "Deaktiviere die Auto-Ausfüllen-Einstellungen deines Browsers, damit sie nicht mit Bitwarden in Konflikt geraten."
+    "message": "Deaktiviere die Auto-Ausfüllen-Einstellungen deines Browsers, damit sie nicht mit Saigon Safe in Konflikt geraten."
   },
   "turnOffBrowserAutofill": {
     "message": "$BROWSER$ Auto-Ausfüllen deaktivieren",
@@ -1825,7 +1825,7 @@
     "message": "Vorschläge zum Auto-Ausfüllen in Formularfeldern anzeigen"
   },
   "howDoesBitwardenProtectFromPhishing": {
-    "message": "Wie schützt Bitwarden deine Daten vor Phishing?"
+    "message": "Wie schützt Saigon Safe deine Daten vor Phishing?"
   },
   "currentWebsite": {
     "message": "Aktuelle Website"
@@ -2466,7 +2466,7 @@
     "message": "Schwaches Master-Passwort"
   },
   "weakMasterPasswordDesc": {
-    "message": "Das Haupt-Passwort, das du gewählt hast ist schwach. Du solltest ein starkes Haupt-Passwort auswählen, um dein Bitwarden-Konto richtig zu schützen. Bist du sicher, dass du dieses Haupt-Passwort verwenden sollen?"
+    "message": "Das Haupt-Passwort, das du gewählt hast ist schwach. Du solltest ein starkes Haupt-Passwort auswählen, um dein Saigon Safe-Konto richtig zu schützen. Bist du sicher, dass du dieses Haupt-Passwort verwenden sollen?"
   },
   "rotateAccountEncKey": {
     "message": "Auch den Verschlüsselungsschlüssel meines Kontos erneuern"
@@ -2478,7 +2478,7 @@
     "message": "Bist du sicher, dass du deinen Verschlüsselungsschlüssel erneuern möchtest?"
   },
   "updateEncryptionKeyWarning": {
-    "message": "Nach der Aktualisierung deines Verschlüsselungsschlüssels musst du dich bei allen Bitwarden-Anwendungen, die du momentan benutzt, erneut anmelden (wie z.B. die mobile App oder die Browser-Erweiterungen). Fehler bei Ab- und Anmeldung (die deinen neuen Verschlüsselungsschlüssel herunterlädt) könnte zu einer Beschädigung der Daten führen. Wir werden versuchen dich automatisch abzumelden, was jedoch verzögert geschehen kann."
+    "message": "Nach der Aktualisierung deines Verschlüsselungsschlüssels musst du dich bei allen Saigon Safe-Anwendungen, die du momentan benutzt, erneut anmelden (wie z.B. die mobile App oder die Browser-Erweiterungen). Fehler bei Ab- und Anmeldung (die deinen neuen Verschlüsselungsschlüssel herunterlädt) könnte zu einer Beschädigung der Daten führen. Wir werden versuchen dich automatisch abzumelden, was jedoch verzögert geschehen kann."
   },
   "updateEncryptionKeyAccountExportWarning": {
     "message": "Alle von dir gespeicherten Exporte mit Konto-Beschränkungen werden ungültig."
@@ -2506,10 +2506,10 @@
     "message": "PIN festlegen"
   },
   "setYourPinCode": {
-    "message": "Gebe deinen PIN-Code für das Entsperren von Bitwarden ein. Deine PIN-Einstellungen werden zurückgesetzt, wenn du dich vollständig von der Anwendung abmeldest."
+    "message": "Gebe deinen PIN-Code für das Entsperren von Saigon Safe ein. Deine PIN-Einstellungen werden zurückgesetzt, wenn du dich vollständig von der Anwendung abmeldest."
   },
   "setPinCode": {
-    "message": "Du kannst diese PIN verwenden, um Bitwarden zu entsperren. Deine PIN wird zurückgesetzt, wenn du dich einmal vollständig aus der Anwendung abmeldest."
+    "message": "Du kannst diese PIN verwenden, um Saigon Safe zu entsperren. Deine PIN wird zurückgesetzt, wenn du dich einmal vollständig aus der Anwendung abmeldest."
   },
   "pinRequired": {
     "message": "PIN-Code ist erforderlich."
@@ -2530,7 +2530,7 @@
     "message": "Warte auf Bestätigung vom Desktop"
   },
   "awaitDesktopDesc": {
-    "message": "Bitte bestätige die Verwendung von Biometrie in der Bitwarden Desktop-Anwendung, um Biometrie für den Browser einzurichten."
+    "message": "Bitte bestätige die Verwendung von Biometrie in der Saigon Safe Desktop-Anwendung, um Biometrie für den Browser einzurichten."
   },
   "lockWithMasterPassOnRestart": {
     "message": "Bei Neustart des Browsers mit Master-Passwort sperren"
@@ -2645,7 +2645,7 @@
     "message": "Das Formular wird von einer anderen Domain als der URI deines gespeicherten Logins gehostet. Wähle OK, um trotzdem automatisch auszufüllen, oder Abbrechen, um aufzuhören."
   },
   "autofillIframeWarningTip": {
-    "message": "Um diese Warnung in Zukunft zu verhindern, speichere diese URI, $HOSTNAME$, in deinem Bitwarden Zugangsdaten-Eintrag für diese Seite.",
+    "message": "Um diese Warnung in Zukunft zu verhindern, speichere diese URI, $HOSTNAME$, in deinem Saigon Safe Zugangsdaten-Eintrag für diese Seite.",
     "placeholders": {
       "hostname": {
         "content": "$1",
@@ -2654,7 +2654,7 @@
     }
   },
   "topLayerHijackWarning": {
-    "message": "Diese Seite beeinträchtigt die Nutzung von Bitwarden. Das Bitwarden Inline-Menü wurde aus Sicherheitsgründen vorübergehend deaktiviert."
+    "message": "Diese Seite beeinträchtigt die Nutzung von Saigon Safe. Das Saigon Safe Inline-Menü wurde aus Sicherheitsgründen vorübergehend deaktiviert."
   },
   "setMasterPassword": {
     "message": "Master-Passwort festlegen"
@@ -2711,7 +2711,7 @@
     "message": "Ihr neues Master-Passwort entspricht nicht den Anforderungen der Richtlinie."
   },
   "receiveMarketingEmailsV2": {
-    "message": "Erhalte Ratschläge, Ankündigungen und Marktforschungsumfragen von Bitwarden in deinem Posteingang."
+    "message": "Erhalte Ratschläge, Ankündigungen und Marktforschungsumfragen von Saigon Safe in deinem Posteingang."
   },
   "unsubscribe": {
     "message": "Deabonnieren"
@@ -2762,13 +2762,13 @@
     "message": "Browser-Integration ist nicht aktiviert"
   },
   "desktopIntegrationDisabledDesc": {
-    "message": "Die Browser-Integration ist in der Bitwarden Desktop-Anwendung nicht eingerichtet. Bitte richte diese in den Einstellungen der Desktop-Anwendung ein."
+    "message": "Die Browser-Integration ist in der Saigon Safe Desktop-Anwendung nicht eingerichtet. Bitte richte diese in den Einstellungen der Desktop-Anwendung ein."
   },
   "startDesktopTitle": {
-    "message": "Bitwarden Desktop-Anwendung starten"
+    "message": "Saigon Safe Desktop-Anwendung starten"
   },
   "startDesktopDesc": {
-    "message": "Die Bitwarden Desktop-Anwendung muss gestartet werden, bevor Entsperren mit Biometrie verwendet werden kann."
+    "message": "Die Saigon Safe Desktop-Anwendung muss gestartet werden, bevor Entsperren mit Biometrie verwendet werden kann."
   },
   "errorEnableBiometricTitle": {
     "message": "Biometrie konnte nicht eingerichtet werden"
@@ -2822,13 +2822,13 @@
     "message": "Biometrie fehlgeschlagen"
   },
   "biometricsFailedDesc": {
-    "message": "Die biometrische Verifizierung kann nicht abgeschlossen werden. Versuch es mit dem Master-Passwort oder melde dich ab. Sollte das Problem weiterhin bestehen, kontaktiere bitte den Bitwarden-Support."
+    "message": "Die biometrische Verifizierung kann nicht abgeschlossen werden. Versuch es mit dem Master-Passwort oder melde dich ab. Sollte das Problem weiterhin bestehen, kontaktiere bitte den Saigon Safe-Support."
   },
   "nativeMessaginPermissionErrorTitle": {
     "message": "Berechtigung nicht erteilt"
   },
   "nativeMessaginPermissionErrorDesc": {
-    "message": "Ohne die Berechtigung zur Kommunikation mit der Bitwarden Desktop-Anwendung können wir keine Biometrie in der Browser-Erweiterung anbieten. Bitte versuche es erneut."
+    "message": "Ohne die Berechtigung zur Kommunikation mit der Saigon Safe Desktop-Anwendung können wir keine Biometrie in der Browser-Erweiterung anbieten. Bitte versuche es erneut."
   },
   "nativeMessaginPermissionSidebarTitle": {
     "message": "Fehler bei der Berechtigungsanfrage"
@@ -2865,7 +2865,7 @@
     "message": "Ausgeschlossene Domains"
   },
   "excludedDomainsDesc": {
-    "message": "Bitwarden wird keine Login-Daten für diese Domäne speichern. Du musst die Seite aktualisieren, damit die Änderungen wirksam werden."
+    "message": "Saigon Safe wird keine Login-Daten für diese Domäne speichern. Du musst die Seite aktualisieren, damit die Änderungen wirksam werden."
   },
   "blockedDomainsDesc": {
     "message": "Automatisches Ausfüllen und andere zugehörige Funktionen werden für diese Webseiten nicht angeboten. Du musst die Seite neu laden, damit die Änderungen wirksam werden."
@@ -2981,24 +2981,24 @@
     "message": "Illustration einer Liste gefährdeter Zugangsdaten."
   },
   "welcomeDialogGraphicAlt": {
-    "message": "Illustration der Bitwarden-Tresor-Seite."
+    "message": "Illustration der Saigon Safe-Tresor-Seite."
   },
   "generatePasswordSlideDesc": {
-    "message": "Generiere schnell ein starkes, einzigartiges Passwort mit dem Bitwarden Auto-Ausfüllen-Menü auf der gefährdeten Website.",
+    "message": "Generiere schnell ein starkes, einzigartiges Passwort mit dem Saigon Safe Auto-Ausfüllen-Menü auf der gefährdeten Website.",
     "description": "Description of the generate password slide on the at-risk password page carousel"
   },
   "generatePasswordSlideImgAltPeriod": {
-    "message": "Illustration des Bitwarden Auto-Ausfüllen-Menüs, das ein generiertes Passwort anzeigt."
+    "message": "Illustration des Saigon Safe Auto-Ausfüllen-Menüs, das ein generiertes Passwort anzeigt."
   },
   "updateInBitwarden": {
-    "message": "In Bitwarden aktualisieren"
+    "message": "In Saigon Safe aktualisieren"
   },
   "updateInBitwardenSlideDesc": {
-    "message": "Bitwarden wird dich dann auffordern, das Passwort im Passwort-Manager zu aktualisieren.",
+    "message": "Saigon Safe wird dich dann auffordern, das Passwort im Passwort-Manager zu aktualisieren.",
     "description": "Description of the update in Bitwarden slide on the at-risk password page carousel"
   },
   "updateInBitwardenSlideImgAltPeriod": {
-    "message": "Illustration einer Bitwarden-Benachrichtigung, die den Benutzer dazu auffordert, die Zugangsdaten zu aktualisieren."
+    "message": "Illustration einer Saigon Safe-Benachrichtigung, die den Benutzer dazu auffordert, die Zugangsdaten zu aktualisieren."
   },
   "turnOnAutofill": {
     "message": "Auto-Ausfüllen aktivieren"
@@ -3524,7 +3524,7 @@
     "message": "Fehler beim Abrufen der Auto-Ausfüllen-Daten"
   },
   "couldNotDecryptVaultItemsBelow": {
-    "message": "Bitwarden konnte folgende(n) Tresor-Eintrag/Einträge nicht entschlüsseln."
+    "message": "Saigon Safe konnte folgende(n) Tresor-Eintrag/Einträge nicht entschlüsseln."
   },
   "contactCSToAvoidDataLossPart1": {
     "message": "Kontaktiere unser Customer Success Team",
@@ -3628,11 +3628,11 @@
     }
   },
   "forwarderGeneratedBy": {
-    "message": "Von Bitwarden generiert.",
+    "message": "Von Saigon Safe generiert.",
     "description": "Displayed with the address on the forwarding service's configuration screen."
   },
   "forwarderGeneratedByWithWebsite": {
-    "message": "Website: $WEBSITE$. Von Bitwarden generiert.",
+    "message": "Website: $WEBSITE$. Von Saigon Safe generiert.",
     "description": "Displayed with the address on the forwarding service's configuration screen.",
     "placeholders": {
       "WEBSITE": {
@@ -3825,7 +3825,7 @@
     "message": "Eine Benachrichtigung wurde an dein Gerät gesendet."
   },
   "notificationSentDevicePart1": {
-    "message": "Entsperre Bitwarden auf deinem Gerät oder mit der"
+    "message": "Entsperre Saigon Safe auf deinem Gerät oder mit der"
   },
   "notificationSentDeviceAnchor": {
     "message": "Web-App"
@@ -4328,15 +4328,15 @@
     "message": "Zum Inhalt wechseln"
   },
   "bitwardenOverlayButton": {
-    "message": "Bitwarden Auto-Ausfüllen Menütaste",
+    "message": "Saigon Safe Auto-Ausfüllen Menütaste",
     "description": "Page title for the iframe containing the overlay button"
   },
   "toggleBitwardenVaultOverlay": {
-    "message": "Bitwarden Auto-Ausfüllen Menü umschalten",
+    "message": "Saigon Safe Auto-Ausfüllen Menü umschalten",
     "description": "Screen reader and tool tip label for the overlay button"
   },
   "bitwardenVault": {
-    "message": "Bitwarden Auto-Ausfüllen Menü",
+    "message": "Saigon Safe Auto-Ausfüllen Menü",
     "description": "Page title in overlay"
   },
   "unlockYourAccountToViewMatchingLogins": {
@@ -4408,7 +4408,7 @@
     "description": "Screen reader text (aria-label) for new identity button within inline menu"
   },
   "bitwardenOverlayMenuAvailable": {
-    "message": "Bitwarden Auto-Ausfüllen Menü verfügbar. Drücke die Pfeiltaste nach unten zum Auswählen.",
+    "message": "Saigon Safe Auto-Ausfüllen Menü verfügbar. Drücke die Pfeiltaste nach unten zum Auswählen.",
     "description": "Screen reader text for announcing when the overlay opens on the page"
   },
   "turnOn": {
@@ -4726,7 +4726,7 @@
     "message": "Aktives Konto"
   },
   "bitwardenAccount": {
-    "message": "Bitwarden-Konto"
+    "message": "Saigon Safe-Konto"
   },
   "availableAccounts": {
     "message": "Verfügbare Konten"
@@ -4772,7 +4772,7 @@
     "description": "Label indicating the most common import formats"
   },
   "uriMatchDefaultStrategyHint": {
-    "message": "Die URI-Übereinstimmungserkennung ist die Methode, mit der Bitwarden Vorschläge zum automatischen Ausfüllen identifiziert.",
+    "message": "Die URI-Übereinstimmungserkennung ist die Methode, mit der Saigon Safe Vorschläge zum automatischen Ausfüllen identifiziert.",
     "description": "Explains to the user that URI match detection determines how Bitwarden suggests autofill options, and clarifies that this default strategy applies when no specific match detection is set for a login item."
   },
   "regExAdvancedOptionWarning": {
@@ -4816,23 +4816,23 @@
     "description": "Body content for dialog which asks if the user wants to proceed to the browser's keyboard shortcut settings page"
   },
   "overrideDefaultBrowserAutofillTitle": {
-    "message": "Bitwarden zum Standard-Passwort-Manager machen?",
+    "message": "Saigon Safe zum Standard-Passwort-Manager machen?",
     "description": "Dialog title facilitating the ability to override a chrome browser's default autofill behavior"
   },
   "overrideDefaultBrowserAutofillDescription": {
-    "message": "Das Ignorieren dieser Option kann zu Konflikten zwischen den Bitwarden Vorschlägen zum Auto-Ausfüllen und denen deines Browsers führen.",
+    "message": "Das Ignorieren dieser Option kann zu Konflikten zwischen den Saigon Safe Vorschlägen zum Auto-Ausfüllen und denen deines Browsers führen.",
     "description": "Dialog message facilitating the ability to override a chrome browser's default autofill behavior"
   },
   "overrideDefaultBrowserAutoFillSettings": {
-    "message": "Bitwarden zum Standard-Passwort-Manager machen",
+    "message": "Saigon Safe zum Standard-Passwort-Manager machen",
     "description": "Label for the setting that allows overriding the default browser autofill settings"
   },
   "privacyPermissionAdditionNotGrantedTitle": {
-    "message": "Bitwarden konnte nicht als Standard-Passwort-Manager festgelegt werden",
+    "message": "Saigon Safe konnte nicht als Standard-Passwort-Manager festgelegt werden",
     "description": "Title for the dialog that appears when the user has not granted the extension permission to set privacy settings"
   },
   "privacyPermissionAdditionNotGrantedDescription": {
-    "message": "Du musst Bitwarden Zugriff für die Browser-Datenschutzberechtigungen erteilen, um Bitwarden als Standard-Passwort-Manager festzulegen.",
+    "message": "Du musst Saigon Safe Zugriff für die Browser-Datenschutzberechtigungen erteilen, um Saigon Safe als Standard-Passwort-Manager festzulegen.",
     "description": "Description for the dialog that appears when the user has not granted the extension permission to set privacy settings"
   },
   "makeDefault": {
@@ -5173,16 +5173,16 @@
     "message": "Anhang herunterladen"
   },
   "downloadBitwarden": {
-    "message": "Bitwarden herunterladen"
+    "message": "Saigon Safe herunterladen"
   },
   "downloadBitwardenOnAllDevices": {
-    "message": "Bitwarden auf allen Geräten herunterladen"
+    "message": "Saigon Safe auf allen Geräten herunterladen"
   },
   "getTheMobileApp": {
     "message": "Smartphone-App herunterladen"
   },
   "getTheMobileAppDesc": {
-    "message": "Greife von unterwegs mit der Bitwarden Smartphone-App auf deine Passwörter zu."
+    "message": "Greife von unterwegs mit der Saigon Safe Smartphone-App auf deine Passwörter zu."
   },
   "getTheDesktopApp": {
     "message": "Desktop-App herunterladen"
@@ -5191,7 +5191,7 @@
     "message": "Greife ohne Browser auf deinen Tresor zu und richte dann das Entsperren mit Biometrie ein, um die Entsperrung sowohl in der Desktop-App als auch in der Browser-Erweiterung zu beschleunigen."
   },
   "downloadFromBitwardenNow": {
-    "message": "Jetzt von bitwarden.com herunterladen"
+    "message": "Jetzt von saigonsafe.com herunterladen"
   },
   "getItOnGooglePlay": {
     "message": "Verfügbar bei Google Play"
@@ -5656,10 +5656,10 @@
     "message": "Biometrisches Entsperren ist aufgrund falsch konfigurierter Systemdateien nicht verfügbar."
   },
   "biometricsStatusHelptextDesktopDisconnected": {
-    "message": "Biometrisches Entsperren ist nicht verfügbar, da die Bitwarden Desktop-App geschlossen ist."
+    "message": "Biometrisches Entsperren ist nicht verfügbar, da die Saigon Safe Desktop-App geschlossen ist."
   },
   "biometricsStatusHelptextNotEnabledInDesktop": {
-    "message": "Biometrisches Entsperren ist nicht verfügbar, da es für $EMAIL$ in der Bitwarden Desktop-App nicht aktiviert ist.",
+    "message": "Biometrisches Entsperren ist nicht verfügbar, da es für $EMAIL$ in der Saigon Safe Desktop-App nicht aktiviert ist.",
     "placeholders": {
       "email": {
         "content": "$1",
@@ -5694,7 +5694,7 @@
     "description": "Notification message for when a password has been regenerated"
   },
   "saveToBitwarden": {
-    "message": "In Bitwarden speichern",
+    "message": "In Saigon Safe speichern",
     "description": "Confirmation message for saving a login to Bitwarden"
   },
   "spaceCharacterDescriptor": {
@@ -5920,13 +5920,13 @@
     "message": "Der Tresor schützt mehr als nur deine Passwörter. Speicher hier sicher Zugangsdaten, Identitäten, Karten und Notizen."
   },
   "introCarouselLabel": {
-    "message": "Willkommen bei Bitwarden"
+    "message": "Willkommen bei Saigon Safe"
   },
   "securityPrioritized": {
     "message": "Sicherheit, priorisiert"
   },
   "securityPrioritizedBody": {
-    "message": "Speichere Zugangsdaten, Karten und Identitäten in deinem sicheren Tresor. Bitwarden verwendet Zero-Knowledge und Ende-zu-Ende-Verschlüsselung, um das zu schützen, was für dich wichtig ist."
+    "message": "Speichere Zugangsdaten, Karten und Identitäten in deinem sicheren Tresor. Saigon Safe verwendet Zero-Knowledge und Ende-zu-Ende-Verschlüsselung, um das zu schützen, was für dich wichtig ist."
   },
   "quickLogin": {
     "message": "Schnelle und einfache Anmeldung"
@@ -5944,7 +5944,7 @@
     "message": "Deine Daten, wann und wo du sie brauchst"
   },
   "secureDevicesBody": {
-    "message": "Speicher eine unbegrenzte Anzahl von Passwörtern auf unbegrenzt vielen Geräten mit Bitwarden-Apps für Smartphones, Browser und Desktop."
+    "message": "Speicher eine unbegrenzte Anzahl von Passwörtern auf unbegrenzt vielen Geräten mit Saigon Safe-Apps für Smartphones, Browser und Desktop."
   },
   "nudgeBadgeAria": {
     "message": "1 Benachrichtigung"
@@ -5953,7 +5953,7 @@
     "message": "Vorhandene Passwörter importieren"
   },
   "emptyVaultNudgeBody": {
-    "message": "Verwende den Importer, um Zugangsdaten schnell zu Bitwarden zu übertragen, ohne sie manuell hinzuzufügen."
+    "message": "Verwende den Importer, um Zugangsdaten schnell zu Saigon Safe zu übertragen, ohne sie manuell hinzuzufügen."
   },
   "emptyVaultNudgeButton": {
     "message": "Jetzt importieren"
@@ -6072,13 +6072,13 @@
     "message": "Über diese Einstellung"
   },
   "permitCipherDetailsDescription": {
-    "message": "Bitwarden verwendet gespeicherte Zugangsdaten-URIs, um zu erkennen, welches Symbol oder welche Passwort-Ändern-URL verwendet werden soll, um dein Erlebnis zu verbessern. Es werden keine Informationen erfasst oder gespeichert, wenn du diesen Dienst nutzt."
+    "message": "Saigon Safe verwendet gespeicherte Zugangsdaten-URIs, um zu erkennen, welches Symbol oder welche Passwort-Ändern-URL verwendet werden soll, um dein Erlebnis zu verbessern. Es werden keine Informationen erfasst oder gespeichert, wenn du diesen Dienst nutzt."
   },
   "noPermissionsViewPage": {
     "message": "Du hast keine Berechtigung, diese Seite anzuzeigen. Versuche, dich mit einem anderen Konto anzumelden."
   },
   "wasmNotSupported": {
-    "message": "WebAssembly wird von deinem Browser nicht unterstützt oder ist nicht aktiviert. WebAssembly wird benötigt, um die Bitwarden-App nutzen zu können.",
+    "message": "WebAssembly wird von deinem Browser nicht unterstützt oder ist nicht aktiviert. WebAssembly wird benötigt, um die Saigon Safe-App nutzen zu können.",
     "description": "'WebAssembly' is a technical term and should not be translated."
   },
   "showMore": {
@@ -6153,7 +6153,7 @@
     "message": "Fehler: Entschlüsselung nicht möglich"
   },
   "removeMasterPasswordForOrgUserKeyConnector": {
-    "message": "Deine Organisation verwendet keine Master-Passwörter mehr, um sich bei Bitwarden anzumelden. Verifiziere die Organisation und Domain, um fortzufahren."
+    "message": "Deine Organisation verwendet keine Master-Passwörter mehr, um sich bei Saigon Safe anzumelden. Verifiziere die Organisation und Domain, um fortzufahren."
   },
   "continueWithLogIn": {
     "message": "Mit der Anmeldung fortfahren"
@@ -6239,7 +6239,7 @@
     "message": "Stell eine Entsperrmethode ein, um deine Timeout-Aktion zu ändern"
   },
   "sessionTimeoutSuppressedByConnectedDevice": {
-    "message": "Verwaltet von der Bitwarden Desktop-App. Öffne die Desktop-App zum Bearbeiten."
+    "message": "Verwaltet von der Saigon Safe Desktop-App. Öffne die Desktop-App zum Bearbeiten."
   },
   "percentageCompleted": {
     "message": "Zu $PERCENT$% abgeschlossen",
@@ -6335,13 +6335,13 @@
     "message": "Gib mehrere E-Mail-Adressen ein, indem du sie mit einem Komma trennst."
   },
   "emailPlaceholder": {
-    "message": "benutzer@bitwarden.com, benutzer@acme.com"
+    "message": "benutzer@saigonsafe.com, benutzer@acme.com"
   },
   "emailPlaceholderMultiple": {
-    "message": "benutzer@bitwarden.com, benutzer@acme.com"
+    "message": "benutzer@saigonsafe.com, benutzer@acme.com"
   },
   "downloadBitwardenApps": {
-    "message": "Bitwarden-Apps herunterladen"
+    "message": "Saigon Safe-Apps herunterladen"
   },
   "emailProtected": {
     "message": "E-Mail-Adresse geschützt"

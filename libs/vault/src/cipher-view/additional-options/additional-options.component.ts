@@ -2,6 +2,7 @@ import { CommonModule } from "@angular/common";
 import { Component, Input } from "@angular/core";
 
 import { JslibModule } from "@bitwarden/angular/jslib.module";
+import { getVisibleNotes } from "@bitwarden/common/vault/utils/search-pin-utils";
 import {
   IconButtonModule,
   CardComponent,
@@ -30,5 +31,9 @@ import {
 export class AdditionalOptionsComponent {
   // FIXME(https://bitwarden.atlassian.net/browse/CL-903): Migrate to Signals
   // eslint-disable-next-line @angular-eslint/prefer-signals
-  @Input() notes: string = "";
+  @Input() set notes(value: string | null | undefined) {
+    this.visibleNotes = getVisibleNotes(value);
+  }
+
+  visibleNotes: string = "";
 }

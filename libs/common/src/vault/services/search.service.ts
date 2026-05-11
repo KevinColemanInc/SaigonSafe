@@ -7,6 +7,7 @@ import { SendView } from "../../tools/send/models/view/send.view";
 import { OrganizationId, UserId } from "../../types/guid";
 import { SearchService as SearchServiceAbstraction } from "../abstractions/search.service";
 import { CipherViewLike, CipherViewLikeUtils } from "../utils/cipher-view-like-utils";
+import { hasSearchPin, matchesSearchPinExactly } from "../utils/search-pin-utils";
 
 import { LunrSearchService } from "./lunr-search.service";
 
@@ -71,7 +72,7 @@ export class SearchService implements SearchServiceAbstraction {
     query = normalizeSearchQuery(query.trim().toLowerCase());
     if (!(await this.isSearchable(query))) {
       this._isCipherSearching$.next(false);
-      return ciphers;
+      return this.visibleCipherSetForQuery(ciphers, query);
     }
 
     // Important: Only ever route to the lunr service when this is actually a lunr query.
@@ -84,7 +85,10 @@ export class SearchService implements SearchServiceAbstraction {
         ciphers,
       );
       this._isCipherSearching$.next(false);
-      return lunrResults;
+      return this.mergeCipherMatches(
+        ciphers.filter((cipher) => matchesSearchPinExactly(cipher.notes, query)),
+        lunrResults.filter((cipher) => !hasSearchPin(cipher.notes)),
+      );
     } else {
       // Use basic search if the query is not a lunr query
       const basicResults = this.searchCiphersBasic(ciphers, query);
@@ -96,7 +100,14 @@ export class SearchService implements SearchServiceAbstraction {
 
   searchCiphersBasic<C extends CipherViewLike>(ciphers: C[], query: string) {
     query = normalizeSearchQuery(query.trim().toLowerCase());
-    return ciphers.filter((c) => {
+    const searchPinMatches = ciphers.filter((cipher) =>
+      matchesSearchPinExactly(cipher.notes, query),
+    );
+    const visibleMatches = ciphers.filter((c) => {
+      if (hasSearchPin(c.notes)) {
+        return false;
+      }
+
       if (c.name != null && c.name.toLowerCase().indexOf(query) > -1) {
         return true;
       }
@@ -121,6 +132,8 @@ export class SearchService implements SearchServiceAbstraction {
       }
       return false;
     });
+
+    return this.mergeCipherMatches(searchPinMatches, visibleMatches);
   }
 
   searchSends(sends: SendView[], query: string) {
@@ -152,6 +165,25 @@ export class SearchService implements SearchServiceAbstraction {
     });
     this._isSendSearching$.next(false);
     return sendsMatched.concat(lowPriorityMatched);
+  }
+
+  private visibleCipherSetForQuery<C extends CipherViewLike>(ciphers: C[], query: string): C[] {
+    return this.mergeCipherMatches(
+      ciphers.filter((cipher) => matchesSearchPinExactly(cipher.notes, query)),
+      ciphers.filter((cipher) => !hasSearchPin(cipher.notes)),
+    );
+  }
+
+  private mergeCipherMatches<C extends CipherViewLike>(...cipherGroups: C[][]): C[] {
+    const uniqueCiphers = new Map<string, C>();
+
+    for (const group of cipherGroups) {
+      for (const cipher of group) {
+        uniqueCiphers.set(uuidAsString(cipher.id), cipher);
+      }
+    }
+
+    return Array.from(uniqueCiphers.values());
   }
 }
 

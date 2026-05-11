@@ -36,6 +36,12 @@ import { PopupCompactModeService } from "../../../platform/popup/layout/popup-co
 import { PopupHeaderComponent } from "../../../platform/popup/layout/popup-header.component";
 import { PopupPageComponent } from "../../../platform/popup/layout/popup-page.component";
 import { PopupSizeService } from "../../../platform/popup/layout/popup-size.service";
+import {
+  PopupColorPalette,
+  PopupColorPaletteOption,
+  PopupColorPaletteService,
+  POPUP_COLOR_PALETTE_OPTIONS,
+} from "../../../platform/popup/theming/popup-color-palette.service";
 import { VaultPopupCopyButtonsService } from "../services/vault-popup-copy-buttons.service";
 
 // FIXME(https://bitwarden.atlassian.net/browse/CL-764): Migrate to OnPush
@@ -83,6 +89,7 @@ export class AppearanceComponent implements OnInit {
     enableFavicon: false,
     enableBadgeCounter: true,
     theme: ThemeTypes.System as Theme,
+    palette: POPUP_COLOR_PALETTE_OPTIONS[0].value as PopupColorPalette,
     enableAnimations: true,
     enableCompactMode: false,
     showQuickCopyActions: false,
@@ -97,6 +104,9 @@ export class AppearanceComponent implements OnInit {
   /** Available theme options */
   themeOptions: { name: string; value: Theme }[];
 
+  /** Available popup color palette options */
+  protected readonly paletteOptions: PopupColorPaletteOption[] = POPUP_COLOR_PALETTE_OPTIONS;
+
   /** Available width options */
   protected readonly widthOptions: Option<PopupWidthOption>[] = [
     { label: this.i18nService.t("default"), value: "default" },
@@ -104,11 +114,18 @@ export class AppearanceComponent implements OnInit {
     { label: this.i18nService.t("narrow"), value: "narrow" },
   ];
 
+  protected get selectedPaletteOption(): PopupColorPaletteOption | undefined {
+    return this.paletteOptions.find(
+      (option) => option.value === this.appearanceForm.controls.palette.value,
+    );
+  }
+
   constructor(
     private messagingService: MessagingService,
     private domainSettingsService: DomainSettingsService,
     private badgeSettingsService: BadgeSettingsServiceAbstraction,
     private themeStateService: ThemeStateService,
+    private popupColorPaletteService: PopupColorPaletteService,
     private formBuilder: FormBuilder,
     private destroyRef: DestroyRef,
     private animationControlService: AnimationControlService,
@@ -126,6 +143,7 @@ export class AppearanceComponent implements OnInit {
     const enableFavicon = await firstValueFrom(this.domainSettingsService.showFavicons$);
     const enableBadgeCounter = await firstValueFrom(this.badgeSettingsService.enableBadgeCounter$);
     const theme = await firstValueFrom(this.themeStateService.selectedTheme$);
+    const palette = await firstValueFrom(this.popupColorPaletteService.selectedPalette$);
     const enableAnimations = await firstValueFrom(
       this.animationControlService.enableRoutingAnimation$,
     );
@@ -146,6 +164,7 @@ export class AppearanceComponent implements OnInit {
       enableFavicon,
       enableBadgeCounter,
       theme,
+      palette,
       enableAnimations,
       enableCompactMode,
       showQuickCopyActions,
@@ -160,6 +179,12 @@ export class AppearanceComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((newTheme) => {
         void this.saveTheme(newTheme);
+      });
+
+    this.appearanceForm.controls.palette.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((newPalette) => {
+        void this.savePalette(newPalette);
       });
 
     this.appearanceForm.controls.enableFavicon.valueChanges
@@ -230,6 +255,10 @@ export class AppearanceComponent implements OnInit {
 
   async saveTheme(newTheme: Theme) {
     await this.themeStateService.setSelectedTheme(newTheme);
+  }
+
+  async savePalette(newPalette: PopupColorPalette) {
+    await this.popupColorPaletteService.setSelectedPalette(newPalette);
   }
 
   async updateAnimations(enableAnimations: boolean) {

@@ -42,6 +42,8 @@ import { CipherPartialRequest } from "../models/request/cipher-partial.request";
 import { CipherRequest } from "../models/request/cipher.request";
 import { AttachmentView } from "../models/view/attachment.view";
 import { CipherView } from "../models/view/cipher.view";
+import { CipherViewLikeUtils } from "../utils/cipher-view-like-utils";
+import { buildNotesWithSearchPin } from "../utils/search-pin-utils";
 
 import { CipherService } from "./cipher.service";
 import { DECRYPTED_CIPHERS, ENCRYPTED_CIPHERS } from "./key-state/ciphers.state";
@@ -1388,6 +1390,40 @@ describe("Cipher Service", () => {
       }
 
       expect(sdkServiceSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("filterCiphersForUrl()", () => {
+    beforeEach(() => {
+      domainSettingsService.getUrlEquivalentDomains.mockReturnValue(of(new Set<string>()));
+      Object.defineProperty(domainSettingsService, "resolvedDefaultUriMatchStrategy$", {
+        configurable: true,
+        value: of(null),
+      });
+    });
+
+    it("excludes ciphers with a search pin from autofill suggestions", async () => {
+      const visibleCipher = new CipherView();
+      visibleCipher.id = "visible" as CipherId;
+      visibleCipher.type = CipherType.Login;
+      visibleCipher.login = {} as any;
+      visibleCipher.notes = "Visible note";
+
+      const hiddenCipher = new CipherView();
+      hiddenCipher.id = "hidden" as CipherId;
+      hiddenCipher.type = CipherType.Login;
+      hiddenCipher.login = {} as any;
+      hiddenCipher.notes = buildNotesWithSearchPin("Hidden note", "1234");
+
+      const matchesUriSpy = jest.spyOn(CipherViewLikeUtils, "matchesUri").mockReturnValue(true);
+
+      const result = await cipherService.filterCiphersForUrl(
+        [visibleCipher, hiddenCipher],
+        "https://example.com",
+      );
+
+      expect(result).toEqual([visibleCipher]);
+      expect(matchesUriSpy).toHaveBeenCalledTimes(1);
     });
   });
 

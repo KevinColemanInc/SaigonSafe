@@ -348,7 +348,6 @@ import { ClipboardNotificationBadgeUpdaterService } from "../autofill/services/c
 import { InlineMenuFieldQualificationService } from "../autofill/services/inline-menu-field-qualification.service";
 import { TargetingRulesDataService } from "../autofill/services/targeting-rules-data.service";
 import { trackGeneratedCredential } from "../autofill/utils/credential-history-utils";
-import { SafariApp } from "../browser/safariApp";
 import { PhishingDataService } from "../dirt/phishing-detection/services/phishing-data.service";
 import { PhishingDetectionService } from "../dirt/phishing-detection/services/phishing-detection.service";
 import { BackgroundBrowserBiometricsService } from "../key-management/biometrics/background-browser-biometrics.service";
@@ -1727,6 +1726,9 @@ export default class MainBackground {
     await this.runtimeBackground.init();
     await this.notificationBackground.init();
     this.overlayNotificationsBackground.init();
+    if (this.actionsService instanceof BrowserActionsService) {
+      this.actionsService.init();
+    }
     this.commandsBackground.init();
     this.contextMenusBackground?.init();
     // Disable the side panel globally on startup so Bitwarden does not appear in
@@ -1989,36 +1991,12 @@ export default class MainBackground {
    * @deprecated Migrating to the browser actions service.
    */
   async openPopup() {
-    const browserAction = BrowserApi.getBrowserAction();
-
-    if ("openPopup" in browserAction && typeof browserAction.openPopup === "function") {
-      await browserAction.openPopup();
-      return;
-    }
-
-    if (this.platformUtilsService.isSafari()) {
-      await SafariApp.sendMessageToApp("showPopover", null, true);
-    }
+    await this.actionsService.openPopup();
   }
 
   /** Opens the `/at-risk-passwords` page within the popup */
   async openAtRisksPasswordsPage() {
-    const browserAction = BrowserApi.getBrowserAction();
-
-    try {
-      // Set route of the popup before attempting to open it.
-      // If the vault is locked, this won't have an effect as the auth guards will
-      // redirect the user to the login page.
-      await browserAction.setPopup({ popup: ExtensionPageUrls.AtRiskPasswords });
-
-      await this.openPopup();
-    } finally {
-      // Reset the popup route to the default route so any subsequent
-      // popup openings will not open to the at-risk-passwords page.
-      await browserAction.setPopup({
-        popup: ExtensionPageUrls.Index,
-      });
-    }
+    await this.openExtensionToPage(ExtensionPageUrls.AtRiskPasswords);
   }
 
   /**
@@ -2035,22 +2013,36 @@ export default class MainBackground {
       return;
     }
 
-    const browserAction = BrowserApi.getBrowserAction();
+    await this.openExtensionToPage(url);
+  }
 
-    try {
-      // Set route of the popup before attempting to open it.
-      // If the vault is locked, this won't have an effect as the auth guards will
-      // redirect the user to the login page.
-      await browserAction.setPopup({ popup: url });
+  private async openExtensionToPage(url: ExtensionPageUrls) {
+    const wasAlreadyOpen = await this.platformUtilsService.isPopupOpen();
+    await this.openPopup();
 
-      await this.openPopup();
-    } finally {
-      // Reset the popup route to the default route so any subsequent
-      // popup openings will not open to the at-risk-passwords page.
-      await browserAction.setPopup({
-        popup: ExtensionPageUrls.Index,
-      });
+    if (url === ExtensionPageUrls.Index) {
+      return;
     }
+
+    const isOpen = wasAlreadyOpen || (await this.waitForExtensionViewOpen());
+    if (!isOpen) {
+      return;
+    }
+
+    this.messagingService.send("navigatePopup", { url });
+  }
+
+  private async waitForExtensionViewOpen(timeoutMs = 1000): Promise<boolean> {
+    const start = Date.now();
+    while (Date.now() - start < timeoutMs) {
+      if (await this.platformUtilsService.isPopupOpen()) {
+        return true;
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+
+    return false;
   }
 
   async reseedStorage() {

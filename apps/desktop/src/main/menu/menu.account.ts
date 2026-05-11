@@ -5,7 +5,6 @@ import { MessagingService } from "@bitwarden/common/platform/abstractions/messag
 import { UrlType } from "@bitwarden/common/platform/misc/safe-urls";
 
 import { SafeShell } from "../../platform/main/safe-shell.main";
-import { isMacAppStore, isWindowsStore } from "../../utils";
 
 import { IMenubarMenu } from "./menubar";
 
@@ -17,7 +16,7 @@ export class AccountMenu implements IMenubarMenu {
   }
 
   get items(): MenuItemConstructorOptions[] {
-    const items = [this.premiumMembership];
+    const items: MenuItemConstructorOptions[] = [];
     if (this._hasMasterPassword) {
       items.push(this.changeMasterPassword);
     }
@@ -64,16 +63,6 @@ export class AccountMenu implements IMenubarMenu {
     this._multiClientPasswordManagement = multiClientPasswordManagement;
     // TODO: PM-34438 - remove this assignment
     this._desktopAddDevices = desktopAddDevices;
-  }
-
-  private get premiumMembership(): MenuItemConstructorOptions {
-    return {
-      label: this.localize("premiumMembership"),
-      click: () => this.sendMessage("openPremium"),
-      id: "premiumMembership",
-      visible: !isWindowsStore() && !isMacAppStore(),
-      enabled: !this._isLocked,
-    };
   }
 
   private get changeMasterPassword(): MenuItemConstructorOptions {

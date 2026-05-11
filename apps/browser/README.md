@@ -16,6 +16,14 @@ The Bitwarden browser extension is written using the Web Extension API and Angul
 
 ![My Vault](https://raw.githubusercontent.com/bitwarden/brand/main/screenshots/web-browser-extension-generator.png)
 
+## Custom features
+
+This fork includes the following browser-extension customizations:
+
+- Chrome and Firefox open the extension in a large right-side panel instead of the standard toolbar popup modal.
+- The vault header includes a `Generate` button next to `New`.
+- `Generate` creates a new login using the current page domain, prefills the username from a default email configured in `Settings -> Autofill`, generates a password from the existing password generator settings, saves the item, and autofills the active page.
+
 ## Documentation
 
 Please refer to the [Browser section](https://contributing.bitwarden.com/getting-started/clients/browser/) of the [Contributing Documentation](https://contributing.bitwarden.com/) for build instructions, recommended tooling, code style tips, and lots of other great information to get you started.

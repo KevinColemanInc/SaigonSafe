@@ -465,10 +465,10 @@ export class BrowserApi {
   }
 
   /**
-   * Returns true if the vault popup is currently open.
+   * Returns true if the main extension view is currently open.
    *
-   * Uses `chrome.runtime.getContexts()` on MV3 (Chrome/Edge),
-   * and falls back to `chrome.extension.getViews()` for MV2 (Firefox) and Safari.
+   * Uses `chrome.runtime.getContexts()` on MV3 and falls back to
+   * `chrome.extension.getViews()` for MV2 and Safari.
    */
   static async isPopupOpen(): Promise<boolean> {
     if (
@@ -476,11 +476,18 @@ export class BrowserApi {
       BrowserApi.isManifestVersion(3)
     ) {
       const contexts = await chrome.runtime.getContexts({});
-      return contexts.some((context) => context.contextType === "POPUP");
+      return contexts.some(
+        (context) => context.contextType === "POPUP" || context.contextType === "SIDE_PANEL",
+      );
     }
 
-    // MV2/Safari — background page can use getExtensionViews
-    return BrowserApi.getExtensionViews({ type: "popup" }).length > 0;
+    if (BrowserApi.getExtensionViews({ type: "popup" }).length > 0) {
+      return true;
+    }
+
+    return BrowserApi.getExtensionViews({ type: "tab" }).some((view) =>
+      view.location.href.includes("uilocation=sidebar"),
+    );
   }
 
   /**

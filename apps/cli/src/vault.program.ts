@@ -519,7 +519,7 @@ export class VaultProgram extends BaseProgram {
       .option("--format <format>", "Export file format.")
       .option(
         "--password [password]",
-        "Use password to encrypt instead of your Bitwarden account encryption key. Only applies to the encrypted_json format.",
+        "Use password to encrypt instead of your SaigonSafe account encryption key. Only applies to the encrypted_json format.",
       )
       .option("--organizationid <organizationid>", "Organization id for an organization.")
       .on("--help", () => {

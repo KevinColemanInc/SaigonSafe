@@ -259,6 +259,11 @@ export class AppComponent implements OnInit, OnDestroy {
             // FIXME: Verify that this floating promise is intentional. If it is, add an explanatory comment and ensure there is proper error handling.
             // eslint-disable-next-line @typescript-eslint/no-floating-promises
             this.router.navigate(["/"]);
+          } else if (msg.command === "navigatePopup") {
+            const route = this.getPopupRouteFromExtensionUrl(msg.url);
+            if (route != null) {
+              await this.router.navigateByUrl(route);
+            }
           } else if (msg.command === "convertAccountToKeyConnector") {
             // FIXME: Verify that this floating promise is intentional. If it is, add an explanatory comment and ensure there is proper error handling.
             // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -323,6 +328,21 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private showToast(msg: any) {
     this.platformUtilsService.showToast(msg.type, msg.title, msg.text, msg.options);
+  }
+
+  private getPopupRouteFromExtensionUrl(extensionUrl?: string): string | null {
+    if (extensionUrl == null) {
+      return null;
+    }
+
+    try {
+      const parsedUrl = new URL(extensionUrl, window.location.origin);
+      const route = parsedUrl.hash.slice(1);
+      return route.length > 0 ? route : "/";
+    } catch (error) {
+      this.logService.error(`Invalid extension route received for popup navigation: ${error}`);
+      return null;
+    }
   }
 
   private async showDialog(msg: SimpleDialogOptions) {

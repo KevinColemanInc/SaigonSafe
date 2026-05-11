@@ -635,6 +635,16 @@ describe("CipherViewLikeUtils", () => {
         expect(CipherViewLikeUtils.hasCopyableValue(cipherListView, "publicKey")).toBe(false);
       });
 
+      it("does not treat a hidden search pin as a copyable secure note value", () => {
+        const cipherListView = {
+          type: "secureNote",
+          notes: "<!--BW-SEARCH-PIN:1234-->",
+          copyableFields: ["SecureNotes"],
+        } as CipherListView;
+
+        expect(CipherViewLikeUtils.hasCopyableValue(cipherListView, "secureNote")).toBe(false);
+      });
+
       it("returns false for login username when copyableFields includes it but the value is empty", () => {
         const cipherListView = {
           type: { login: { username: "" } },
@@ -721,6 +731,13 @@ describe("CipherViewLikeUtils", () => {
         expect(CipherViewLikeUtils.getNotes(cipherView)).toBe("This is a test note");
       });
 
+      it("strips a hidden search pin from notes", () => {
+        const cipherView = createCipherView();
+        cipherView.notes = "This is a test note\n<!--BW-SEARCH-PIN:1234-->";
+
+        expect(CipherViewLikeUtils.getNotes(cipherView)).toBe("This is a test note");
+      });
+
       it("returns undefined when notes are not present", () => {
         const cipherView = createCipherView();
         cipherView.notes = undefined;
@@ -737,6 +754,15 @@ describe("CipherViewLikeUtils", () => {
         } as CipherListView;
 
         expect(CipherViewLikeUtils.getNotes(cipherListView)).toBe("List view notes");
+      });
+
+      it("returns undefined when notes only contain a hidden search pin", () => {
+        const cipherListView = {
+          type: "secureNote",
+          notes: "<!--BW-SEARCH-PIN:1234-->",
+        } as CipherListView;
+
+        expect(CipherViewLikeUtils.getNotes(cipherListView)).toBeUndefined();
       });
 
       it("returns undefined when notes are not present", () => {

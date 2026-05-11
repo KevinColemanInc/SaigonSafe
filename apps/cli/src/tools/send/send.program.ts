@@ -41,7 +41,7 @@ export class SendProgram extends BaseProgram {
     return new Command("send")
       .argument("<data>", "The data to Send. Specify as a filepath with the --file option")
       .description(
-        "Work with Bitwarden sends. A Send can be quickly created using this command or subcommands can be used to fine-tune the Send",
+        "Work with SaigonSafe sends. A Send can be quickly created using this command or subcommands can be used to fine-tune the Send",
       )
       .option("-f, --file", "Specifies that <data> is a filepath")
       .option(
@@ -97,7 +97,7 @@ export class SendProgram extends BaseProgram {
   private receiveCommand(): Command {
     return new Command("receive")
       .arguments("<url>")
-      .description("Access a Bitwarden Send from a url")
+      .description("Access a SaigonSafe Send from a url")
       .option("--password <password>", "Password needed to access the Send.")
       .option("--passwordenv <passwordenv>", "Environment variable storing the Send's password")
       .option(

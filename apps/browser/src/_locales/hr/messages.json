@@ -1,16 +1,16 @@
 {
   "appName": {
-    "message": "Bitwarden"
+    "message": "Saigon Safe"
   },
   "appLogoLabel": {
-    "message": "Bitwarden logo"
+    "message": "Saigon Safe logo"
   },
   "extName": {
-    "message": "Bitwarden upravitelj lozinki",
+    "message": "Kevinwarden Password Manager",
     "description": "Extension name, MUST be less than 40 characters (Safari restriction)"
   },
   "extDesc": {
-    "message": "Kod kuće, na poslu ili u pokretu, Bitwarden štiti sve tvoje lozinke, pristupne ključeve i osjetljive informacije",
+    "message": "Kod kuće, na poslu ili u pokretu, Saigon Safe štiti sve tvoje lozinke, pristupne ključeve i osjetljive informacije",
     "description": "Extension description, MUST be less than 112 characters (Safari restriction)"
   },
   "loginOrCreateNewAccount": {
@@ -23,7 +23,7 @@
     "message": "Stvori račun"
   },
   "newToBitwarden": {
-    "message": "Novi u Bitwardenu?"
+    "message": "Novi u Saigon Safeu?"
   },
   "logInWithPasskey": {
     "message": "Prijava pristupnim ključem"
@@ -300,22 +300,22 @@
     "message": "Nastavi na web aplikaciju?"
   },
   "continueToWebAppDesc": {
-    "message": "Pronađi više značajki svojeg Bitwarden računa u web aplikaciji."
+    "message": "Pronađi više značajki svojeg Saigon Safe računa u web aplikaciji."
   },
   "continueToHelpCenter": {
     "message": "Nastavi u centar za pomoć?"
   },
   "continueToHelpCenterDesc": {
-    "message": "Za pomoć oko korištenja Bitwardena posjeti centar za pomoć."
+    "message": "Za pomoć oko korištenja Saigon Safea posjeti centar za pomoć."
   },
   "continueToBrowserExtensionStore": {
     "message": "Nastaviti na trgovinu proširenja za preglednik?"
   },
   "continueToBrowserExtensionStoreDesc": {
-    "message": "Želiš preporučiti Bitwarden drugima? Posjeti trgovinu proširenja svojeg preglednika i ostavi recenziju."
+    "message": "Želiš preporučiti Saigon Safe drugima? Posjeti trgovinu proširenja svojeg preglednika i ostavi recenziju."
   },
   "changeMasterPasswordOnWebConfirmation": {
-    "message": "Svoju lozinku možeš promijeniti u Bitwarden web aplikaciji."
+    "message": "Svoju lozinku možeš promijeniti u Saigon Safe web aplikaciji."
   },
   "fingerprintPhrase": {
     "message": "Jedinstvena fraza",
@@ -332,43 +332,43 @@
     "message": "Odjava"
   },
   "aboutBitwarden": {
-    "message": "O Bitwardenu"
+    "message": "O Saigon Safeu"
   },
   "about": {
     "message": "O aplikaciji"
   },
   "moreFromBitwarden": {
-    "message": "Više od Bitwardena"
+    "message": "Više od Saigon Safea"
   },
   "continueToBitwardenDotCom": {
-    "message": "Nastavi na bitwarden.com?"
+    "message": "Nastavi na saigonsafe.com?"
   },
   "bitwardenForBusiness": {
-    "message": "Bitwarden za tvrtke"
+    "message": "Saigon Safe za tvrtke"
   },
   "bitwardenAuthenticator": {
-    "message": "Bitwarden autentifikator"
+    "message": "Saigon Safe autentifikator"
   },
   "continueToAuthenticatorPageDesc": {
-    "message": "Bitwarden autentifikator omogućuje pohranu autentifikatorskih ključeva i generiranje TOTP kodova za dvostruku autentifikaciju. Saznaj više na web stranici bitwarden.com"
+    "message": "Saigon Safe autentifikator omogućuje pohranu autentifikatorskih ključeva i generiranje TOTP kodova za dvostruku autentifikaciju. Saznaj više na web stranici saigonsafe.com"
   },
   "bitwardenSecretsManager": {
-    "message": "Bitwarden Secrets Manager"
+    "message": "Saigon Safe Secrets Manager"
   },
   "continueToSecretsManagerPageDesc": {
-    "message": "Sigurno pohrani, upravljaj i dijeli programerske tajne s Bitwarden Secrets Managerom. Saznajte više na web stranici bitwarden.com."
+    "message": "Sigurno pohrani, upravljaj i dijeli programerske tajne s Saigon Safe Secrets Managerom. Saznajte više na web stranici saigonsafe.com."
   },
   "passwordlessDotDev": {
     "message": "Passwordless.dev"
   },
   "continueToPasswordlessDotDevPageDesc": {
-    "message": "Stvori laka i sigurna iskustva prijave bez tradicionalnih lozinki uz Passwordless.dev. Saznaj više na web stranici bitwarden.com."
+    "message": "Stvori laka i sigurna iskustva prijave bez tradicionalnih lozinki uz Passwordless.dev. Saznaj više na web stranici saigonsafe.com."
   },
   "freeBitwardenFamilies": {
-    "message": "Besplatni Bitwarden Families"
+    "message": "Besplatni Saigon Safe Families"
   },
   "freeBitwardenFamiliesPageDesc": {
-    "message": "Ispunjavaš uvjete za besplatni Bitwarden Families. Iskoristi ovu ponudu u web aplikaciji već danas."
+    "message": "Ispunjavaš uvjete za besplatni Saigon Safe Families. Iskoristi ovu ponudu u web aplikaciji već danas."
   },
   "version": {
     "message": "Verzija"
@@ -428,13 +428,13 @@
     "message": "Pomoć i povratne informacije"
   },
   "helpCenter": {
-    "message": "Bitwarden centar za pomoć"
+    "message": "Saigon Safe centar za pomoć"
   },
   "communityForums": {
-    "message": "Istraži forume zajednice Bitwarden"
+    "message": "Istraži forume zajednice Saigon Safe"
   },
   "contactSupport": {
-    "message": "Kontaktiraj Bitwarden pomoć"
+    "message": "Kontaktiraj Saigon Safe pomoć"
   },
   "sync": {
     "message": "Sinkronizacija"
@@ -456,7 +456,7 @@
     "message": "Automatski generiraj jake, jedinstvene lozinke."
   },
   "bitWebVaultApp": {
-    "message": "Bitwarden web trezor"
+    "message": "Saigon Safe web trezor"
   },
   "select": {
     "message": "Odaberi"
@@ -919,10 +919,10 @@
     "message": "Učini dvostruku autentifikaciju besprijekornom"
   },
   "totpHelper": {
-    "message": "Bitwarden može pohraniti i ispuniti kodove za dvostruku autentifikaciju. Kopiraj i zalijepi ključ u ovo polje."
+    "message": "Saigon Safe može pohraniti i ispuniti kodove za dvostruku autentifikaciju. Kopiraj i zalijepi ključ u ovo polje."
   },
   "totpHelperWithCapture": {
-    "message": "Bitwarden može pohraniti i ispuniti kodove za dvostruku autentifikaciju. Odaberi ikonu kamere i označi QR kôd za provjeru autentičnosti ove web stranice ili kopiraj i zalijepi ključ u ovo polje."
+    "message": "Saigon Safe može pohraniti i ispuniti kodove za dvostruku autentifikaciju. Odaberi ikonu kamere i označi QR kôd za provjeru autentičnosti ove web stranice ili kopiraj i zalijepi ključ u ovo polje."
   },
   "learnMoreAboutAuthenticators": {
     "message": "Više o autentifikatorima"
@@ -943,7 +943,7 @@
     "message": "Prijavi se"
   },
   "logInToBitwarden": {
-    "message": "Prijavi se u Bitwarden"
+    "message": "Prijavi se u Saigon Safe"
   },
   "enterTheCodeSentToYourEmail": {
     "message": "Unesi kôd poslan e-poštom"
@@ -1003,10 +1003,10 @@
     "message": "Mapa dodana"
   },
   "twoStepLoginConfirmation": {
-    "message": "Prijava dvostrukom autentifikacijom čini tvoj račun još sigurnijim tako što će zahtijevati potvrdu prijave drugim uređajem kao što je sigurnosni ključ, autentifikatorska aplikacija, SMS, poziv ili e-pošta. Prijavu dvostrukom autentifikacijom možeš omogućiti na web trezoru. Želiš li sada posjetiti bitwarden.com?"
+    "message": "Prijava dvostrukom autentifikacijom čini tvoj račun još sigurnijim tako što će zahtijevati potvrdu prijave drugim uređajem kao što je sigurnosni ključ, autentifikatorska aplikacija, SMS, poziv ili e-pošta. Prijavu dvostrukom autentifikacijom možeš omogućiti na web trezoru. Želiš li sada posjetiti saigonsafe.com?"
   },
   "twoStepLoginConfirmationContent": {
-    "message": "Učini svoj račun sigurnijim uključivanjem prijave dvofaktorskom autentifikacijom u Bitwarden web aplikaciji."
+    "message": "Učini svoj račun sigurnijim uključivanjem prijave dvofaktorskom autentifikacijom u Saigon Safe web aplikaciji."
   },
   "twoStepLoginConfirmationTitle": {
     "message": "Nastavi na web aplikaciju?"
@@ -1111,7 +1111,7 @@
     "message": "Mogućnosti spremanja u trezor"
   },
   "addLoginNotificationDesc": {
-    "message": "Upit za dodavanje prijave pojavljuje se kada se otkrije prva prijava na neko web mjesto. Bitwarden će te pitatati želiš li uneseno korisničko ime i lozinku spremiti u svoj trezor."
+    "message": "Upit za dodavanje prijave pojavljuje se kada se otkrije prva prijava na neko web mjesto. Saigon Safe će te pitatati želiš li uneseno korisničko ime i lozinku spremiti u svoj trezor."
   },
   "addLoginNotificationDescAlt": {
     "message": "Pitaj za dodavanje stavke ako nije pronađena u tvojem trezoru. Primjenjuje se na sve prijavljene račune."
@@ -1158,7 +1158,7 @@
     "message": "Idi na postavku"
   },
   "notificationAddDesc": {
-    "message": "Treba li Bitwarden zapamtiti ovu lozinku?"
+    "message": "Treba li Saigon Safe zapamtiti ovu lozinku?"
   },
   "notificationAddSave": {
     "message": "Spremi"
@@ -1194,7 +1194,7 @@
     }
   },
   "notificationLoginSaveConfirmation": {
-    "message": "spremljeno u Bitwarden.",
+    "message": "spremljeno u Saigon Safe.",
     "description": "Shown to user after item is saved."
   },
   "notificationLoginUpdatedConfirmation": {
@@ -1296,13 +1296,13 @@
     "message": "Pitaj za spremanje novih pristupnih ključeva ili se prijavi pomoću pristupnih ključeva pohranjenih u tvojem trezoru. Primjenjuje se na sve prijavljene račune."
   },
   "notificationChangeDesc": {
-    "message": "Želiš li ovu lozinku ažurirati u Bitwarden-u?"
+    "message": "Želiš li ovu lozinku ažurirati u Saigon Safe-u?"
   },
   "notificationChangeSave": {
     "message": "Ažuriraj"
   },
   "notificationUnlockDesc": {
-    "message": "Za dovršetak auto-ispune, otključaj svoj Bitwarden trezor."
+    "message": "Za dovršetak auto-ispune, otključaj svoj Saigon Safe trezor."
   },
   "notificationUnlock": {
     "message": "Otključaj"
@@ -1378,10 +1378,10 @@
     "message": "Ova će se lozinka koristiti za izvoz i uvoz ove datoteke"
   },
   "accountRestrictedOptionDescription": {
-    "message": "Upotrijebi svoj ključ za šifriranje računa, izveden iz korisničkog imena i glavne lozinke za šifriranje izvoza i ograničavanje uvoza samo na trenutni Bitwarden račun."
+    "message": "Upotrijebi svoj ključ za šifriranje računa, izveden iz korisničkog imena i glavne lozinke za šifriranje izvoza i ograničavanje uvoza samo na trenutni Saigon Safe račun."
   },
   "passwordProtectedOptionDescription": {
-    "message": "Bitwarden omogućuje dijeljenje trezora s drugima pomoću organizacijskog računa. Za više informacija posjeti bitwarden. com."
+    "message": "Saigon Safe omogućuje dijeljenje trezora s drugima pomoću organizacijskog računa. Za više informacija posjeti Saigon Safe. com."
   },
   "exportTypeHeading": {
     "message": "Tip izvoza"
@@ -1410,7 +1410,7 @@
     "message": "Ovaj izvoz šifrira tvoje podatke koristeći ključ za šifriranje. Promijeniš li naknadno ključ za šifriranje, potrebno je ponovno napraviti izvoz jer nećeš moći dešifrirati ovu izvezenu datoteku."
   },
   "encExportAccountWarningDesc": {
-    "message": "Ključ za šifriranje jedinstven je za svakog Bitwarden korisnika, kako bi se šifrirani izvoz mogao uvesti u drugi korisnički račun."
+    "message": "Ključ za šifriranje jedinstven je za svakog Saigon Safe korisnika, kako bi se šifrirani izvoz mogao uvesti u drugi korisnički račun."
   },
   "exportMasterPassword": {
     "message": "Unesi glavnu lozinku za izvoz podataka iz trezora."
@@ -1419,7 +1419,7 @@
     "message": "Dijeljeno"
   },
   "bitwardenForBusinessPageDesc": {
-    "message": "Bitwarden for Business omogućuje dijeljenje stavki trezora s drugima koristeći organizacije. Za više informacija posjeti bitwarden.com."
+    "message": "Saigon Safe for Business omogućuje dijeljenje stavki trezora s drugima koristeći organizacije. Za više informacija posjeti saigonsafe.com."
   },
   "moveToOrganization": {
     "message": "Premjesti u organizaciju"
@@ -1531,7 +1531,7 @@
     "message": "Upravljaj članstvom"
   },
   "premiumManageAlert": {
-    "message": "Svojim članstvom možeš upravljati na web trezoru. Želiš li sada posjetiti bitwarden.com?"
+    "message": "Svojim članstvom možeš upravljati na web trezoru. Želiš li sada posjetiti saigonsafe.com?"
   },
   "premiumRefresh": {
     "message": "Osvježi status članstva"
@@ -1585,13 +1585,13 @@
     "message": "Kupi premium članstvo"
   },
   "premiumPurchaseAlertV2": {
-    "message": "Premium možeš kupiti u postavkama računa na Bitwarden web aplikaciji."
+    "message": "Premium možeš kupiti u postavkama računa na Saigon Safe web aplikaciji."
   },
   "premiumCurrentMember": {
     "message": "Ti si premium član!"
   },
   "premiumCurrentMemberThanks": {
-    "message": "Hvala ti što podupireš Bitwarden."
+    "message": "Hvala ti što podupireš Saigon Safe."
   },
   "premiumFeatures": {
     "message": "Nadogradi na Premium za:"
@@ -1697,7 +1697,7 @@
     "message": "Autentifikatorska aplikacija"
   },
   "authenticatorAppDescV2": {
-    "message": "Unesi kôd generiran autentifikatorskom aplikacijom kao npr. Bitwarden Authenticatorom.",
+    "message": "Unesi kôd generiran autentifikatorskom aplikacijom kao npr. Saigon Safe Authenticatorom.",
     "description": "'Bitwarden Authenticator' is a product name and should not be translated."
   },
   "yubiKeyTitleV2": {
@@ -1730,7 +1730,7 @@
     "message": "Vlastito hosting okruženje"
   },
   "selfHostedBaseUrlHint": {
-    "message": "Navedi osnovni URL svoje lokalne Bitwarden instalacije, npr.: https://bitwarden.company.com"
+    "message": "Navedi osnovni URL svoje lokalne Saigon Safe instalacije, npr.: https://saigonsafe.company.com"
   },
   "selfHostedCustomEnvHeader": {
     "message": "Kao naprednu postavku, možeš odrediti osnovni URL svake usluge zasebno."
@@ -1780,7 +1780,7 @@
     "message": "Jednostavno pronađi prijedloge auto-ispune"
   },
   "autofillSpotlightDesc": {
-    "message": "Isključi postavke auto-ispune preglenika kako se ne bi kosile s Bitwardenom."
+    "message": "Isključi postavke auto-ispune preglenika kako se ne bi kosile s Saigon Safeom."
   },
   "turnOffBrowserAutofill": {
     "message": "Isključi auto-ispunu za $BROWSER$",
@@ -1825,7 +1825,7 @@
     "message": "Prikaži prijedloge auto-ispune na poljima obrazaca"
   },
   "howDoesBitwardenProtectFromPhishing": {
-    "message": "Kako Bitwarden štiti tvoje podatke od phishinga?"
+    "message": "Kako Saigon Safe štiti tvoje podatke od phishinga?"
   },
   "currentWebsite": {
     "message": "Trenutna web stranica"
@@ -2466,7 +2466,7 @@
     "message": "Slaba glavna lozinka"
   },
   "weakMasterPasswordDesc": {
-    "message": "Odabrana glavna lozinka je slaba. Trebaš koristiti jaču glavnu lozinku (ili frazu) kako bi tvoj Bitwarden račun bio pravilno zaštićen. Sigurno želiš koristiti ovakvu, slabu glavnu lozinku?"
+    "message": "Odabrana glavna lozinka je slaba. Trebaš koristiti jaču glavnu lozinku (ili frazu) kako bi tvoj Saigon Safe račun bio pravilno zaštićen. Sigurno želiš koristiti ovakvu, slabu glavnu lozinku?"
   },
   "rotateAccountEncKey": {
     "message": "Dodatno rotiraj ključ za šifriranje mojeg računa"
@@ -2506,10 +2506,10 @@
     "message": "Postavi PIN"
   },
   "setYourPinCode": {
-    "message": "Postavi svoj PIN kôd za otključavanje Bitwardena. Postavke PIN-a se resetiraju ako se potpuno odjaviš iz aplikacije."
+    "message": "Postavi svoj PIN kôd za otključavanje Saigon Safea. Postavke PIN-a se resetiraju ako se potpuno odjaviš iz aplikacije."
   },
   "setPinCode": {
-    "message": "Ovim PIN-om možeš otključati Bitwarden. Tvoj PIN će se resetirati ako se ikada potpuno odjaviš iz aplikacije."
+    "message": "Ovim PIN-om možeš otključati Saigon Safe. Tvoj PIN će se resetirati ako se ikada potpuno odjaviš iz aplikacije."
   },
   "pinRequired": {
     "message": "Potreban je PIN."
@@ -2530,7 +2530,7 @@
     "message": "Čekanje potvrde iz desktop aplikacije"
   },
   "awaitDesktopDesc": {
-    "message": "Potvrdi korištenje biometrije u Bitwarden desktop aplikaciji za korištenje biometrije u pregledniku."
+    "message": "Potvrdi korištenje biometrije u Saigon Safe desktop aplikaciji za korištenje biometrije u pregledniku."
   },
   "lockWithMasterPassOnRestart": {
     "message": "Zaključaj glavnom lozinkom kod svakog pokretanja preglednika"
@@ -2654,7 +2654,7 @@
     }
   },
   "topLayerHijackWarning": {
-    "message": "Ova stranica ometa Bitwarden iskustvo. Kao sigurnosna mjera, Bitwarden inline izbornik je privremeno onemogućen."
+    "message": "Ova stranica ometa Saigon Safe iskustvo. Kao sigurnosna mjera, Saigon Safe inline izbornik je privremeno onemogućen."
   },
   "setMasterPassword": {
     "message": "Postavi glavnu lozinku"
@@ -2711,7 +2711,7 @@
     "message": "Tvoja nova glavna lozinka ne ispunjava zahtjeve."
   },
   "receiveMarketingEmailsV2": {
-    "message": "Primaj e-poštom od Bitwardena savjete, najave i mogućnosti istraživanja."
+    "message": "Primaj e-poštom od Saigon Safea savjete, najave i mogućnosti istraživanja."
   },
   "unsubscribe": {
     "message": "Poništi pretplatu"
@@ -2762,13 +2762,13 @@
     "message": "Integracija s preglednikom nije omogućena"
   },
   "desktopIntegrationDisabledDesc": {
-    "message": "Integracija s preglednikom nije omogućena u Bitwarden desktop aplikaciji. Omogući integraciju u postavkama desktop aplikacije."
+    "message": "Integracija s preglednikom nije omogućena u Saigon Safe desktop aplikaciji. Omogući integraciju u postavkama desktop aplikacije."
   },
   "startDesktopTitle": {
-    "message": "Pokreni Bitwarden dekstop aplikaciju"
+    "message": "Pokreni Saigon Safe dekstop aplikaciju"
   },
   "startDesktopDesc": {
-    "message": "Bitwarden desktop aplikacija mora biti pokrenuta prije korištenja ove funkcije."
+    "message": "Saigon Safe desktop aplikacija mora biti pokrenuta prije korištenja ove funkcije."
   },
   "errorEnableBiometricTitle": {
     "message": "Nije moguće omogućiti biometriju"
@@ -2798,7 +2798,7 @@
     "message": "Biometrija nije omogućena"
   },
   "biometricsNotEnabledDesc": {
-    "message": "Biometrija preglednika zahtijeva prethodno omogućenu biometriju u Bitwarden desktop aplikaciji."
+    "message": "Biometrija preglednika zahtijeva prethodno omogućenu biometriju u Saigon Safe desktop aplikaciji."
   },
   "biometricsNotSupportedTitle": {
     "message": "Biometrija nije podržana"
@@ -2822,13 +2822,13 @@
     "message": "Biometrija neuspješna"
   },
   "biometricsFailedDesc": {
-    "message": "Biometrija se ne može dovršiti. Pokušaj glavnom lozinkom ili se odjavi i ponovno prijavi. Ako se ovo nastavi, obrati se Bitwarden podršci."
+    "message": "Biometrija se ne može dovršiti. Pokušaj glavnom lozinkom ili se odjavi i ponovno prijavi. Ako se ovo nastavi, obrati se Saigon Safe podršci."
   },
   "nativeMessaginPermissionErrorTitle": {
     "message": "Dopuštenje nije dano"
   },
   "nativeMessaginPermissionErrorDesc": {
-    "message": "Bez odobrenja za komunikaciju s Bitwarden Desktop aplikacijom nije moguće korištenje biometrije u proširenju preglednika."
+    "message": "Bez odobrenja za komunikaciju s Saigon Safe Desktop aplikacijom nije moguće korištenje biometrije u proširenju preglednika."
   },
   "nativeMessaginPermissionSidebarTitle": {
     "message": "Greška zahtjeva dozvole"
@@ -2865,7 +2865,7 @@
     "message": "Izuzete domene"
   },
   "excludedDomainsDesc": {
-    "message": "Bitwarden neće pitati treba li spremiti prijavne podatke za ove domene. Za primjenu promjena, potrebno je osvježiti stranicu."
+    "message": "Saigon Safe neće pitati treba li spremiti prijavne podatke za ove domene. Za primjenu promjena, potrebno je osvježiti stranicu."
   },
   "blockedDomainsDesc": {
     "message": "Auto-ispuna i druge vezane značajke neće biti ponuđene za ova web mjesta. Potrebno je osvježiti stranicu zaprimjenu postavki."
@@ -2981,24 +2981,24 @@
     "message": "Ilustracija liste rizičnih prijava."
   },
   "welcomeDialogGraphicAlt": {
-    "message": "Ilustracija izgleda stranice Bitwarden trezora."
+    "message": "Ilustracija izgleda stranice Saigon Safe trezora."
   },
   "generatePasswordSlideDesc": {
-    "message": "Brzo generiraj jake, jedinstvene lozinke koristeći Bitwarden dijalog auto-ispune direktno na stranici.",
+    "message": "Brzo generiraj jake, jedinstvene lozinke koristeći Saigon Safe dijalog auto-ispune direktno na stranici.",
     "description": "Description of the generate password slide on the at-risk password page carousel"
   },
   "generatePasswordSlideImgAltPeriod": {
-    "message": "Ilustracija Bitwarden dijaloga auto-ispune s prikazom generirane lozinke."
+    "message": "Ilustracija Saigon Safe dijaloga auto-ispune s prikazom generirane lozinke."
   },
   "updateInBitwarden": {
-    "message": "Ažuriraj u Bitwardenu"
+    "message": "Ažuriraj u Saigon Safeu"
   },
   "updateInBitwardenSlideDesc": {
-    "message": "Bitwarden će te pitati treba li ažurirati lozinku u upravitelju lozinki.",
+    "message": "Saigon Safe će te pitati treba li ažurirati lozinku u upravitelju lozinki.",
     "description": "Description of the update in Bitwarden slide on the at-risk password page carousel"
   },
   "updateInBitwardenSlideImgAltPeriod": {
-    "message": "Ilustracija Bitwarden upita za ažuriranje prijave."
+    "message": "Ilustracija Saigon Safe upita za ažuriranje prijave."
   },
   "turnOnAutofill": {
     "message": "Uključi auto-ispunu"
@@ -3524,7 +3524,7 @@
     "message": "Greška kod dohvata podataka za auto-ispunu"
   },
   "couldNotDecryptVaultItemsBelow": {
-    "message": "Bitwarden nije mogao dešifrirati sljedeće stavke trezora."
+    "message": "Saigon Safe nije mogao dešifrirati sljedeće stavke trezora."
   },
   "contactCSToAvoidDataLossPart1": {
     "message": "Kontaktiraj službu za korisnike",
@@ -3628,11 +3628,11 @@
     }
   },
   "forwarderGeneratedBy": {
-    "message": "Generirao Bitwarden.",
+    "message": "Generirao Saigon Safe.",
     "description": "Displayed with the address on the forwarding service's configuration screen."
   },
   "forwarderGeneratedByWithWebsite": {
-    "message": "Web: $WEBSITE$. Generirao Bitwarden.",
+    "message": "Web: $WEBSITE$. Generirao Saigon Safe.",
     "description": "Displayed with the address on the forwarding service's configuration screen.",
     "placeholders": {
       "WEBSITE": {
@@ -3825,7 +3825,7 @@
     "message": "Obavijest je poslana na tvoj uređaj."
   },
   "notificationSentDevicePart1": {
-    "message": "Otključaj Bitwarden na svojem uređaju ili na"
+    "message": "Otključaj Saigon Safe na svojem uređaju ili na"
   },
   "notificationSentDeviceAnchor": {
     "message": "web trezoru"
@@ -4328,15 +4328,15 @@
     "message": "Preskoči na sadržaj"
   },
   "bitwardenOverlayButton": {
-    "message": "Tipka izbornika Bitwarden auto-ispune",
+    "message": "Tipka izbornika Saigon Safe auto-ispune",
     "description": "Page title for the iframe containing the overlay button"
   },
   "toggleBitwardenVaultOverlay": {
-    "message": "U/isključivanje izbornika Bitwarden auto-ispune",
+    "message": "U/isključivanje izbornika Saigon Safe auto-ispune",
     "description": "Screen reader and tool tip label for the overlay button"
   },
   "bitwardenVault": {
-    "message": "Izbornik Bitwarden auto-ispune",
+    "message": "Izbornik Saigon Safe auto-ispune",
     "description": "Page title in overlay"
   },
   "unlockYourAccountToViewMatchingLogins": {
@@ -4408,7 +4408,7 @@
     "description": "Screen reader text (aria-label) for new identity button within inline menu"
   },
   "bitwardenOverlayMenuAvailable": {
-    "message": "Dostupan je Bitwarden izbornik auto-ispune. Pritisni tipku sa strelicom prema dolje za odabir.",
+    "message": "Dostupan je Saigon Safe izbornik auto-ispune. Pritisni tipku sa strelicom prema dolje za odabir.",
     "description": "Screen reader text for announcing when the overlay opens on the page"
   },
   "turnOn": {
@@ -4726,7 +4726,7 @@
     "message": "Aktivni račun"
   },
   "bitwardenAccount": {
-    "message": "Bitwarden račun"
+    "message": "Saigon Safe račun"
   },
   "availableAccounts": {
     "message": "Dostupni računi"
@@ -4772,7 +4772,7 @@
     "description": "Label indicating the most common import formats"
   },
   "uriMatchDefaultStrategyHint": {
-    "message": "Otkrivanje podudaranja URI-ja je način na koji Bitwarden identificira prijedloge za auto-ispunu.",
+    "message": "Otkrivanje podudaranja URI-ja je način na koji Saigon Safe identificira prijedloge za auto-ispunu.",
     "description": "Explains to the user that URI match detection determines how Bitwarden suggests autofill options, and clarifies that this default strategy applies when no specific match detection is set for a login item."
   },
   "regExAdvancedOptionWarning": {
@@ -4816,23 +4816,23 @@
     "description": "Body content for dialog which asks if the user wants to proceed to the browser's keyboard shortcut settings page"
   },
   "overrideDefaultBrowserAutofillTitle": {
-    "message": "Postavi Bitwarden kao zadani upravitelj lozinki?",
+    "message": "Postavi Saigon Safe kao zadani upravitelj lozinki?",
     "description": "Dialog title facilitating the ability to override a chrome browser's default autofill behavior"
   },
   "overrideDefaultBrowserAutofillDescription": {
-    "message": "Ostavljanje ove postavke isključenom može uzrokovati sukob između prijedloga za auto-ispunu Bitwardena i tvojeg preglednika.",
+    "message": "Ostavljanje ove postavke isključenom može uzrokovati sukob između prijedloga za auto-ispunu Saigon Safea i tvojeg preglednika.",
     "description": "Dialog message facilitating the ability to override a chrome browser's default autofill behavior"
   },
   "overrideDefaultBrowserAutoFillSettings": {
-    "message": "Postavi Bitwarden kao zadani upravitelj lozinki",
+    "message": "Postavi Saigon Safe kao zadani upravitelj lozinki",
     "description": "Label for the setting that allows overriding the default browser autofill settings"
   },
   "privacyPermissionAdditionNotGrantedTitle": {
-    "message": "Nije moguće postaviti Bitwarden kao zadani upravitelj lozinki",
+    "message": "Nije moguće postaviti Saigon Safe kao zadani upravitelj lozinki",
     "description": "Title for the dialog that appears when the user has not granted the extension permission to set privacy settings"
   },
   "privacyPermissionAdditionNotGrantedDescription": {
-    "message": "Za postavljanje Bitwardena kao zadanog upravitelja lozinki moraš pregledniku dati dopuštenje privatnosti.",
+    "message": "Za postavljanje Saigon Safea kao zadanog upravitelja lozinki moraš pregledniku dati dopuštenje privatnosti.",
     "description": "Description for the dialog that appears when the user has not granted the extension permission to set privacy settings"
   },
   "makeDefault": {
@@ -5173,16 +5173,16 @@
     "message": "Preuzmi privitak"
   },
   "downloadBitwarden": {
-    "message": "Preuzmi Bitwarden"
+    "message": "Preuzmi Saigon Safe"
   },
   "downloadBitwardenOnAllDevices": {
-    "message": "Preuzmi Bitwarden na svim uređajima"
+    "message": "Preuzmi Saigon Safe na svim uređajima"
   },
   "getTheMobileApp": {
     "message": "Nabavi mobilnu aplikaciju"
   },
   "getTheMobileAppDesc": {
-    "message": "Pristupi svojim lozinkama bilo gdje s Bitwarden mobilnom aplikacijom."
+    "message": "Pristupi svojim lozinkama bilo gdje s Saigon Safe mobilnom aplikacijom."
   },
   "getTheDesktopApp": {
     "message": "Nabavi aplikaciju za stolna računala"
@@ -5191,7 +5191,7 @@
     "message": "Pristupi svojem trezoru bez preglednika, a zatim postavi otključavanje biometrijom za brže otključavanje aplikacije za stolna računala i prošitenja preglednika."
   },
   "downloadFromBitwardenNow": {
-    "message": "Odmah preusmi s bitwarden.com"
+    "message": "Odmah preusmi s saigonsafe.com"
   },
   "getItOnGooglePlay": {
     "message": "Nabavi u Google Play"
@@ -5656,10 +5656,10 @@
     "message": "Biometrijsko otključavanje nije dostupno zbog pogrešno konfiguriranih sistemskih datoteka."
   },
   "biometricsStatusHelptextDesktopDisconnected": {
-    "message": "Biometrijsko otključavanje nije dostupno jer je Bitwarden dekstop aplikacija zatvorena."
+    "message": "Biometrijsko otključavanje nije dostupno jer je Saigon Safe dekstop aplikacija zatvorena."
   },
   "biometricsStatusHelptextNotEnabledInDesktop": {
-    "message": "Biometrijsko otključavanje nije dostupno jer nije omogućeno za $EMAIL$ u Bitwarden desktop aplikaciji.",
+    "message": "Biometrijsko otključavanje nije dostupno jer nije omogućeno za $EMAIL$ u Saigon Safe desktop aplikaciji.",
     "placeholders": {
       "email": {
         "content": "$1",
@@ -5694,7 +5694,7 @@
     "description": "Notification message for when a password has been regenerated"
   },
   "saveToBitwarden": {
-    "message": "Spremi u Bitwarden",
+    "message": "Spremi u Saigon Safe",
     "description": "Confirmation message for saving a login to Bitwarden"
   },
   "spaceCharacterDescriptor": {
@@ -5920,13 +5920,13 @@
     "message": "Trezor štiti više od lozinki. Sigurno spremi prijave, identitete, kartice i bilješke."
   },
   "introCarouselLabel": {
-    "message": "Dobrodošli u Bitwarden"
+    "message": "Dobrodošli u Saigon Safe"
   },
   "securityPrioritized": {
     "message": "Sigurnost je imperativ"
   },
   "securityPrioritizedBody": {
-    "message": "Spremi prijave, kartice i identitete u svoj sigurni trezor. Bitwarden koristi end-to-end enkripciju bez znanja kako bi zaštitio ono što ti je važno."
+    "message": "Spremi prijave, kartice i identitete u svoj sigurni trezor. Saigon Safe koristi end-to-end enkripciju bez znanja kako bi zaštitio ono što ti je važno."
   },
   "quickLogin": {
     "message": "Brza i jednostavna prijava"
@@ -5944,7 +5944,7 @@
     "message": "Tvoji podaci kada god i gdje god su ti potrebni"
   },
   "secureDevicesBody": {
-    "message": "Spremi neograničen broj lozinki na neograničenom broju uređaja s Bitwarden mobilnom aplikacijom, proširenjem za preglednik i aplikacijom za stolna računala."
+    "message": "Spremi neograničen broj lozinki na neograničenom broju uređaja s Saigon Safe mobilnom aplikacijom, proširenjem za preglednik i aplikacijom za stolna računala."
   },
   "nudgeBadgeAria": {
     "message": "1 obavijest"
@@ -5953,7 +5953,7 @@
     "message": "Uvezi postojeće lozinke"
   },
   "emptyVaultNudgeBody": {
-    "message": "Koristi uvoz za brzi prijenos prijava u Bitwarden bez ručnog dodavanja."
+    "message": "Koristi uvoz za brzi prijenos prijava u Saigon Safe bez ručnog dodavanja."
   },
   "emptyVaultNudgeButton": {
     "message": "Uvezi odmah"
@@ -6072,13 +6072,13 @@
     "message": "O ovoj postavci"
   },
   "permitCipherDetailsDescription": {
-    "message": "Bitwarden će koristiti spremljene URI-je za prijavu kako bi identificirao ikonu ili URL za promjenu lozinke koji treba koristiti za poboljšanje tvojeg iskustva. Nikakvi podaci se ne prikupljaju, niti spremaju kada koristiš ovu uslugu."
+    "message": "Saigon Safe će koristiti spremljene URI-je za prijavu kako bi identificirao ikonu ili URL za promjenu lozinke koji treba koristiti za poboljšanje tvojeg iskustva. Nikakvi podaci se ne prikupljaju, niti spremaju kada koristiš ovu uslugu."
   },
   "noPermissionsViewPage": {
     "message": "Nemaš dozvolu za pregled ove stranice. Pokušaj se prijaviti s drugim računom."
   },
   "wasmNotSupported": {
-    "message": "WebAssembly ili nije podržan ili nije omogućen u tvom pregledniku. WebAssembly je potreban za korištenje Bitwarden aplikacije.",
+    "message": "WebAssembly ili nije podržan ili nije omogućen u tvom pregledniku. WebAssembly je potreban za korištenje Saigon Safe aplikacije.",
     "description": "'WebAssembly' is a technical term and should not be translated."
   },
   "showMore": {
@@ -6153,7 +6153,7 @@
     "message": "Greška: ne mogu dešifrirati"
   },
   "removeMasterPasswordForOrgUserKeyConnector": {
-    "message": "Tvoja organizacija više ne koristi glavne lozinke za prijavu u Bitwarden. Za nastavak, potvrdi orgnaizaciju i domenu."
+    "message": "Tvoja organizacija više ne koristi glavne lozinke za prijavu u Saigon Safe. Za nastavak, potvrdi orgnaizaciju i domenu."
   },
   "continueWithLogIn": {
     "message": "Nastavi s prijavom"
@@ -6239,7 +6239,7 @@
     "message": "Postavi metodu otključavanja za promjenu radnje nakon isteka vremenskog ograničenja trezora"
   },
   "sessionTimeoutSuppressedByConnectedDevice": {
-    "message": "Upravlja se putem Bitwarden aplikacije na računalu. Za uređivanje, otvori Bitwarden aplikaciju."
+    "message": "Upravlja se putem aplikacije Saigon Safe za računalo. Za uređivanje otvori aplikaciju za računalo."
   },
   "percentageCompleted": {
     "message": "dovršeno $PERCENT$ %",
@@ -6335,13 +6335,13 @@
     "message": "Unesi više adresa, odvojenih zarezom."
   },
   "emailPlaceholder": {
-    "message": "korisnik@bitwarden.com , korisnik@primjer.hr"
+    "message": "korisnik@saigonsafe.com , korisnik@primjer.hr"
   },
   "emailPlaceholderMultiple": {
-    "message": "korisnik@bitwarden.com, korisnik@primjer.hr"
+    "message": "korisnik@saigonsafe.com, korisnik@primjer.hr"
   },
   "downloadBitwardenApps": {
-    "message": "Preuzmi Bitwarden aplikaciju"
+    "message": "Preuzmi Saigon Safe aplikaciju"
   },
   "emailProtected": {
     "message": "Zaštićeno e-poštom"

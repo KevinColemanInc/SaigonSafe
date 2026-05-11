@@ -18,6 +18,8 @@ import { CipherView } from "../models/view/cipher.view";
 import { LoginUriView } from "../models/view/login-uri.view";
 import { LoginView } from "../models/view/login.view";
 
+import { getVisibleNotes } from "./search-pin-utils";
+
 /**
  * Type union of {@link CipherView} and {@link CipherListView}.
  */
@@ -247,6 +249,13 @@ export class CipherViewLikeUtils {
         }
       }
 
+      if (copyField === "secureNote") {
+        const notes = (cipher as { notes?: string | null }).notes;
+        if (notes !== undefined) {
+          return !!getVisibleNotes(notes);
+        }
+      }
+
       let _copyField = copyField;
 
       if (_copyField === "username" && this.getType(cipher) === CipherType.Identity) {
@@ -275,7 +284,7 @@ export class CipherViewLikeUtils {
       case "address":
         return !!cipher.identity?.fullAddressForCopy;
       case "secureNote":
-        return !!cipher.notes;
+        return !!getVisibleNotes((cipher as { notes?: string | null }).notes);
       case "privateKey":
         return !!cipher.sshKey?.privateKey;
       case "publicKey":
@@ -312,12 +321,14 @@ export class CipherViewLikeUtils {
 
   /**
    * Returns the notes from the cipher.
+   * Hidden search PIN metadata stored in notes is stripped from the returned value.
    *
    * @param cipher - The cipher to extract notes from (either `CipherView` or `CipherListView`)
    * @returns The notes string if present, or `undefined` if not set
    */
   static getNotes = (cipher: CipherViewLike): string | undefined => {
-    return cipher.notes;
+    const notes = getVisibleNotes((cipher as { notes?: string | null }).notes);
+    return notes === "" ? undefined : notes;
   };
 
   /**

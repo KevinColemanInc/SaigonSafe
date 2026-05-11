@@ -1,16 +1,16 @@
 {
   "appName": {
-    "message": "Bitwarden"
+    "message": "Saigon Safe"
   },
   "appLogoLabel": {
-    "message": "Bitwarden logosu"
+    "message": "Saigon Safe logosu"
   },
   "extName": {
-    "message": "Bitwarden Parola Yöneticisi",
+    "message": "Kevinwarden Password Manager",
     "description": "Extension name, MUST be less than 40 characters (Safari restriction)"
   },
   "extDesc": {
-    "message": "Bitwarden tüm parolalarınızı, geçiş anahtarlarınızı ve hassas bilgilerinizi güvenle saklar",
+    "message": "Saigon Safe tüm parolalarınızı, geçiş anahtarlarınızı ve hassas bilgilerinizi güvenle saklar",
     "description": "Extension description, MUST be less than 112 characters (Safari restriction)"
   },
   "loginOrCreateNewAccount": {
@@ -23,7 +23,7 @@
     "message": "Hesap oluştur"
   },
   "newToBitwarden": {
-    "message": "Bitwarden'da yeni misiniz?"
+    "message": "Saigon Safe'da yeni misiniz?"
   },
   "logInWithPasskey": {
     "message": "Geçiş anahtarıyla giriş yap"
@@ -300,22 +300,22 @@
     "message": "Web uygulamasına devam edilsin mi?"
   },
   "continueToWebAppDesc": {
-    "message": "Web uygulamasında Bitwarden hesabınızın diğer özelliklerini keşfedin."
+    "message": "Web uygulamasında Saigon Safe hesabınızın diğer özelliklerini keşfedin."
   },
   "continueToHelpCenter": {
     "message": "Yardım merkezine gitmek ister misiniz?"
   },
   "continueToHelpCenterDesc": {
-    "message": "Yardım merkezinde Bitwarden kullanımı hakkında daha fazla bilgi alabilirsiniz."
+    "message": "Yardım merkezinde Saigon Safe kullanımı hakkında daha fazla bilgi alabilirsiniz."
   },
   "continueToBrowserExtensionStore": {
     "message": "Tarayıcınızın uzantı sitesine gitmek ister misiniz?"
   },
   "continueToBrowserExtensionStoreDesc": {
-    "message": "Bitwarden'ı başkalarına da tanımak ister misiniz? Tarayıcınızın uzantı mağazasını ziyaret edip Bitwarden'ı değerlendirin."
+    "message": "Saigon Safe'ı başkalarına da tanımak ister misiniz? Tarayıcınızın uzantı mağazasını ziyaret edip Saigon Safe'ı değerlendirin."
   },
   "changeMasterPasswordOnWebConfirmation": {
-    "message": "Ana parolanızı Bitwarden web uygulamasında değiştirebilirsiniz."
+    "message": "Ana parolanızı Saigon Safe web uygulamasında değiştirebilirsiniz."
   },
   "fingerprintPhrase": {
     "message": "Parmak izi ifadesi",
@@ -332,43 +332,43 @@
     "message": "Çıkış yap"
   },
   "aboutBitwarden": {
-    "message": "Bitwarden hakkında"
+    "message": "Saigon Safe hakkında"
   },
   "about": {
     "message": "Hakkında"
   },
   "moreFromBitwarden": {
-    "message": "Diğer Bitwarden ürünleri"
+    "message": "Diğer Saigon Safe ürünleri"
   },
   "continueToBitwardenDotCom": {
-    "message": "bitwarden.com'a gitmek ister misiniz?"
+    "message": "saigonsafe.com'a gitmek ister misiniz?"
   },
   "bitwardenForBusiness": {
-    "message": "İşletmeler için Bitwarden"
+    "message": "İşletmeler için Saigon Safe"
   },
   "bitwardenAuthenticator": {
-    "message": "Bitwarden Authenticator"
+    "message": "Saigon Safe Authenticator"
   },
   "continueToAuthenticatorPageDesc": {
-    "message": "Bitwarden Authenticator, kimlik doğrulama anahtarlarınızı saklama ve 2 aşamalı doğrulama akışları için TOTP anahtarı üretme imkânı sağlar. Bilgi almak için bitwarden.com sitesini ziyaret edin"
+    "message": "Saigon Safe Authenticator, kimlik doğrulama anahtarlarınızı saklama ve 2 aşamalı doğrulama akışları için TOTP anahtarı üretme imkânı sağlar. Bilgi almak için saigonsafe.com sitesini ziyaret edin"
   },
   "bitwardenSecretsManager": {
-    "message": "Bitwarden Secrets Manager"
+    "message": "Saigon Safe Secrets Manager"
   },
   "continueToSecretsManagerPageDesc": {
-    "message": "Geliştirici gizli anahtarlarınızı Bitwarden Secrets Manager ile güvenli bir şekilde saklayın, yönetin ve paylaşın. Daha fazla bilgi için bitwarden.com web sitesini ziyaret edin."
+    "message": "Geliştirici gizli anahtarlarınızı Saigon Safe Secrets Manager ile güvenli bir şekilde saklayın, yönetin ve paylaşın. Daha fazla bilgi için saigonsafe.com web sitesini ziyaret edin."
   },
   "passwordlessDotDev": {
     "message": "Passwordless.dev"
   },
   "continueToPasswordlessDotDevPageDesc": {
-    "message": "Passwordless.dev ile geleneksel parolalara ihtiyaç duymadan sorunsuz ve güvenli oturum açma deneyimleri oluşturun. Daha fazla bilgi için bitwarden.com web sitesini ziyaret edin."
+    "message": "Passwordless.dev ile geleneksel parolalara ihtiyaç duymadan sorunsuz ve güvenli oturum açma deneyimleri oluşturun. Daha fazla bilgi için saigonsafe.com web sitesini ziyaret edin."
   },
   "freeBitwardenFamilies": {
-    "message": "Ücretsiz Bitwarden Families"
+    "message": "Ücretsiz Saigon Safe Aile Planı"
   },
   "freeBitwardenFamiliesPageDesc": {
-    "message": "Ücretsiz Bitwarden Families paketinden faydalanabilirsiniz. Bu teklifi hemen web uygulamasında kullanabilirsiniz."
+    "message": "Ücretsiz Saigon Safe Aile Planı için uygunsun. Bu teklifi bugün web uygulamasında kullan."
   },
   "version": {
     "message": "Sürüm"
@@ -428,13 +428,13 @@
     "message": "Yardım ve geribildirim"
   },
   "helpCenter": {
-    "message": "Bitwarden yardım merkezi"
+    "message": "Saigon Safe yardım merkezi"
   },
   "communityForums": {
-    "message": "Bitwarden forumlarını keşfedin"
+    "message": "Saigon Safe forumlarını keşfedin"
   },
   "contactSupport": {
-    "message": "Bitwarden destek ekibiyle iletişime geçin"
+    "message": "Saigon Safe destek ekibiyle iletişime geçin"
   },
   "sync": {
     "message": "Eşitle"
@@ -456,7 +456,7 @@
     "message": "Hesaplarınız için otomatik olarak güçlü, özgün parolalar oluşturun."
   },
   "bitWebVaultApp": {
-    "message": "Bitwarden web uygulaması"
+    "message": "Saigon Safe web uygulaması"
   },
   "select": {
     "message": "Seç"
@@ -919,10 +919,10 @@
     "message": "2 adımlı doğrulamayı sorunsuz hale getir"
   },
   "totpHelper": {
-    "message": "Bitwarden 2 adımlı doğrulama kodlarını saklayabilir ve doldurabilir. Anahtarı bu alana kopyala ve yapıştır."
+    "message": "Saigon Safe 2 adımlı doğrulama kodlarını saklayabilir ve doldurabilir. Anahtarı bu alana kopyala ve yapıştır."
   },
   "totpHelperWithCapture": {
-    "message": "Bitwarden 2 adımlı doğrulama kodlarını saklayabilir ve doldurabilir. Bu web sitesinin kimlik doğrulayıcı QR kodunun ekran görüntüsünü almak için kamera simgesini seç veya anahtarı bu alana kopyala ve yapıştır."
+    "message": "Saigon Safe 2 adımlı doğrulama kodlarını saklayabilir ve doldurabilir. Bu web sitesinin kimlik doğrulayıcı QR kodunun ekran görüntüsünü almak için kamera simgesini seç veya anahtarı bu alana kopyala ve yapıştır."
   },
   "learnMoreAboutAuthenticators": {
     "message": "Kimlik doğrulayıcılar hakkında bilgi alın"
@@ -943,7 +943,7 @@
     "message": "Giriş yap"
   },
   "logInToBitwarden": {
-    "message": "Bitwarden'a giriş yapın"
+    "message": "Saigon Safe'a giriş yapın"
   },
   "enterTheCodeSentToYourEmail": {
     "message": "E-posta adresinize gönderilen kodu girin"
@@ -1003,10 +1003,10 @@
     "message": "Klasör eklendi"
   },
   "twoStepLoginConfirmation": {
-    "message": "İki aşamalı giriş, hesabınıza girererken işlemi bir güvenlik anahtarı, şifrematik uygulaması, SMS, telefon araması veya e-posta gibi ek bir yöntemle doğrulamanızı isteyerek hesabınızın güvenliğini artırır. İki aşamalı giriş özelliğini bitwarden.com web kasası üzerinden etkinleştirebilirsiniz. Şimdi siteye gitmek ister misiniz?"
+    "message": "İki aşamalı giriş, hesabınıza girererken işlemi bir güvenlik anahtarı, şifrematik uygulaması, SMS, telefon araması veya e-posta gibi ek bir yöntemle doğrulamanızı isteyerek hesabınızın güvenliğini artırır. İki aşamalı giriş özelliğini saigonsafe.com web kasası üzerinden etkinleştirebilirsiniz. Şimdi siteye gitmek ister misiniz?"
   },
   "twoStepLoginConfirmationContent": {
-    "message": "Bitwarden web uygulamasında iki aşamalı girişi ayarlayarak hesabınızın güvenliğini artırabilirsiniz."
+    "message": "Saigon Safe web uygulamasında iki aşamalı girişi ayarlayarak hesabınızın güvenliğini artırabilirsiniz."
   },
   "twoStepLoginConfirmationTitle": {
     "message": "Web uygulamasına devam edilsin mi?"
@@ -1158,7 +1158,7 @@
     "message": "Ayara git"
   },
   "notificationAddDesc": {
-    "message": "Bitwarden bu parolayı sizin için hatırlasın mı?"
+    "message": "Saigon Safe bu parolayı sizin için hatırlasın mı?"
   },
   "notificationAddSave": {
     "message": "Kaydet"
@@ -1194,11 +1194,11 @@
     }
   },
   "notificationLoginSaveConfirmation": {
-    "message": "Bitwarden’a kaydedildi.",
+    "message": "Saigon Safe’a kaydedildi.",
     "description": "Shown to user after item is saved."
   },
   "notificationLoginUpdatedConfirmation": {
-    "message": "Bitwarden’da güncellendi.",
+    "message": "Saigon Safe’da güncellendi.",
     "description": "Shown to user after item is updated."
   },
   "selectItemAriaLabel": {
@@ -1296,13 +1296,13 @@
     "message": "Yeni geçiş anahtarlarını kaydetmek ve kasanızda saklanan geçiş anahtarlarıyla giriş yapmak için sor. Giriş yapmış tüm hesaplar için geçerlidir."
   },
   "notificationChangeDesc": {
-    "message": "Bu parolayı Bitwarden'da güncellemek ister misiniz?"
+    "message": "Bu parolayı Saigon Safe'da güncellemek ister misiniz?"
   },
   "notificationChangeSave": {
     "message": "Güncelle"
   },
   "notificationUnlockDesc": {
-    "message": "Otomatik doldurma isteğini tamamlamak için Bitwarden kasanızın kilidini açın."
+    "message": "Otomatik doldurma isteğini tamamlamak için Saigon Safe kasanızın kilidini açın."
   },
   "notificationUnlock": {
     "message": "Kilidi aç"
@@ -1378,10 +1378,10 @@
     "message": "Bu parola, bu dosyayı dışa ve içe aktarmak için kullanılacaktır"
   },
   "accountRestrictedOptionDescription": {
-    "message": "Dışa aktarmayı şifrelemek ve içe aktarmayı yalnızca mevcut Bitwarden hesabıyla kısıtlamak için, hesabınızın kullanıcı adı ve ana parolasından türetilen hesap şifreleme anahtarınızı kullanın."
+    "message": "Dışa aktarmayı şifrelemek ve içe aktarmayı yalnızca mevcut Saigon Safe hesabıyla kısıtlamak için, hesabınızın kullanıcı adı ve ana parolasından türetilen hesap şifreleme anahtarınızı kullanın."
   },
   "passwordProtectedOptionDescription": {
-    "message": "Dışa aktardığınız dosyayı şifrelemek ve bir Bitwarden hesabına içe aktarmak için kullanacağınız parolayı belirleyin."
+    "message": "Dışa aktardığınız dosyayı şifrelemek ve bir Saigon Safe hesabına içe aktarmak için kullanacağınız parolayı belirleyin."
   },
   "exportTypeHeading": {
     "message": "Dışa aktarma türü"
@@ -1410,7 +1410,7 @@
     "message": "Dışa aktardığınız bu dosyadaki verileriniz, hesabınızın şifreleme anahtarıyla şifrelenir. Hesabınızın şifreleme anahtarını değiştirirseniz bu dosyanın şifresi çözülemez hale gelir, dolayısıyla dosyayı yeniden dışa aktarmanız gerekir."
   },
   "encExportAccountWarningDesc": {
-    "message": "Her Bitwarden kullanıcı hesabının hesap şifreleme anahtarları farklıdır. Yani şifrelenmiş bir dışa aktarmayı farklı bir hesapta içe aktaramazsınız."
+    "message": "Her Saigon Safe kullanıcı hesabının hesap şifreleme anahtarları farklıdır. Yani şifrelenmiş bir dışa aktarmayı farklı bir hesapta içe aktaramazsınız."
   },
   "exportMasterPassword": {
     "message": "Kasadaki verilerinizi dışa aktarmak için ana parolanızı girin."
@@ -1419,7 +1419,7 @@
     "message": "Paylaşılan"
   },
   "bitwardenForBusinessPageDesc": {
-    "message": "İşletmeler için Bitwarden'ı kullanarak kasanızdaki kayıtları başkalarıyla paylaşabilirsiniz. Daha fazla bilgi için bitwarden.com sitesini ziyaret edin."
+    "message": "İşletmeler için Saigon Safe'ı kullanarak kasanızdaki kayıtları başkalarıyla paylaşabilirsiniz. Daha fazla bilgi için saigonsafe.com sitesini ziyaret edin."
   },
   "moveToOrganization": {
     "message": "Kuruluşa taşı"
@@ -1531,7 +1531,7 @@
     "message": "Üyeliği yönet"
   },
   "premiumManageAlert": {
-    "message": "Üyeliğinizi bitwarden.com web kasası üzerinden yönetebilirsiniz. Şimdi siteye gitmek ister misiniz?"
+    "message": "Üyeliğinizi saigonsafe.com web kasası üzerinden yönetebilirsiniz. Şimdi siteye gitmek ister misiniz?"
   },
   "premiumRefresh": {
     "message": "Üyeliği yenile"
@@ -1585,13 +1585,13 @@
     "message": "Premium satın al"
   },
   "premiumPurchaseAlertV2": {
-    "message": "Bitwarden web uygulamasındaki hesap ayarlarınızdan Premium abonelik satın alabilirsiniz."
+    "message": "Saigon Safe web uygulamasındaki hesap ayarlarınızdan Premium abonelik satın alabilirsiniz."
   },
   "premiumCurrentMember": {
     "message": "Premium üyesiniz!"
   },
   "premiumCurrentMemberThanks": {
-    "message": "Bitwarden'ı desteklediğiniz için teşekkür ederiz."
+    "message": "Saigon Safe'ı desteklediğiniz için teşekkür ederiz."
   },
   "premiumFeatures": {
     "message": "Premium'a geçmenin avantajları:"
@@ -1697,7 +1697,7 @@
     "message": "Kimlik doğrulama uygulaması"
   },
   "authenticatorAppDescV2": {
-    "message": "Kimlik doğrulama uygulamanızın (örn. Bitwarden Authenticator) ürettiği kodu girin.",
+    "message": "Kimlik doğrulama uygulamanızın (örn. Saigon Safe Authenticator) ürettiği kodu girin.",
     "description": "'Bitwarden Authenticator' is a product name and should not be translated."
   },
   "yubiKeyTitleV2": {
@@ -1730,7 +1730,7 @@
     "message": "Şirket içinde barındırılan ortam"
   },
   "selfHostedBaseUrlHint": {
-    "message": "Şirket içinde barındırılan Bitwarden kurulumunun temel URL’sini belirt. Örnek: https://bitwarden.company.com"
+    "message": "Şirket içinde barındırılan Saigon Safe kurulumunun temel URL’sini belirt. Örnek: https://saigonsafe.company.com"
   },
   "selfHostedCustomEnvHeader": {
     "message": "İleri düzey yapılandırma için her hizmetin taban URL'sini bağımsız olarak belirleyebilirsiniz."
@@ -1780,7 +1780,7 @@
     "message": "Otomatik doldurma önerilerini kolayca bulun"
   },
   "autofillSpotlightDesc": {
-    "message": "Bitwarden ile çakışmaması için tarayıcınızın otomatik doldurma ayarını kapatın."
+    "message": "Saigon Safe ile çakışmaması için tarayıcınızın otomatik doldurma ayarını kapatın."
   },
   "turnOffBrowserAutofill": {
     "message": "$BROWSER$ ile otomatik doldurmayı kapat",
@@ -1825,7 +1825,7 @@
     "message": "Form alanlarında otomatik doldurma önerilerini göster"
   },
   "howDoesBitwardenProtectFromPhishing": {
-    "message": "Bitwarden verilerinizi kimlik avı saldırılarından nasıl koruyor?"
+    "message": "Saigon Safe verilerinizi kimlik avı saldırılarından nasıl koruyor?"
   },
   "currentWebsite": {
     "message": "Geçerli web sitesi"
@@ -2466,7 +2466,7 @@
     "message": "Zayıf ana parola"
   },
   "weakMasterPasswordDesc": {
-    "message": "Seçtiğiniz ana parola zayıf. Bitwarden hesabınızı korumak için daha güçlü bir ana parola seçmenizi öneririz. Bu ana parolayı kullanmak istediğinizden emin misiniz?"
+    "message": "Seçtiğiniz ana parola zayıf. Saigon Safe hesabınızı korumak için daha güçlü bir ana parola seçmenizi öneririz. Bu ana parolayı kullanmak istediğinizden emin misiniz?"
   },
   "rotateAccountEncKey": {
     "message": "Hesabımın şifreleme anahtarını da yenile"
@@ -2478,7 +2478,7 @@
     "message": "Hesabınızın şifreleme anahtarını yenilemek istediğinizden emin misiniz?"
   },
   "updateEncryptionKeyWarning": {
-    "message": "Şifreleme anahtarınızı güncelledikten sonra, şu anda kullanmakta olduğunuz tüm Bitwarden uygulamalarında (mobil uygulama veya tarayıcı uzantıları gibi) oturumunuzu kapatıp tekrar açmanız gerekir. Yeni şifreleme anahtarınızı indirme için oturumu kapatıp tekrar açmamamız verilerin bozulmasına neden olabilir. Oturumunuzu otomatik olarak kapatmaya çalışacağız, ancak bu gecikebilir."
+    "message": "Şifreleme anahtarınızı güncelledikten sonra, şu anda kullanmakta olduğunuz tüm Saigon Safe uygulamalarında (mobil uygulama veya tarayıcı uzantıları gibi) oturumunuzu kapatıp tekrar açmanız gerekir. Yeni şifreleme anahtarınızı indirmek için oturumu kapatıp tekrar açmamanız verilerin bozulmasına neden olabilir. Oturumunuzu otomatik olarak kapatmaya çalışacağız, ancak bu gecikebilir."
   },
   "updateEncryptionKeyAccountExportWarning": {
     "message": "Kaydettiğiniz tüm hesap kısıtlamalı dışa aktarmalar geçersiz hale gelecektir."
@@ -2506,10 +2506,10 @@
     "message": "PIN belirle"
   },
   "setYourPinCode": {
-    "message": "Bitwarden'ı açarken kullanacağınız PIN kodunu belirleyin. Uygulamadan tamamen çıkış yaparsanız PIN ayarlarınız sıfırlanacaktır."
+    "message": "Saigon Safe'ı açarken kullanacağınız PIN kodunu belirleyin. Uygulamadan tamamen çıkış yaparsanız PIN ayarlarınız sıfırlanacaktır."
   },
   "setPinCode": {
-    "message": "Bitwarden'ın kilidini açmak için bu PIN'i kullanabilirsiniz. Uygulamadan tamamen çıkış yaparsanız PIN'iniz sıfırlanacaktır."
+    "message": "Saigon Safe'ın kilidini açmak için bu PIN'i kullanabilirsiniz. Uygulamadan tamamen çıkış yaparsanız PIN'iniz sıfırlanacaktır."
   },
   "pinRequired": {
     "message": "PIN kodu gerekli."
@@ -2530,7 +2530,7 @@
     "message": "Masaüstünden onay bekleniyor"
   },
   "awaitDesktopDesc": {
-    "message": "Tarayıcıda biyometriyi etkinleştirmek için lütfen Bitwarden masaüstü uygulamasında biyometri kullanımını onaylayın."
+    "message": "Tarayıcıda biyometriyi etkinleştirmek için lütfen Saigon Safe masaüstü uygulamasında biyometri kullanımını onaylayın."
   },
   "lockWithMasterPassOnRestart": {
     "message": "Tarayıcı yeniden başlatıldığında ana parola ile kilitle"
@@ -2645,7 +2645,7 @@
     "message": "Bu form, kayıtlı hesabınızın URI'sinden farklı bir alan adında yer alıyor. Yine de otomatik doldurmak isterseniz \"Tamam\"ı, durdurmak için \"İptal\"i seçin."
   },
   "autofillIframeWarningTip": {
-    "message": "İleride bu uyarıyı görmek istemiyorsanız bu siteye ait Bitwarden hesap kaydınıza $HOSTNAME$ URI'sini ekleyin.",
+    "message": "İleride bu uyarıyı görmek istemiyorsanız bu siteye ait Saigon Safe hesap kaydınıza $HOSTNAME$ URI'sini ekleyin.",
     "placeholders": {
       "hostname": {
         "content": "$1",
@@ -2654,7 +2654,7 @@
     }
   },
   "topLayerHijackWarning": {
-    "message": "Bu sayfa Bitwarden deneyimiyle çakışıyor. Güvenlik önlemi olarak Bitwarden satır içi menüsü geçici olarak devre dışı bırakıldı."
+    "message": "Bu sayfa Saigon Safe deneyimiyle çakışıyor. Güvenlik önlemi olarak Saigon Safe satır içi menüsü geçici olarak devre dışı bırakıldı."
   },
   "setMasterPassword": {
     "message": "Ana parolayı belirle"
@@ -2711,7 +2711,7 @@
     "message": "Yeni ana parolanız ilke gereksinimlerini karşılamıyor."
   },
   "receiveMarketingEmailsV2": {
-    "message": "Bitwarden'dan öneriler, duyurular ve araştırma fırsatları e-posta adresinize gelsin."
+    "message": "Saigon Safe'dan öneriler, duyurular ve araştırma fırsatları e-posta adresinize gelsin."
   },
   "unsubscribe": {
     "message": "İstediğiniz zaman"
@@ -2762,13 +2762,13 @@
     "message": "Tarayıcı entegrasyonu ayarlanmadı"
   },
   "desktopIntegrationDisabledDesc": {
-    "message": "Bitwarden masaüstü uygulamasında tarayıcı entegrasyonu ayarlanmamış. Lütfen masaüstü uygulamasının ayarlarından tarayıcı entegrasyonunu kurun."
+    "message": "Saigon Safe masaüstü uygulamasında tarayıcı entegrasyonu ayarlanmamış. Lütfen masaüstü uygulamasının ayarlarından tarayıcı entegrasyonunu kurun."
   },
   "startDesktopTitle": {
-    "message": "Bitwarden masaüstü uygulamasını başlat"
+    "message": "Saigon Safe masaüstü uygulamasını başlat"
   },
   "startDesktopDesc": {
-    "message": "Biyometri ile açma işlevini kullanmak için Bitwarden masaüstü uygulamasını çalıştırmanız gerekir."
+    "message": "Biyometri ile açma işlevini kullanmak için Saigon Safe masaüstü uygulamasını çalıştırmanız gerekir."
   },
   "errorEnableBiometricTitle": {
     "message": "Biyometri ayarlanamadı"
@@ -2822,13 +2822,13 @@
     "message": "Biyometri doğrulanamadı"
   },
   "biometricsFailedDesc": {
-    "message": "Biyometri doğrulaması tamamlanamadı. Ana parolanızı kullanabilir veya çıkış yapabilirsiniz. Sorun devam ederse Bitwarden destek ekibiyle iletişime geçin."
+    "message": "Biyometri doğrulaması tamamlanamadı. Ana parolanızı kullanabilir veya çıkış yapabilirsiniz. Sorun devam ederse Saigon Safe destek ekibiyle iletişime geçin."
   },
   "nativeMessaginPermissionErrorTitle": {
     "message": "İzin verilmedi"
   },
   "nativeMessaginPermissionErrorDesc": {
-    "message": "Bitwarden masaüstü uygulamasıyla iletişim kurma iznimiz olmadan tarayıcı uzantısında biyometriyi kullanamayız. Lütfen tekrar deneyin."
+    "message": "Saigon Safe masaüstü uygulamasıyla iletişim kurma iznimiz olmadan tarayıcı uzantısında biyometriyi kullanamayız. Lütfen tekrar deneyin."
   },
   "nativeMessaginPermissionSidebarTitle": {
     "message": "İzin isteme hatası"
@@ -2865,7 +2865,7 @@
     "message": "Hariç tutulan alan adları"
   },
   "excludedDomainsDesc": {
-    "message": "Bitwarden bu alan adlarında hesaplarınızı kaydetmeyi sormayacaktır. Değişikliklerin etkili olması için sayfayı yenilemelisiniz."
+    "message": "Saigon Safe bu alan adlarında hesaplarınızı kaydetmeyi sormayacaktır. Değişikliklerin etkili olması için sayfayı yenilemelisiniz."
   },
   "blockedDomainsDesc": {
     "message": "Bu siteler için otomatik doldurma ve diğer ilgili özellikler önerilmeyecektir. Değişikliklerin devreye girmesi için sayfayı yenilemelisiniz."
@@ -2981,24 +2981,24 @@
     "message": "Risk altındaki hesap listesinin illüstrasyonu."
   },
   "welcomeDialogGraphicAlt": {
-    "message": "Bitwarden kasa sayfası düzeninin illüstrasyonu."
+    "message": "Saigon Safe kasa sayfası düzeninin illüstrasyonu."
   },
   "generatePasswordSlideDesc": {
-    "message": "Riskli sitede Bitwarden otomatik doldurma menüsünü kullanarak hızlıca güçlü ve benzersiz bir parola oluştur.",
+    "message": "Riskli sitede Saigon Safe otomatik doldurma menüsünü kullanarak hızlıca güçlü ve benzersiz bir parola oluştur.",
     "description": "Description of the generate password slide on the at-risk password page carousel"
   },
   "generatePasswordSlideImgAltPeriod": {
-    "message": "Oluşturulan parolayı gösteren Bitwarden otomatik doldurma menüsünün görseli."
+    "message": "Oluşturulan parolayı gösteren Saigon Safe otomatik doldurma menüsünün görseli."
   },
   "updateInBitwarden": {
-    "message": "Bitwarden’da güncelleyin"
+    "message": "Saigon Safe’da güncelleyin"
   },
   "updateInBitwardenSlideDesc": {
-    "message": "Bitwarden, ardından parola yöneticisinde parolayı güncellemeniz için sizi yönlendirecektir.",
+    "message": "Saigon Safe, ardından parola yöneticisinde parolayı güncellemeniz için sizi yönlendirecektir.",
     "description": "Description of the update in Bitwarden slide on the at-risk password page carousel"
   },
   "updateInBitwardenSlideImgAltPeriod": {
-    "message": "Kullanıcıya giriş bilgilerini güncellemesi için bildirim gönderen Bitwarden’in görseli."
+    "message": "Kullanıcıya giriş bilgilerini güncellemesi için bildirim gönderen Saigon Safe’in görseli."
   },
   "turnOnAutofill": {
     "message": "Otomatik doldurmayı etkinleştir"
@@ -3524,7 +3524,7 @@
     "message": "Otomatik doldurma verileri alınırken hata oluştu"
   },
   "couldNotDecryptVaultItemsBelow": {
-    "message": "Bitwarden aşağıdaki kasa öğelerini deşifre edemedi."
+    "message": "Saigon Safe aşağıdaki kasa öğelerini deşifre edemedi."
   },
   "contactCSToAvoidDataLossPart1": {
     "message": "Müşteri hizmetleriyle iletişime geçerek",
@@ -3628,11 +3628,11 @@
     }
   },
   "forwarderGeneratedBy": {
-    "message": "Bitwarden tarafından üretildi.",
+    "message": "Saigon Safe tarafından üretildi.",
     "description": "Displayed with the address on the forwarding service's configuration screen."
   },
   "forwarderGeneratedByWithWebsite": {
-    "message": "Web sitesi: $WEBSITE$. Bitwarden tarafından üretildi.",
+    "message": "Web sitesi: $WEBSITE$. Saigon Safe tarafından üretildi.",
     "description": "Displayed with the address on the forwarding service's configuration screen.",
     "placeholders": {
       "WEBSITE": {
@@ -3825,7 +3825,7 @@
     "message": "Cihazınıza bir bildirim gönderildi."
   },
   "notificationSentDevicePart1": {
-    "message": "Bitwarden kilidini cihazınızdan veya"
+    "message": "Saigon Safe kilidini cihazınızdan veya"
   },
   "notificationSentDeviceAnchor": {
     "message": "web uygulamasından açın"
@@ -4328,15 +4328,15 @@
     "message": "İçeriğe geç"
   },
   "bitwardenOverlayButton": {
-    "message": "Bitwarden otomatik doldurma menüsü düğmesi",
+    "message": "Saigon Safe otomatik doldurma menüsü düğmesi",
     "description": "Page title for the iframe containing the overlay button"
   },
   "toggleBitwardenVaultOverlay": {
-    "message": "Bitwarden otomatik doldurma menüsünü aç/kapat",
+    "message": "Saigon Safe otomatik doldurma menüsünü aç/kapat",
     "description": "Screen reader and tool tip label for the overlay button"
   },
   "bitwardenVault": {
-    "message": "Bitwarden otomatik doldurma menüsü",
+    "message": "Saigon Safe otomatik doldurma menüsü",
     "description": "Page title in overlay"
   },
   "unlockYourAccountToViewMatchingLogins": {
@@ -4408,7 +4408,7 @@
     "description": "Screen reader text (aria-label) for new identity button within inline menu"
   },
   "bitwardenOverlayMenuAvailable": {
-    "message": "Bitwarden otomatik doldurma menüsü mevcut. Seçmek için aşağı ok tuşuna basın.",
+    "message": "Saigon Safe otomatik doldurma menüsü mevcut. Seçmek için aşağı ok tuşuna basın.",
     "description": "Screen reader text for announcing when the overlay opens on the page"
   },
   "turnOn": {
@@ -4726,7 +4726,7 @@
     "message": "Aktif hesap"
   },
   "bitwardenAccount": {
-    "message": "Bitwarden hesabı"
+    "message": "Saigon Safe hesabı"
   },
   "availableAccounts": {
     "message": "Mevcut hesaplar"
@@ -4772,7 +4772,7 @@
     "description": "Label indicating the most common import formats"
   },
   "uriMatchDefaultStrategyHint": {
-    "message": "URl eşleştirme tespiti, Bitwarden'ın otomatik doldurma önerilerini tanımlama şeklidir.",
+    "message": "URI eşleştirme tespiti, Saigon Safe'ın otomatik doldurma önerilerini nasıl tanımladığını belirler.",
     "description": "Explains to the user that URI match detection determines how Bitwarden suggests autofill options, and clarifies that this default strategy applies when no specific match detection is set for a login item."
   },
   "regExAdvancedOptionWarning": {
@@ -4816,23 +4816,23 @@
     "description": "Body content for dialog which asks if the user wants to proceed to the browser's keyboard shortcut settings page"
   },
   "overrideDefaultBrowserAutofillTitle": {
-    "message": "Bitwarden varsayılan parola yöneticiniz yapılsın mı?",
+    "message": "Saigon Safe varsayılan parola yöneticiniz yapılsın mı?",
     "description": "Dialog title facilitating the ability to override a chrome browser's default autofill behavior"
   },
   "overrideDefaultBrowserAutofillDescription": {
-    "message": "Bu seçeneği göz ardı ederseniz Bitwarden otomatik doldurma menüsüyle tarayıcınızınki arasında çakışma yaşanabilir.",
+    "message": "Bu seçeneği göz ardı ederseniz Saigon Safe otomatik doldurma menüsüyle tarayıcınızınki arasında çakışma yaşanabilir.",
     "description": "Dialog message facilitating the ability to override a chrome browser's default autofill behavior"
   },
   "overrideDefaultBrowserAutoFillSettings": {
-    "message": "Bitwarden'ı varsayılan parola yöneticiniz yapın",
+    "message": "Saigon Safe'ı varsayılan parola yöneticiniz yapın",
     "description": "Label for the setting that allows overriding the default browser autofill settings"
   },
   "privacyPermissionAdditionNotGrantedTitle": {
-    "message": "Bitwarden varsayılan parola yöneticisi olarak ayarlanamadı",
+    "message": "Saigon Safe varsayılan parola yöneticisi olarak ayarlanamadı",
     "description": "Title for the dialog that appears when the user has not granted the extension permission to set privacy settings"
   },
   "privacyPermissionAdditionNotGrantedDescription": {
-    "message": "Bitwarden'ı varsayılan parola yöneticisi olarak ayarlamak için tarayıcı gizlilik izinlerini vermeniz gerekir.",
+    "message": "Saigon Safe'ı varsayılan parola yöneticisi olarak ayarlamak için tarayıcı gizlilik izinlerini vermeniz gerekir.",
     "description": "Description for the dialog that appears when the user has not granted the extension permission to set privacy settings"
   },
   "makeDefault": {
@@ -5173,16 +5173,16 @@
     "message": "Ek dosyayı indir"
   },
   "downloadBitwarden": {
-    "message": "Bitwarden’ı indirin"
+    "message": "Saigon Safe’ı indirin"
   },
   "downloadBitwardenOnAllDevices": {
-    "message": "Bitwarden’ı tüm cihazlarınıza indirin"
+    "message": "Saigon Safe’ı tüm cihazlarınıza indirin"
   },
   "getTheMobileApp": {
     "message": "Mobil uygulamayı indirin"
   },
   "getTheMobileAppDesc": {
-    "message": "Parolalarınıza Bitwarden mobil uygulaması sayesinde her yerden ulaşın."
+    "message": "Parolalarınıza Saigon Safe mobil uygulaması sayesinde her yerden ulaşın."
   },
   "getTheDesktopApp": {
     "message": "Masaüstü uygulamasını indirin"
@@ -5191,7 +5191,7 @@
     "message": "Kasanıza tarayıcıyı kullanmadan erişin, biyometri ile kilit açmayı etkinleştirerek hem masaüstü uygulamasından hem de tarayıcı uzantısından kilit açmayı geliştirin."
   },
   "downloadFromBitwardenNow": {
-    "message": "Şimdi bitwarden.com’dan indirin"
+    "message": "Şimdi saigonsafe.com’dan indirin"
   },
   "getItOnGooglePlay": {
     "message": "Google Play'den edinin"
@@ -5656,10 +5656,10 @@
     "message": "Biyometrik kilit açma, yanlış yapılandırılmış sistem dosyaları nedeniyle kullanılamıyor."
   },
   "biometricsStatusHelptextDesktopDisconnected": {
-    "message": "Bitwarden masaüstü uygulaması kapalı olduğu için biyometrik kilit açma kullanılamıyor."
+    "message": "Saigon Safe masaüstü uygulaması kapalı olduğu için biyometrik kilit açma kullanılamıyor."
   },
   "biometricsStatusHelptextNotEnabledInDesktop": {
-    "message": "Biyometrik kilit açma, Bitwarden masaüstü uygulamasında $EMAIL$ etkin olmadığı için kullanılamıyor.",
+    "message": "Biyometrik kilit açma, Saigon Safe masaüstü uygulamasında $EMAIL$ etkin olmadığı için kullanılamıyor.",
     "placeholders": {
       "email": {
         "content": "$1",
@@ -5694,7 +5694,7 @@
     "description": "Notification message for when a password has been regenerated"
   },
   "saveToBitwarden": {
-    "message": "Bitwarden’a kaydet",
+    "message": "Saigon Safe’a kaydet",
     "description": "Confirmation message for saving a login to Bitwarden"
   },
   "spaceCharacterDescriptor": {
@@ -5920,13 +5920,13 @@
     "message": "Kasanız sadece parolalarınız için değil. Hesaplarınızı, kimliklerinizi, kredi kartlarınızı ve notlarınızı da güvenle burada depolayabilirsiniz."
   },
   "introCarouselLabel": {
-    "message": "Bitwarden’a hoş geldiniz"
+    "message": "Saigon Safe’a hoş geldiniz"
   },
   "securityPrioritized": {
     "message": "Önce güvenlik"
   },
   "securityPrioritizedBody": {
-    "message": "Hesaplarınızı, kartlarınızı ve kimliklerinizi güvenli kasanıza kaydedin. Bitwarden'ın sıfır bilgi ispatlı uçtan uca şifrelemesi sizin için önemli olan her şeyi korur."
+    "message": "Hesaplarınızı, kartlarınızı ve kimliklerinizi güvenli kasanıza kaydedin. Saigon Safe'ın sıfır bilgi ispatlı uçtan uca şifrelemesi sizin için önemli olan her şeyi korur."
   },
   "quickLogin": {
     "message": "Hızlı ve kolay giriş"
@@ -5944,7 +5944,7 @@
     "message": "Verilerinize her zaman, her yerden ulaşın"
   },
   "secureDevicesBody": {
-    "message": "Bitwarden mobil, tarayıcı ve masaüstü uygulamalarıyla istediğiniz kadar cihaza istediğiniz kadar parola kaydedebilirsiniz."
+    "message": "Saigon Safe mobil, tarayıcı ve masaüstü uygulamalarıyla istediğiniz kadar cihaza istediğiniz kadar parola kaydedebilirsiniz."
   },
   "nudgeBadgeAria": {
     "message": "1 bildirim"
@@ -5953,7 +5953,7 @@
     "message": "Mevcut parolaları içe aktar"
   },
   "emptyVaultNudgeBody": {
-    "message": "Hesapları manuel olarak eklemeden Bitwarden'a hızlı bir şekilde aktarmak için içe aktarıcıyı kullanın."
+    "message": "Hesapları manuel olarak eklemeden Saigon Safe'a hızlı bir şekilde aktarmak için içe aktarıcıyı kullanın."
   },
   "emptyVaultNudgeButton": {
     "message": "Şimdi içe aktar"
@@ -6072,13 +6072,13 @@
     "message": "Bu ayar hakkında"
   },
   "permitCipherDetailsDescription": {
-    "message": "Bitwarden, deneyimini iyileştirmek için hangi simgenin veya parola değiştirme URL’sinin kullanılacağını belirlemek amacıyla kaydedilmiş hesap URI’lerini kullanır. Bu hizmeti kullandığında hiçbir bilgi toplanmaz veya kaydedilmez."
+    "message": "Saigon Safe, deneyimini iyileştirmek için hangi simgenin veya parola değiştirme URL’sinin kullanılacağını belirlemek amacıyla kaydedilmiş hesap URI’lerini kullanır. Bu hizmeti kullandığında hiçbir bilgi toplanmaz veya kaydedilmez."
   },
   "noPermissionsViewPage": {
     "message": "Bu sayfayı görüntüleme izniniz yok. Farklı bir hesapla giriş yapmayı deneyin."
   },
   "wasmNotSupported": {
-    "message": "Tarayıcınızda WebAssembly desteklenmiyor veya etkinleştirilmemişt. Bitwarden uygulamasını kullanmak için WebAssembly gereklidir.",
+    "message": "Tarayıcınızda WebAssembly desteklenmiyor veya etkinleştirilmemişt. Saigon Safe uygulamasını kullanmak için WebAssembly gereklidir.",
     "description": "'WebAssembly' is a technical term and should not be translated."
   },
   "showMore": {
@@ -6153,7 +6153,7 @@
     "message": "Hata: Deşifre edilemiyor"
   },
   "removeMasterPasswordForOrgUserKeyConnector": {
-    "message": "Kuruluşunuz artık Bitwarden'da oturum açmak için ana parolalar kullanmıyor. Devam etmek için kuruluşu ve etki alanını doğrulayın."
+    "message": "Kuruluşunuz artık Saigon Safe'te oturum açmak için ana parolaları kullanmıyor. Devam etmek için kuruluşu ve etki alanını doğrulayın."
   },
   "continueWithLogIn": {
     "message": "Giriş yapmaya devam et"
@@ -6239,7 +6239,7 @@
     "message": "Zaman aşımı eyleminizi değiştirmek için kilit açma yönteminizi ayarlayın"
   },
   "sessionTimeoutSuppressedByConnectedDevice": {
-    "message": "Bitwarden masaüstü uygulaması tarafından yönetiliyor. Düzenlemek için masaüstü uygulamasını açın."
+    "message": "Saigon Safe masaüstü uygulaması tarafından yönetiliyor. Düzenlemek için masaüstü uygulamasını açın."
   },
   "percentageCompleted": {
     "message": "%$PERCENT$ tamamlandı",
@@ -6335,13 +6335,13 @@
     "message": "E-posta adreslerini virgülle ayırarak yazın."
   },
   "emailPlaceholder": {
-    "message": "kullanici@bitwarden.com , kullanici@acme.com"
+    "message": "kullanici@saigonsafe.com , kullanici@acme.com"
   },
   "emailPlaceholderMultiple": {
-    "message": "kullanici@bitwarden.com, kullanici@acme.com"
+    "message": "kullanici@saigonsafe.com, kullanici@acme.com"
   },
   "downloadBitwardenApps": {
-    "message": "Bitwarden uygulamalarını indir"
+    "message": "Saigon Safe uygulamalarını indir"
   },
   "emailProtected": {
     "message": "E-posta korumalı"

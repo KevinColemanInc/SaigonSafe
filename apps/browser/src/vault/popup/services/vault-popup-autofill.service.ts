@@ -1,12 +1,16 @@
 // FIXME: Update this file to be type safe and remove this and next line
 // @ts-strict-ignore
 import { Injectable } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ActivatedRoute } from "@angular/router";
 import {
   combineLatest,
   debounceTime,
   firstValueFrom,
+  filter,
+  fromEvent,
   map,
+  merge,
   Observable,
   of,
   shareReplay,
@@ -38,13 +42,27 @@ import {
 import { InlineMenuFieldQualificationService } from "../../../autofill/services/inline-menu-field-qualification.service";
 import { BrowserApi } from "../../../platform/browser/browser-api";
 import BrowserPopupUtils from "../../../platform/browser/browser-popup-utils";
+import { fromChromeEvent } from "../../../platform/browser/from-chrome-event";
 import { closeViewVaultItemPopout, VaultPopoutType } from "../utils/vault-popout-window";
+
+type PendingSidebarAutofillClose = {
+  tabId: number;
+  windowId?: number;
+  initialUrl?: string;
+  armed: boolean;
+  urlChanged: boolean;
+};
+
+type ChromeSidePanelApi = {
+  close?: (options: { tabId?: number; windowId?: number }) => Promise<void>;
+};
 
 @Injectable({
   providedIn: "root",
 })
 export class VaultPopupAutofillService {
   private _refreshCurrentTab$ = new Subject<void>();
+  private pendingSidebarAutofillClose: PendingSidebarAutofillClose | null = null;
   private senderTabId$: Observable<number | undefined> = this.route.queryParams.pipe(
     map((params) => (params?.senderTabId ? parseInt(params.senderTabId, 10) : undefined)),
   );
@@ -224,7 +242,133 @@ export class VaultPopupAutofillService {
     private logService: LogService,
     private inlineMenuFieldQualificationService: InlineMenuFieldQualificationService,
   ) {
+    this.setupCurrentTabRefreshListeners();
+    this.setupSidebarAutofillCloseListener();
     this._currentPageDetails$.subscribe();
+  }
+
+  private setupCurrentTabRefreshListeners() {
+    if (BrowserPopupUtils.inPopout(window)) {
+      return;
+    }
+
+    merge(
+      fromChromeEvent<[message?: { command?: string }]>(chrome.runtime.onMessage).pipe(
+        map(([message]) => message?.command),
+        filter((command) => command === "tabChanged" || command === "windowChanged"),
+      ),
+      fromEvent(window, "focus"),
+      fromEvent(document, "visibilitychange").pipe(
+        filter(() => document.visibilityState === "visible"),
+      ),
+    )
+      .pipe(debounceTime(50), takeUntilDestroyed())
+      .subscribe(() => this.refreshCurrentTab());
+  }
+
+  private setupSidebarAutofillCloseListener() {
+    this.currentAutofillTab$
+      .pipe(takeUntilDestroyed())
+      .subscribe((tab) => void this.handleSidebarUrlChange(tab));
+  }
+
+  private getTabUrl(tab: chrome.tabs.Tab | null | undefined): string | undefined {
+    return tab?.url ?? tab?.pendingUrl;
+  }
+
+  private shouldDelaySidebarCloseUntilUrlChange(
+    tab: chrome.tabs.Tab | null,
+  ): tab is chrome.tabs.Tab {
+    return BrowserPopupUtils.inSidebar(window) && !!tab?.id;
+  }
+
+  private beginPendingSidebarAutofillClose(tab: chrome.tabs.Tab | null) {
+    if (!this.shouldDelaySidebarCloseUntilUrlChange(tab)) {
+      this.pendingSidebarAutofillClose = null;
+      return;
+    }
+
+    this.pendingSidebarAutofillClose = {
+      tabId: tab.id,
+      windowId: tab.windowId,
+      initialUrl: this.getTabUrl(tab),
+      armed: false,
+      urlChanged: false,
+    };
+  }
+
+  private async completePendingSidebarAutofillClose(
+    tab: chrome.tabs.Tab | null,
+    didAutofill: boolean,
+  ) {
+    const pendingSidebarAutofillClose = this.pendingSidebarAutofillClose;
+    if (!pendingSidebarAutofillClose) {
+      return;
+    }
+
+    if (!didAutofill) {
+      this.pendingSidebarAutofillClose = null;
+      return;
+    }
+
+    if (pendingSidebarAutofillClose.urlChanged) {
+      await this.closeSidebarAfterAutofill(pendingSidebarAutofillClose);
+      return;
+    }
+
+    if (!this.shouldDelaySidebarCloseUntilUrlChange(tab)) {
+      this.pendingSidebarAutofillClose = null;
+      return;
+    }
+
+    pendingSidebarAutofillClose.armed = true;
+  }
+
+  private async handleSidebarUrlChange(tab: chrome.tabs.Tab | null) {
+    const pendingSidebarAutofillClose = this.pendingSidebarAutofillClose;
+    if (!pendingSidebarAutofillClose || !tab?.id || pendingSidebarAutofillClose.tabId !== tab.id) {
+      return;
+    }
+
+    const currentUrl = this.getTabUrl(tab);
+    if (!currentUrl || currentUrl === pendingSidebarAutofillClose.initialUrl) {
+      return;
+    }
+
+    pendingSidebarAutofillClose.windowId ??= tab.windowId;
+
+    if (!pendingSidebarAutofillClose.armed) {
+      pendingSidebarAutofillClose.urlChanged = true;
+      return;
+    }
+
+    await this.closeSidebarAfterAutofill(pendingSidebarAutofillClose);
+  }
+
+  private async closeSidebarAfterAutofill(
+    pendingSidebarAutofillClose: PendingSidebarAutofillClose,
+  ) {
+    this.pendingSidebarAutofillClose = null;
+
+    if (!BrowserPopupUtils.inSidebar(window)) {
+      return;
+    }
+
+    const chromeWithSidePanel = chrome as typeof chrome & {
+      sidePanel?: ChromeSidePanelApi;
+    };
+
+    if (
+      pendingSidebarAutofillClose.windowId != null &&
+      typeof chromeWithSidePanel.sidePanel?.close === "function"
+    ) {
+      await chromeWithSidePanel.sidePanel.close({
+        windowId: pendingSidebarAutofillClose.windowId,
+      });
+      return;
+    }
+
+    BrowserApi.closePopup(window);
   }
 
   private async _internalDoAutofill(
@@ -325,6 +469,7 @@ export class VaultPopupAutofillService {
   ): Promise<boolean> {
     const tab = await firstValueFrom(this.currentAutofillTab$);
     const pageDetails = await firstValueFrom(this._currentPageDetails$);
+    this.beginPendingSidebarAutofillClose(tab);
 
     const didAutofill = await this._internalDoAutofill(
       cipher,
@@ -332,6 +477,7 @@ export class VaultPopupAutofillService {
       pageDetails,
       skipPasswordReprompt,
     );
+    await this.completePendingSidebarAutofillClose(tab, didAutofill);
 
     if (didAutofill && closePopup) {
       await this._closePopup(cipher, tab);
@@ -374,6 +520,7 @@ export class VaultPopupAutofillService {
 
     const pageDetails = await firstValueFrom(this._currentPageDetails$);
     const tab = await firstValueFrom(this.currentAutofillTab$);
+    this.beginPendingSidebarAutofillClose(tab);
 
     const didAutofill = await this._internalDoAutofill(
       cipher,
@@ -383,14 +530,18 @@ export class VaultPopupAutofillService {
     );
 
     if (!didAutofill) {
+      await this.completePendingSidebarAutofillClose(tab, false);
       return false;
     }
 
     const didSaveUri = await this._saveNewUri(cipher, tab);
 
     if (!didSaveUri) {
+      await this.completePendingSidebarAutofillClose(tab, false);
       return false;
     }
+
+    await this.completePendingSidebarAutofillClose(tab, true);
 
     if (closePopup) {
       await this._closePopup(cipher, tab);

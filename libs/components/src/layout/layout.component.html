@@ -65,8 +65,11 @@
     }
   </div>
 
-  <!-- Drawer (always col 3; col 3 track is auto when push, 1fr when overlay, 0px when closed) -->
-  <div #drawerContainer class="tw-col-start-3 tw-row-start-1 tw-relative tw-z-30 tw-h-full">
+  <!-- Drawer (always col 3; in overlay mode the host stays right-aligned within the track) -->
+  <div
+    #drawerContainer
+    class="tw-col-start-3 tw-row-start-1 tw-relative tw-z-30 tw-flex tw-h-full tw-justify-end"
+  >
     <ng-template [cdkPortalOutlet]="drawerPortal()"></ng-template>
   </div>
 </div>

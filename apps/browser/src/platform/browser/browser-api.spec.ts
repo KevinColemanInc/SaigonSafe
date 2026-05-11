@@ -338,6 +338,17 @@ describe("BrowserApi", () => {
         expect(await BrowserApi.isPopupOpen()).toBe(true);
       });
 
+      it("returns true when a SIDE_PANEL context exists", async () => {
+        (chrome.runtime as any).getContexts.mockResolvedValue([
+          {
+            contextType: "SIDE_PANEL",
+            documentUrl: "chrome-extension://id/popup/index.html?uilocation=sidebar",
+          },
+        ]);
+
+        expect(await BrowserApi.isPopupOpen()).toBe(true);
+      });
+
       it("returns false when no POPUP context exists", async () => {
         (chrome.runtime as any).getContexts.mockResolvedValue([
           { contextType: "TAB", documentUrl: "chrome-extension://id/popup/index.html" },
@@ -368,6 +379,18 @@ describe("BrowserApi", () => {
         chrome.extension.getViews = jest.fn().mockReturnValue([]);
 
         expect(await BrowserApi.isPopupOpen()).toBe(false);
+      });
+
+      it("returns true if the sidebar is open", async () => {
+        const sidebarView = {
+          location: { href: "chrome-extension://id/popup/index.html?uilocation=sidebar" },
+        };
+        chrome.extension.getViews = jest
+          .fn()
+          .mockReturnValueOnce([])
+          .mockReturnValueOnce([sidebarView]);
+
+        expect(await BrowserApi.isPopupOpen()).toBe(true);
       });
 
       it("ignores getContexts even when available (Firefox MV2 background page bug)", async () => {

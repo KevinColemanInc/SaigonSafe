@@ -7,6 +7,8 @@ import { BitSvg } from "@bitwarden/assets/svg";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import { SvgModule, LinkModule, BerryComponent } from "@bitwarden/components";
 
+import BrowserPopupUtils from "../../browser/browser-popup-utils";
+
 export type NavButton = {
   label: string;
   page: string;
@@ -29,6 +31,7 @@ export class PopupTabNavigationComponent {
   // FIXME(https://bitwarden.atlassian.net/browse/CL-903): Migrate to Signals
   // eslint-disable-next-line @angular-eslint/prefer-signals
   @Input() navButtons: NavButton[] = [];
+  protected readonly isSidebar = BrowserPopupUtils.inSidebar(window);
 
   constructor(private i18nService: I18nService) {}
 
