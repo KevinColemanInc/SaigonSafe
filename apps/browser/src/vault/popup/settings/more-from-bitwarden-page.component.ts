@@ -16,6 +16,8 @@ import { PopOutComponent } from "../../../platform/popup/components/pop-out.comp
 import { PopupHeaderComponent } from "../../../platform/popup/layout/popup-header.component";
 import { PopupPageComponent } from "../../../platform/popup/layout/popup-page.component";
 
+const RepoUrl = "https://github.com/kevincolemaninc/saigonsafe";
+
 // FIXME(https://bitwarden.atlassian.net/browse/CL-764): Migrate to OnPush
 // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
 @Component({
@@ -71,7 +73,7 @@ export class MoreFromBitwardenPageComponent {
       acceptButtonText: { key: "continue" },
     });
     if (confirmed) {
-      await BrowserApi.createNewTab("https://bitwarden.com/products/business/");
+      await BrowserApi.createNewTab(RepoUrl);
     }
   }
 
@@ -83,7 +85,7 @@ export class MoreFromBitwardenPageComponent {
       acceptButtonText: { key: "continue" },
     });
     if (confirmed) {
-      await BrowserApi.createNewTab("https://bitwarden.com/products/authenticator");
+      await BrowserApi.createNewTab(RepoUrl);
     }
   }
 
@@ -95,7 +97,7 @@ export class MoreFromBitwardenPageComponent {
       acceptButtonText: { key: "continue" },
     });
     if (confirmed) {
-      await BrowserApi.createNewTab("https://bitwarden.com/products/secrets-manager");
+      await BrowserApi.createNewTab(RepoUrl);
     }
   }
 
@@ -107,7 +109,7 @@ export class MoreFromBitwardenPageComponent {
       acceptButtonText: { key: "continue" },
     });
     if (confirmed) {
-      await BrowserApi.createNewTab("https://bitwarden.com/products/passwordless");
+      await BrowserApi.createNewTab(RepoUrl);
     }
   }
 }

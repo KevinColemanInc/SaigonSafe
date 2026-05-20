@@ -27,10 +27,10 @@
           <bit-form-control [disableMargin]="!((pinEnabled$ | async) || this.form.value.pin)">
             <input bitCheckbox id="biometric" type="checkbox" formControlName="biometric" />
             <bit-label for="biometric" class="tw-whitespace-normal">
-              {{ "unlockWithBiometrics" | i18n }}
+              {{ biometricText | i18n }}
             </bit-label>
-            <bit-hint *ngIf="biometricUnavailabilityReason">
-              {{ biometricUnavailabilityReason }}
+            <bit-hint *ngIf="biometricStatusMessage">
+              {{ biometricStatusMessage }}
             </bit-hint>
           </bit-form-control>
           <bit-form-control
@@ -46,6 +46,21 @@
             />
             <bit-label for="autoBiometricsPrompt" class="tw-whitespace-normal">
               {{ "enableAutoBiometricsPrompt" | i18n }}
+            </bit-label>
+          </bit-form-control>
+          <bit-form-control
+            class="tw-pl-5"
+            [disableMargin]="!((pinEnabled$ | async) || this.form.value.pin)"
+            *ngIf="this.form.value.biometric && showMasterPasswordOnClientRestartOption"
+          >
+            <input
+              bitCheckbox
+              id="requireMasterPasswordOnRestart"
+              type="checkbox"
+              formControlName="requireMasterPasswordOnRestart"
+            />
+            <bit-label for="requireMasterPasswordOnRestart" class="tw-whitespace-normal">
+              {{ "lockWithMasterPassOnRestart1" | i18n }}
             </bit-label>
           </bit-form-control>
           <bit-form-control

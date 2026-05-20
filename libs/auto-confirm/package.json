@@ -6,6 +6,11 @@
   "type": "commonjs",
   "main": "index.js",
   "types": "index.d.ts",
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "npm run clean && tsc -p tsconfig.lib.json",
+    "build:watch": "npm run clean && tsc -p tsconfig.lib.json --watch"
+  },
   "license": "GPL-3.0",
   "author": "admin-console"
 }

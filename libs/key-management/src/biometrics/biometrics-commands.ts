@@ -9,6 +9,10 @@ export enum BiometricsCommands {
   UnlockWithBiometricsForUser = "unlockWithBiometricsForUser",
   /** Get biometric status for a specific user account. This includes both information about availability of cryptographic material (is the user configured for biometric unlock? is a masterpassword unlock needed? But also information about the biometric system's availability in a single status) */
   GetBiometricsStatusForUser = "getBiometricsStatusForUser",
+  /** Stores a user key for the current desktop session so biometric unlock can be used until the host app is restarted. */
+  SetBiometricUnlockKeyForUser = "setBiometricUnlockKeyForUser",
+  /** Persists a user key for biometric unlock across host restarts when the platform supports it. */
+  PersistBiometricUnlockKeyForUser = "persistBiometricUnlockKeyForUser",
 
   /** Checks whether the biometric unlock can be enabled. */
   CanEnableBiometricUnlock = "canEnableBiometricUnlock",

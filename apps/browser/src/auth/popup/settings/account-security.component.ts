@@ -66,6 +66,10 @@ import {
 } from "@bitwarden/key-management";
 import { SessionTimeoutSettingsComponent } from "@bitwarden/key-management-ui";
 
+import {
+  browserUsesTouchIdLabel,
+  getBrowserBiometricUnlockTextKey,
+} from "../../../key-management/biometrics/browser-biometric-text";
 import { BiometricErrors, BiometricErrorTypes } from "../../../models/biometricErrors";
 import { BrowserApi } from "../../../platform/browser/browser-api";
 import BrowserPopupUtils from "../../../platform/browser/browser-popup-utils";
@@ -109,7 +113,7 @@ import { AwaitDesktopDialogComponent } from "./await-desktop-dialog.component";
 })
 export class AccountSecurityComponent implements OnInit, OnDestroy {
   showMasterPasswordOnClientRestartOption = true;
-  biometricUnavailabilityReason: string;
+  biometricStatusMessage: string;
   showChangeMasterPass = true;
   pinEnabled$: Observable<boolean> = of(true);
   protected readonly loading = signal(true);
@@ -118,6 +122,7 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
     pin: [null as boolean | null],
     pinLockWithMasterPassword: false,
     biometric: false,
+    requireMasterPasswordOnRestart: false,
     enableAutoBiometricsPrompt: true,
     enablePhishingDetection: true,
   });
@@ -191,12 +196,22 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
       pinLockWithMasterPassword:
         (await this.pinService.getPinLockType(activeAccount.id)) == "EPHEMERAL",
       biometric: await this.vaultTimeoutSettingsService.isBiometricLockSet(activeAccount.id),
+      requireMasterPasswordOnRestart: this.showMasterPasswordOnClientRestartOption
+        ? !(await this.biometricStateService.getAllowBiometricUnlockOnRestart(activeAccount.id))
+        : false,
       enableAutoBiometricsPrompt: await firstValueFrom(
         this.biometricStateService.promptAutomatically$,
       ),
       enablePhishingDetection: await firstValueFrom(this.phishingDetectionSettingsService.enabled$),
     };
     this.form.patchValue(initialValues, { emitEvent: false });
+
+    if (initialValues.biometric && this.showMasterPasswordOnClientRestartOption) {
+      this.form.controls.requireMasterPasswordOnRestart.enable({ emitEvent: false });
+    } else {
+      this.form.controls.requireMasterPasswordOnRestart.disable({ emitEvent: false });
+    }
+
     this.loading.set(false);
 
     timer(0, this.BIOMETRICS_POLLING_INTERVAL)
@@ -214,19 +229,26 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
             !(await BrowserApi.permissionsGranted(["nativeMessaging"])) &&
             !this.platformUtilsService.isSafari();
           if (needsPermissionPrompt) {
+            this.biometricStatusMessage = "";
             return;
           }
 
           const status = await this.biometricsService.getBiometricsStatusForUser(activeAccount.id);
-          if (status === BiometricsStatus.DesktopDisconnected && !biometricSettingAvailable) {
-            this.biometricUnavailabilityReason = this.i18nService.t(
+          if (
+            status === BiometricsStatus.Available &&
+            biometricSettingAvailable &&
+            this.usesTouchId()
+          ) {
+            this.biometricStatusMessage = this.i18nService.t("touchIdAvailableOnThisMac");
+          } else if (status === BiometricsStatus.DesktopDisconnected && !biometricSettingAvailable) {
+            this.biometricStatusMessage = this.i18nService.t(
               "biometricsStatusHelptextDesktopDisconnected",
             );
           } else if (
             status === BiometricsStatus.NotEnabledInConnectedDesktopApp &&
             !biometricSettingAvailable
           ) {
-            this.biometricUnavailabilityReason = this.i18nService.t(
+            this.biometricStatusMessage = this.i18nService.t(
               "biometricsStatusHelptextNotEnabledInDesktop",
               activeAccount.email,
             );
@@ -234,11 +256,11 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
             status === BiometricsStatus.HardwareUnavailable &&
             !biometricSettingAvailable
           ) {
-            this.biometricUnavailabilityReason = this.i18nService.t(
+            this.biometricStatusMessage = this.i18nService.t(
               "biometricsStatusHelptextHardwareUnavailable",
             );
           } else {
-            this.biometricUnavailabilityReason = "";
+            this.biometricStatusMessage = "";
           }
         }),
         takeUntil(this.destroy$),
@@ -274,12 +296,26 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
         distinctUntilChanged(),
         concatMap(async (enabled) => {
           await this.updateBiometric(enabled);
-          if (enabled) {
+          const biometricsEnabled = this.form.controls.biometric.value === true;
+          if (biometricsEnabled) {
             this.form.controls.enableAutoBiometricsPrompt.enable();
+            if (this.showMasterPasswordOnClientRestartOption) {
+              this.form.controls.requireMasterPasswordOnRestart.enable({ emitEvent: false });
+            }
           } else {
             this.form.controls.enableAutoBiometricsPrompt.disable();
+            this.form.controls.requireMasterPasswordOnRestart.disable({ emitEvent: false });
           }
           this.refreshTimeoutSettings$.next();
+        }),
+        takeUntil(this.destroy$),
+      )
+      .subscribe();
+
+    this.form.controls.requireMasterPasswordOnRestart.valueChanges
+      .pipe(
+        concatMap(async (enabled) => {
+          await this.updateRequireMasterPasswordOnRestart(enabled);
         }),
         takeUntil(this.destroy$),
       )
@@ -381,13 +417,18 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
 
       try {
         const userId = await firstValueFrom(this.accountService.activeAccount$.pipe(getUserId));
+        if (!this.showMasterPasswordOnClientRestartOption) {
+          await this.biometricStateService.setAllowBiometricUnlockOnRestart(true, userId);
+          this.form.controls.requireMasterPasswordOnRestart.setValue(false, { emitEvent: false });
+        }
         await this.keyService.refreshAdditionalKeys(userId);
 
         const successful = await this.trySetupBiometrics();
-        this.form.controls.biometric.setValue(successful);
+        this.form.controls.biometric.setValue(successful, { emitEvent: false });
         await this.biometricStateService.setBiometricUnlockEnabled(successful);
         if (!successful) {
           await this.biometricStateService.setFingerprintValidated(false);
+          await this.biometricStateService.setBiometricUnlockSessionReady(false, userId);
           return;
         }
         this.toastService.showToast({
@@ -402,6 +443,7 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
     } else {
       await this.biometricStateService.setBiometricUnlockEnabled(false);
       await this.biometricStateService.setFingerprintValidated(false);
+      await this.biometricStateService.setBiometricUnlockSessionReady(false);
     }
   }
 
@@ -431,10 +473,18 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
         const userId = await firstValueFrom(
           this.accountService.activeAccount$.pipe(map((a) => a.id)),
         );
+        const userKey = await this.keyService.getUserKey(userId);
+        if (userKey == null) {
+          throw new Error("User key unavailable");
+        }
+
         let result = false;
         try {
-          const userKey = await this.biometricsService.unlockWithBiometricsForUser(userId);
-          result = await this.keyService.validateUserKey(userKey, userId);
+          result = await this.biometricsService.authenticateWithBiometrics();
+          if (result) {
+            await this.biometricsService.setBiometricProtectedUnlockKeyForUser(userId, userKey);
+            result = await this.biometricStateService.getBiometricUnlockSessionReady(userId);
+          }
           // FIXME: Remove when updating file. Eslint update
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (e) {
@@ -464,12 +514,17 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
           await awaitDesktopDialogRef.close(true);
         }
 
-        if (e.message == "canceled") {
+        if (e instanceof Error && e.message == "canceled") {
           setupResult = false;
           return;
         }
 
-        const error = BiometricErrors[e.message as BiometricErrorTypes];
+        const error = BiometricErrors[(e as Error)?.message as BiometricErrorTypes];
+        if (error == null) {
+          this.validationService.showError(e);
+          setupResult = false;
+          return;
+        }
         const shouldRetry = await this.dialogService.openSimpleDialog({
           title: { key: error.title },
           content: { key: error.description },
@@ -492,6 +547,22 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
 
     await Promise.all([waitForUserDialogPromise(), biometricsPromise()]);
     return setupResult;
+  }
+
+  async updateRequireMasterPasswordOnRestart(enabled: boolean) {
+    const userId = await firstValueFrom(this.accountService.activeAccount$.pipe(getUserId));
+    await this.biometricStateService.setAllowBiometricUnlockOnRestart(!enabled, userId);
+
+    if (!this.form.controls.biometric.value) {
+      return;
+    }
+
+    const userKey = await this.keyService.getUserKey(userId);
+    if (userKey == null) {
+      return;
+    }
+
+    await this.biometricsService.setBiometricProtectedUnlockKeyForUser(userId, userKey);
   }
 
   async updateAutoBiometricsPrompt() {
@@ -534,7 +605,7 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
     if (confirmed) {
       // FIXME: Verify that this floating promise is intentional. If it is, add an explanatory comment and ensure there is proper error handling.
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      BrowserApi.createNewTab("https://bitwarden.com/help/setup-two-step-login/");
+      BrowserApi.createNewTab("https://github.com/kevincolemaninc/saigonsafe");
     }
   }
 
@@ -579,5 +650,13 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  get biometricText(): string {
+    return getBrowserBiometricUnlockTextKey();
+  }
+
+  private usesTouchId(): boolean {
+    return browserUsesTouchIdLabel();
   }
 }

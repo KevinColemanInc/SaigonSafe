@@ -6,7 +6,7 @@
     "message": "Saigon Safe logo"
   },
   "extName": {
-    "message": "Saigon Safe Password Manager",
+    "message": "Saigon Safe",
     "description": "Extension name, MUST be less than 40 characters (Safari restriction)"
   },
   "extDesc": {
@@ -759,7 +759,7 @@
       },
       "hostname": {
         "content": "$2",
-        "example": "bitwarden.com"
+        "example": "saigonsafe.com"
       }
     }
   },
@@ -771,7 +771,7 @@
     "placeholders": {
       "host": {
         "content": "$1",
-        "example": "vault.bitwarden.com"
+        "example": "vault.saigonsafe.com"
       }
     }
   },
@@ -1068,7 +1068,7 @@
   },
   "addDomain": {
     "message": "Add domain",
-    "description": "'Domain' here refers to an internet domain name (e.g. 'bitwarden.com') and the message in whole described the act of putting a domain value into the context."
+    "description": "'Domain' here refers to an internet domain name (e.g. 'saigonsafe.com') and the message in whole described the act of putting a domain value into the context."
   },
   "addedItem": {
     "message": "Item added"
@@ -2536,7 +2536,10 @@
     "message": "Too many invalid PIN entry attempts. Logging out."
   },
   "unlockWithBiometrics": {
-    "message": "Unlock with biometrics"
+    "message": "Unlock with fingerprint"
+  },
+  "unlockWithTouchId": {
+    "message": "Unlock with Touch ID"
   },
   "unlockWithMasterPassword": {
     "message": "Unlock with master password"
@@ -5682,6 +5685,9 @@
   "biometricsStatusHelptextUnavailableReasonUnknown": {
     "message": "Biometric unlock is currently unavailable for an unknown reason."
   },
+  "touchIdAvailableOnThisMac": {
+    "message": "Touch ID is available on this Mac."
+  },
   "unlockVault": {
     "message": "Unlock your vault in seconds"
   },
@@ -6459,7 +6465,7 @@
   },
   "sendCreated": {
     "message": "Send created",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "numericInputError": {
     "message": "Input must be numeric"

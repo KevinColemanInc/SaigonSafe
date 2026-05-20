@@ -14,10 +14,11 @@ import { mockAccountInfoWith, FakeAccountService } from "@bitwarden/common/spec"
 import { CsprngArray } from "@bitwarden/common/types/csprng";
 import { UserId } from "@bitwarden/common/types/guid";
 import { DialogService } from "@bitwarden/components";
-import { KeyService, BiometricsService, BiometricsCommands } from "@bitwarden/key-management";
+import { KeyService, BiometricsCommands } from "@bitwarden/key-management";
 import { ConfigService } from "@bitwarden/services/config.service";
 
 import { DesktopSettingsService } from "../platform/services/desktop-settings.service";
+import { DesktopBiometricsService } from "../key-management/biometrics/desktop.biometrics.service";
 
 import { BiometricMessageHandlerService } from "./biometric-message-handler.service";
 
@@ -44,7 +45,7 @@ describe("BiometricMessageHandlerService", () => {
   let configService: MockProxy<ConfigService>;
   let messagingService: MockProxy<MessagingService>;
   let desktopSettingsService: DesktopSettingsService;
-  let biometricsService: MockProxy<BiometricsService>;
+  let biometricsService: MockProxy<DesktopBiometricsService>;
   let dialogService: MockProxy<DialogService>;
   let accountService: AccountService;
   let authService: MockProxy<AuthService>;
@@ -58,7 +59,7 @@ describe("BiometricMessageHandlerService", () => {
     messagingService = mock<MessagingService>();
     desktopSettingsService = mock<DesktopSettingsService>();
     configService = mock<ConfigService>();
-    biometricsService = mock<BiometricsService>();
+    biometricsService = mock<DesktopBiometricsService>();
     dialogService = mock<DialogService>();
 
     accountService = new FakeAccountService(accounts);
@@ -500,5 +501,81 @@ describe("BiometricMessageHandlerService", () => {
         }
       },
     );
+  });
+
+  describe("store biometric unlock key", () => {
+    const appId = "appId";
+    const sessionSecret = Utils.fromBufferToB64(new Uint8Array(64));
+    const userKey = new SymmetricCryptoKey(new Uint8Array(64));
+
+    beforeEach(() => {
+      (global as any).ipc.platform.ephemeralStore.listEphemeralValueKeys.mockResolvedValue([
+        "connectedApp_appId",
+      ]);
+      (global as any).ipc.platform.ephemeralStore.getEphemeralValue.mockResolvedValue(
+        JSON.stringify({
+          publicKey: Utils.fromUtf8ToB64("publicKey"),
+          sessionSecret,
+          trusted: true,
+        }),
+      );
+      encryptService.encryptString.mockResolvedValue(mock<EncString>());
+    });
+
+    it("stores a session biometric key and responds to the browser", async () => {
+      encryptService.decryptString.mockResolvedValue(
+        JSON.stringify({
+          command: BiometricsCommands.SetBiometricUnlockKeyForUser,
+          messageId: 7,
+          timestamp: Date.now(),
+          userId: SomeUser,
+          keyB64: userKey.keyB64,
+        }),
+      );
+
+      await service.handleMessage({
+        appId,
+        message: {} as EncString,
+      });
+
+      expect(biometricsService.setBiometricProtectedUnlockKeyForUser).toHaveBeenCalledWith(
+        SomeUser,
+        expect.objectContaining({ keyB64: userKey.keyB64 }),
+      );
+      expect(ipc.platform.nativeMessaging.sendMessage).toHaveBeenCalledWith(
+        expect.objectContaining({
+          appId,
+          messageId: 7,
+        }),
+      );
+    });
+
+    it("persists a biometric key when restart unlock is allowed", async () => {
+      encryptService.decryptString.mockResolvedValue(
+        JSON.stringify({
+          command: BiometricsCommands.PersistBiometricUnlockKeyForUser,
+          messageId: 8,
+          timestamp: Date.now(),
+          userId: SomeUser,
+          keyB64: userKey.keyB64,
+        }),
+      );
+
+      await service.handleMessage({
+        appId,
+        message: {} as EncString,
+      });
+
+      expect(biometricsService.enrollPersistent).toHaveBeenCalledWith(
+        SomeUser,
+        expect.objectContaining({ keyB64: userKey.keyB64 }),
+      );
+      expect(ipc.platform.nativeMessaging.sendMessage).toHaveBeenCalledWith(
+        expect.objectContaining({
+          appId,
+          messageId: 8,
+        }),
+      );
+    });
   });
 });

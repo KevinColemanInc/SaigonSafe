@@ -233,6 +233,46 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
                 context.completeRequest(returningItems: [response], completionHandler: nil)
             }
             return
+        case "setBiometricUnlockKeyForUser", "persistBiometricUnlockKeyForUser":
+            let messageId = message?["messageId"] as? Int
+
+            guard let userId = message?["userId"] as? String,
+                  let keyB64 = message?["keyB64"] as? String else {
+                response.userInfo = [
+                    SFExtensionMessageKey: [
+                        "message": [
+                            "command": command,
+                            "response": false,
+                            "timestamp": Int64(NSDate().timeIntervalSince1970 * 1000),
+                            "messageId": messageId,
+                        ],
+                    ],
+                ]
+
+                context.completeRequest(returningItems: [response], completionHandler: nil)
+                break
+            }
+
+            let passwordName = userId + "_user_biometric"
+            let keyData = keyB64.data(using: .utf8)!
+            var existingItem: SecKeychainItem?
+            let existingStatus = SecKeychainFindGenericPassword(nil, UInt32(ServiceNameBiometric.utf8.count), ServiceNameBiometric, UInt32(passwordName.utf8.count), passwordName, nil, nil, &existingItem)
+            if existingStatus == errSecSuccess, let existingItem {
+                SecKeychainItemDelete(existingItem)
+            }
+            let status = SecKeychainAddGenericPassword(nil, UInt32(ServiceNameBiometric.utf8.count), ServiceNameBiometric, UInt32(passwordName.utf8.count), passwordName, keyData.count, (keyData as NSData).bytes, nil)
+
+            response.userInfo = [
+                SFExtensionMessageKey: [
+                    "message": [
+                        "command": command,
+                        "response": status == errSecSuccess,
+                        "timestamp": Int64(NSDate().timeIntervalSince1970 * 1000),
+                        "messageId": messageId,
+                    ],
+                ],
+            ]
+            break
         case "getBiometricsStatusForUser":
             let messageId = message?["messageId"] as? Int
             let laContext = LAContext()

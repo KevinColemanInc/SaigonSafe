@@ -6,7 +6,7 @@
     "message": "Λογότυπο του Saigon Safe"
   },
   "extName": {
-    "message": "Kevinwarden Password Manager",
+    "message": "Saigon Safe",
     "description": "Extension name, MUST be less than 40 characters (Safari restriction)"
   },
   "extDesc": {
@@ -744,7 +744,7 @@
       },
       "hostname": {
         "content": "$2",
-        "example": "bitwarden.com"
+        "example": "saigonsafe.com"
       }
     }
   },
@@ -756,7 +756,7 @@
     "placeholders": {
       "host": {
         "content": "$1",
-        "example": "vault.bitwarden.com"
+        "example": "vault.saigonsafe.com"
       }
     }
   },
@@ -1053,7 +1053,7 @@
   },
   "addDomain": {
     "message": "Προσθήκη τομέα",
-    "description": "'Domain' here refers to an internet domain name (e.g. 'bitwarden.com') and the message in whole described the act of putting a domain value into the context."
+    "description": "'Domain' here refers to an internet domain name (e.g. 'saigonsafe.com') and the message in whole described the act of putting a domain value into the context."
   },
   "addedItem": {
     "message": "Το στοιχείο προστέθηκε"
@@ -1698,7 +1698,7 @@
   },
   "authenticatorAppDescV2": {
     "message": "Εισάγετε έναν κωδικό που δημιουργήθηκε από μια εφαρμογή αυθεντικοποίησης όπως το Saigon Safe Authenticator.",
-    "description": "'Bitwarden Authenticator' is a product name and should not be translated."
+    "description": "'Saigon Safe Authenticator' is a product name and should not be translated."
   },
   "yubiKeyTitleV2": {
     "message": "Κλειδί Ασφαλείας Yubico OTP"
@@ -2995,7 +2995,7 @@
   },
   "updateInBitwardenSlideDesc": {
     "message": "Saigon Safe will then prompt you to update the password in the password manager.",
-    "description": "Description of the update in Bitwarden slide on the at-risk password page carousel"
+    "description": "Description of the update in Saigon Safe slide on the at-risk password page carousel"
   },
   "updateInBitwardenSlideImgAltPeriod": {
     "message": "Illustration of a Saigon Safe’s notification prompting the user to update the login."
@@ -3052,11 +3052,11 @@
   },
   "send": {
     "message": "Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendDetails": {
     "message": "Στοιχεία Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendTypeText": {
     "message": "Κείμενο"
@@ -3069,7 +3069,7 @@
   },
   "allSends": {
     "message": "Όλα τα Sends",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "maxAccessCountReached": {
     "message": "Max access count reached",
@@ -3089,7 +3089,7 @@
   },
   "copySendLink": {
     "message": "Αντιγραφή συνδέσμου Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "removePassword": {
     "message": "Αφαίρεση Κωδικού"
@@ -3102,11 +3102,11 @@
   },
   "deletedSend": {
     "message": "Το Send διαγράφηκε",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendLink": {
     "message": "Σύνδεσμος Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "disabled": {
     "message": "Απενεργοποιημένο"
@@ -3116,26 +3116,26 @@
   },
   "deleteSend": {
     "message": "Διαγραφή Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "deleteSendConfirmation": {
     "message": "Είστε βέβαιοι ότι θέλετε να διαγράψετε αυτό το Send;",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "deleteSendPermanentConfirmation": {
     "message": "Θέλετε σίγουρα να διαγράψετε οριστικά αυτό το Send;",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "editSend": {
     "message": "Επεξεργασία Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "deletionDate": {
     "message": "Ημερομηνία διαγραφής"
   },
   "deletionDateDescV2": {
     "message": "Το Send θα διαγραφεί οριστικά σε αυτήν την ημερομηνία.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "expirationDate": {
     "message": "Ημερομηνία λήξης"
@@ -3157,34 +3157,34 @@
   },
   "createSend": {
     "message": "Νέο Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "newPassword": {
     "message": "Νέος κωδικός πρόσβασης"
   },
   "sendDisabled": {
     "message": "Το Send αφαιρέθηκε",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendDisabledWarning": {
     "message": "Λόγω μιας επιχειρηματικής πολιτικής, είστε σε θέση να διαγράψετε μόνο ένα υπάρχον Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "createdSend": {
     "message": "Το Send δημιουργήθηκε",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "createdSendSuccessfully": {
     "message": "Το Send δημιουργήθηκε επιτυχώς!",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendExpiresInHoursSingle": {
     "message": "Το Send θα είναι διαθέσιμο σε όποιον έχει τον σύνδεσμο για την επόμενη 1 ώρα.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendExpiresInHours": {
     "message": "Το Send θα είναι διαθέσιμο σε όποιον έχει τον σύνδεσμο για τις επόμενες $HOURS$ ώρες.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated.",
     "placeholders": {
       "hours": {
         "content": "$1",
@@ -3194,11 +3194,11 @@
   },
   "sendExpiresInDaysSingle": {
     "message": "Το Send θα είναι διαθέσιμο σε όποιον έχει τον σύνδεσμο για την επόμενη 1 ημέρα.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendExpiresInDays": {
     "message": "Το Send θα είναι διαθέσιμο σε όποιον έχει τον σύνδεσμο για τις επόμενες $DAYS$ ημέρες.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated.",
     "placeholders": {
       "days": {
         "content": "$1",
@@ -3217,7 +3217,7 @@
   },
   "sendCreatedDescriptionV2": {
     "message": "Copy and share this Send link. The Send will be available to anyone with the link for the next $TIME$.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated.",
     "placeholders": {
       "time": {
         "content": "$1",
@@ -3227,7 +3227,7 @@
   },
   "sendCreatedDescriptionPassword": {
     "message": "Copy and share this Send link. The Send will be available to anyone with the link and password you set for the next $TIME$.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated.",
     "placeholders": {
       "time": {
         "content": "$1",
@@ -3237,7 +3237,7 @@
   },
   "sendCreatedDescriptionEmail": {
     "message": "Copy and share this Send link. It can be viewed by the people you specified for the next $TIME$.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated.",
     "placeholders": {
       "time": {
         "content": "$1",
@@ -3247,11 +3247,11 @@
   },
   "sendLinkCopied": {
     "message": "Ο σύνδεσμος Send αντιγράφηκε",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "editedSend": {
     "message": "Το Send αποθηκεύτηκε",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "popOut": {
     "message": "Άνοιγμα σε αναδυόμενο παράθυρο"
@@ -4183,11 +4183,11 @@
   },
   "sendsTitleNoItems": {
     "message": "Send sensitive information safely",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendsBodyNoItems": {
     "message": "Share files and data securely with anyone, on any platform. Your information will remain end-to-end encrypted while limiting exposure.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "inputRequired": {
     "message": "Απαιτείται εισαγωγή."
@@ -4773,7 +4773,7 @@
   },
   "uriMatchDefaultStrategyHint": {
     "message": "URI match detection is how Saigon Safe identifies autofill suggestions.",
-    "description": "Explains to the user that URI match detection determines how Bitwarden suggests autofill options, and clarifies that this default strategy applies when no specific match detection is set for a login item."
+    "description": "Explains to the user that URI match detection determines how Saigon Safe suggests autofill options, and clarifies that this default strategy applies when no specific match detection is set for a login item."
   },
   "regExAdvancedOptionWarning": {
     "message": "\"Regular expression\" is an advanced option with increased risk of exposing credentials.",
@@ -5695,7 +5695,7 @@
   },
   "saveToBitwarden": {
     "message": "Αποθήκευση στο Saigon Safe",
-    "description": "Confirmation message for saving a login to Bitwarden"
+    "description": "Confirmation message for saving a login to Saigon Safe"
   },
   "spaceCharacterDescriptor": {
     "message": "Κενό",
@@ -5989,7 +5989,7 @@
     "placeholders": {
       "product": {
         "content": "$1",
-        "example": "Bitwarden Phishing Blocker"
+        "example": "Saigon Safe Phishing Blocker"
       }
     }
   },
@@ -6348,7 +6348,7 @@
   },
   "sendPasswordHelperText": {
     "message": "Individuals will need to enter the password to view this Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "userVerificationFailed": {
     "message": "User verification failed."
@@ -6448,7 +6448,7 @@
   },
   "saveSendEditsFailed": {
     "message": "Saving Send edits failed",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "hideEmailPolicyInEffect": {
     "message": "Your organization requires email visibility. Uncheck \"Hide your email from viewers\" to save."

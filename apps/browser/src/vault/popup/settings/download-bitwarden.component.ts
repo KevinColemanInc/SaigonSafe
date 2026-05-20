@@ -30,6 +30,23 @@ import { PopupPageComponent } from "../../../platform/popup/layout/popup-page.co
   ],
 })
 export class DownloadBitwardenComponent implements OnInit {
+  readonly repoUrl = "https://github.com/kevincolemaninc/saigonsafe";
+  readonly releasesUrl = "https://github.com/kevincolemaninc/saigonsafe/releases";
+  readonly mobileDownloads = [
+    {
+      platform: "iPhone & iPad",
+      description: "Track mobile release availability and source updates from the Saigon Safe repository.",
+      href: this.releasesUrl,
+      cta: "View release feed",
+    },
+    {
+      platform: "Android",
+      description: "Use the Saigon Safe release page for Android build availability and project updates.",
+      href: this.releasesUrl,
+      cta: "Open GitHub releases",
+    },
+  ];
+
   constructor(
     private nudgesService: NudgesService,
     private accountService: AccountService,

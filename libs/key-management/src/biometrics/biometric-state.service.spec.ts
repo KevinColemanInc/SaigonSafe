@@ -14,10 +14,12 @@ import { UserId } from "@bitwarden/common/types/guid";
 import { BiometricStateService, DefaultBiometricStateService } from "./biometric-state.service";
 import {
   BIOMETRIC_UNLOCK_ENABLED,
+  BIOMETRIC_UNLOCK_SESSION_READY,
   ENCRYPTED_CLIENT_KEY_HALF,
   FINGERPRINT_VALIDATED,
   PROMPT_AUTOMATICALLY,
   PROMPT_CANCELLED,
+  REQUIRE_PASSWORD_ON_START,
 } from "./biometric.state";
 
 describe("BiometricStateService", () => {
@@ -178,6 +180,30 @@ describe("BiometricStateService", () => {
     });
   });
 
+  describe("allowBiometricUnlockOnRestart$", () => {
+    it("defaults to true when the setting is unset", async () => {
+      expect(await firstValueFrom(sut.allowBiometricUnlockOnRestart$())).toBe(true);
+    });
+
+    it("maps requirePasswordOnStart=true to false", async () => {
+      stateProvider.activeUser.getFake(REQUIRE_PASSWORD_ON_START).nextState(true);
+
+      expect(await firstValueFrom(sut.allowBiometricUnlockOnRestart$())).toBe(false);
+    });
+  });
+
+  describe("setAllowBiometricUnlockOnRestart", () => {
+    it("stores the inverse requirePasswordOnStart value", async () => {
+      await sut.setAllowBiometricUnlockOnRestart(false);
+
+      expect(stateProvider.activeUser.getFake(REQUIRE_PASSWORD_ON_START).nextMock).toHaveBeenCalledWith([
+        userId,
+        true,
+      ]);
+      expect(await firstValueFrom(sut.allowBiometricUnlockOnRestart$())).toBe(false);
+    });
+  });
+
   describe("biometricUnlockEnabled$", () => {
     describe("no user id provided, active user", () => {
       it("emits when biometricUnlockEnabled state is updated", async () => {
@@ -241,6 +267,28 @@ describe("BiometricStateService", () => {
       expect(stateProvider.global.getFake(FINGERPRINT_VALIDATED).nextMock).toHaveBeenCalledWith(
         true,
       );
+    });
+  });
+
+  describe("biometricUnlockSessionReady$", () => {
+    it("defaults to false when unset", async () => {
+      expect(await firstValueFrom(sut.biometricUnlockSessionReady$())).toBe(false);
+    });
+
+    it("emits true when session-ready state is updated", async () => {
+      stateProvider.activeUser.getFake(BIOMETRIC_UNLOCK_SESSION_READY).nextState(true);
+
+      expect(await firstValueFrom(sut.biometricUnlockSessionReady$())).toBe(true);
+    });
+  });
+
+  describe("setBiometricUnlockSessionReady", () => {
+    it("updates the active user's session-ready state", async () => {
+      await sut.setBiometricUnlockSessionReady(true);
+
+      expect(
+        stateProvider.activeUser.getFake(BIOMETRIC_UNLOCK_SESSION_READY).nextMock,
+      ).toHaveBeenCalledWith([userId, true]);
     });
   });
 });

@@ -69,7 +69,7 @@ export class BackgroundBrowserBiometricsService extends BiometricsService {
 
   async getBiometricsStatus(): Promise<BiometricsStatus> {
     if (!(await BrowserApi.permissionsGranted(["nativeMessaging"]))) {
-      return BiometricsStatus.NativeMessagingPermissionMissing;
+      return BiometricsStatus.PlatformUnsupported;
     }
 
     try {
@@ -102,6 +102,7 @@ export class BackgroundBrowserBiometricsService extends BiometricsService {
         const userKey = new SymmetricCryptoKey(decodedUserkey) as UserKey;
         if (await this.keyService.validateUserKey(userKey, userId)) {
           await this.biometricStateService.setBiometricUnlockEnabled(true);
+          await this.biometricStateService.setBiometricUnlockSessionReady(true, userId);
           await this.keyService.setUserKey(userKey, userId);
           await this.pinService.userUnlocked(userId);
           // to update badge and other things
@@ -163,5 +164,52 @@ export class BackgroundBrowserBiometricsService extends BiometricsService {
   async setBiometricProtectedUnlockKeyForUser(
     userId: UserId,
     value: SymmetricCryptoKey,
-  ): Promise<void> {}
+  ): Promise<void> {
+    try {
+      await this.ensureConnected();
+
+      const setResponse = await this.nativeMessagingBackground().callCommand({
+        command: BiometricsCommands.SetBiometricUnlockKeyForUser,
+        userId,
+        keyB64: value.keyB64,
+      });
+      if (setResponse?.response !== true) {
+        throw new Error("Failed to store biometric unlock key");
+      }
+
+      if (await this.biometricStateService.getAllowBiometricUnlockOnRestart(userId)) {
+        const persistResponse = await this.nativeMessagingBackground().callCommand({
+          command: BiometricsCommands.PersistBiometricUnlockKeyForUser,
+          userId,
+          keyB64: value.keyB64,
+        });
+        if (persistResponse?.response !== true) {
+          this.logService.warning(
+            "[BackgroundBrowserBiometricsService] Failed to persist biometric unlock key",
+          );
+        }
+      }
+
+      await this.biometricStateService.setBiometricUnlockSessionReady(true, userId);
+    } catch (error) {
+      await this.biometricStateService.setBiometricUnlockSessionReady(false, userId);
+      this.logService.warning(
+        "[BackgroundBrowserBiometricsService] Failed to provision biometric unlock key",
+        error,
+      );
+    }
+  }
+
+  async enrollPersistent(userId: UserId, key: SymmetricCryptoKey): Promise<void> {
+    await this.ensureConnected();
+    await this.nativeMessagingBackground().callCommand({
+      command: BiometricsCommands.PersistBiometricUnlockKeyForUser,
+      userId,
+      keyB64: key.keyB64,
+    });
+  }
+
+  async hasPersistentKey(userId: UserId): Promise<boolean> {
+    return await this.biometricStateService.getAllowBiometricUnlockOnRestart(userId);
+  }
 }

@@ -1,6 +1,7 @@
-@import "../../../../shared/styles/webfonts";
-@import "../../../../shared/styles/variables";
-@import "../../../../../../../../libs/angular/src/scss/icons";
+@use "sass:color";
+@use "../../../../shared/styles/webfonts";
+@use "../../../../shared/styles/variables" as *;
+@use "../../../../../../../../libs/angular/src/scss/icons";
 
 * {
   box-sizing: border-box;
@@ -54,6 +55,16 @@ body * {
       }
     }
   }
+
+  &.inline-menu-list-message--auth-required {
+    font-weight: 500;
+    padding: 1rem 0.8rem 0.6rem;
+
+    @include themify($themes) {
+      background: color.mix(themed("primaryColor"), themed("backgroundColor"), 8%);
+      box-shadow: inset 0.3rem 0 0 themed("primaryColor");
+    }
+  }
 }
 
 .inline-menu-list-button-container {
@@ -72,6 +83,15 @@ body * {
     @include themify($themes) {
       background: themed("backgroundOffsetColor");
     }
+  }
+}
+
+.inline-menu-list-button-container--auth-required {
+  padding-top: 0;
+
+  @include themify($themes) {
+    background: color.mix(themed("primaryColor"), themed("backgroundColor"), 8%);
+    border-top-color: transparent;
   }
 }
 
@@ -117,6 +137,13 @@ body * {
   }
 }
 
+.inline-menu-list-button--auth-required {
+  @include themify($themes) {
+    background: themed("backgroundColor");
+    box-shadow: inset 0 0 0 0.1rem themed("borderColor");
+  }
+}
+
 .unlock-button {
   svg {
     top: 0.2rem;
@@ -145,7 +172,9 @@ body * {
   }
 
   @include themify($themes) {
-    scrollbar-color: themed("inputBorderColor") darken(themed("backgroundColor"), 1%);
+    scrollbar-color:
+      themed("inputBorderColor")
+      color.adjust(themed("backgroundColor"), $lightness: -1%);
     border-right-color: themed("borderColor");
   }
 }

@@ -81,6 +81,7 @@ import { SendV2Component } from "../tools/popup/send-v2/send-v2.component";
 import { AboutPageV2Component } from "../tools/popup/settings/about-page/about-page-v2.component";
 import { ExportBrowserV2Component } from "../tools/popup/settings/export/export-browser-v2.component";
 import { ImportBrowserV2Component } from "../tools/popup/settings/import/import-browser-v2.component";
+import { PrivacyDisclosurePageComponent } from "../tools/popup/settings/privacy-disclosure-page/privacy-disclosure-page.component";
 import { SettingsV2Component } from "../tools/popup/settings/settings-v2.component";
 import { AtRiskPasswordsComponent } from "../vault/popup/components/at-risk-passwords/at-risk-passwords.component";
 import { AddEditComponent } from "../vault/popup/components/vault/add-edit/add-edit.component";
@@ -664,6 +665,12 @@ const routes: Routes = [
     component: AboutPageV2Component,
     canActivate: [authGuard],
     data: { elevation: 1 } satisfies RouteDataProperties,
+  },
+  {
+    path: "privacy-disclosure",
+    component: PrivacyDisclosurePageComponent,
+    canActivate: [authGuard],
+    data: { elevation: 2 } satisfies RouteDataProperties,
   },
   {
     path: "more-from-bitwarden",

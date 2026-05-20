@@ -293,7 +293,7 @@ const safeProviders: SafeProvider[] = [
   safeProvider({
     provide: ActionsService,
     useClass: BrowserActionsService,
-    deps: [LogService, PlatformUtilsService],
+    deps: [LogService, PlatformUtilsService, AuthService],
   }),
   safeProvider({
     provide: KeyService,
@@ -631,7 +631,7 @@ const safeProviders: SafeProvider[] = [
   safeProvider({
     provide: ActionsService,
     useClass: BrowserActionsService,
-    deps: [LogService, PlatformUtilsService],
+    deps: [LogService, PlatformUtilsService, AuthService],
   }),
   safeProvider({
     provide: SystemNotificationsService,

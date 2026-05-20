@@ -1118,7 +1118,6 @@ describe("AutofillService", () => {
         jest.spyOn(autofillService, "doAutoFill");
         jest.spyOn(cipherService, "getNextCipherForUrl").mockResolvedValueOnce(null);
         jest.spyOn(cipherService, "getLastLaunchedForUrl").mockResolvedValueOnce(null);
-        jest.spyOn(cipherService, "getLastUsedForUrl").mockResolvedValueOnce(null);
 
         const result = await autofillService.doAutoFillOnTab(pageDetails, tab, true);
 
@@ -1225,10 +1224,55 @@ describe("AutofillService", () => {
         expect(result).toBe(totpCode);
       });
 
+      it("cycles to the next password-bearing login when the current login has no password", async () => {
+        const totpCode = "123456";
+        const fromCommand = true;
+        const usernameOnlyCipher = mock<CipherView>({
+          reprompt: CipherRepromptType.None,
+          login: { password: undefined } as CipherView["login"],
+        });
+        const passwordCipher = mock<CipherView>({
+          reprompt: CipherRepromptType.None,
+          login: { password: "test-password" } as CipherView["login"],
+        });
+
+        jest.spyOn(autofillService, "doAutoFill").mockResolvedValueOnce(totpCode);
+        jest
+          .spyOn(cipherService, "getNextCipherForUrl")
+          .mockResolvedValueOnce(usernameOnlyCipher)
+          .mockResolvedValueOnce(passwordCipher);
+        jest
+          .spyOn(cipherService, "getAllDecryptedForUrl")
+          .mockResolvedValueOnce([usernameOnlyCipher, passwordCipher]);
+        jest.spyOn(cipherService, "updateLastUsedIndexForUrl");
+
+        const result = await autofillService.doAutoFillOnTab(pageDetails, tab, fromCommand);
+
+        expect(cipherService.getNextCipherForUrl).toHaveBeenNthCalledWith(1, tab.url, mockUserId);
+        expect(cipherService.getNextCipherForUrl).toHaveBeenNthCalledWith(2, tab.url, mockUserId);
+        expect(cipherService.getAllDecryptedForUrl).toHaveBeenCalledWith(tab.url, mockUserId);
+        expect(cipherService.updateLastUsedIndexForUrl).toHaveBeenNthCalledWith(1, tab.url);
+        expect(cipherService.updateLastUsedIndexForUrl).toHaveBeenNthCalledWith(2, tab.url);
+        expect(autofillService.doAutoFill).toHaveBeenCalledWith({
+          tab: tab,
+          cipher: passwordCipher,
+          pageDetails: pageDetails,
+          skipLastUsed: !fromCommand,
+          skipUsernameOnlyFill: !fromCommand,
+          onlyEmptyFields: !fromCommand,
+          fillNewPassword: fromCommand,
+          allowUntrustedIframe: fromCommand,
+          allowTotpAutofill: fromCommand,
+          autoSubmitLogin: false,
+        });
+        expect(result).toBe(totpCode);
+      });
+
       it("will skip autofill, launch the password reprompt window, and return a null value if the cipher re-prompt type is not `None`", async () => {
         cipher.reprompt = CipherRepromptType.Password;
         jest.spyOn(autofillService, "doAutoFill");
         jest.spyOn(cipherService, "getNextCipherForUrl").mockResolvedValueOnce(cipher);
+        jest.spyOn(cipherService, "updateLastUsedIndexForUrl");
         jest.spyOn(userVerificationService, "hasMasterPassword").mockResolvedValueOnce(true);
         jest
           .spyOn(autofillService as any, "openVaultItemPasswordRepromptPopout")
@@ -1242,6 +1286,7 @@ describe("AutofillService", () => {
           cipherId: cipher.id,
           action: "autofill",
         });
+        expect(cipherService.updateLastUsedIndexForUrl).toHaveBeenCalledWith(tab.url);
         expect(autofillService.doAutoFill).not.toHaveBeenCalled();
         expect(result).toBeNull();
       });
@@ -1250,6 +1295,7 @@ describe("AutofillService", () => {
         cipher.reprompt = CipherRepromptType.Password;
         jest.spyOn(autofillService, "doAutoFill");
         jest.spyOn(cipherService, "getNextCipherForUrl").mockResolvedValueOnce(cipher);
+        jest.spyOn(cipherService, "updateLastUsedIndexForUrl");
         jest.spyOn(userVerificationService, "hasMasterPassword").mockResolvedValueOnce(true);
         jest
           .spyOn(autofillService as any, "openVaultItemPasswordRepromptPopout")
@@ -1261,6 +1307,7 @@ describe("AutofillService", () => {
         const result = await autofillService.doAutoFillOnTab(pageDetails, tab, true);
 
         expect(cipherService.getNextCipherForUrl).toHaveBeenCalledWith(tab.url, mockUserId);
+        expect(cipherService.updateLastUsedIndexForUrl).toHaveBeenCalledWith(tab.url);
         expect(autofillService["openVaultItemPasswordRepromptPopout"]).not.toHaveBeenCalled();
         expect(autofillService.doAutoFill).not.toHaveBeenCalled();
         expect(result).toBeNull();
@@ -2456,6 +2503,69 @@ describe("AutofillService", () => {
           expect(qualification.fieldContainsKeyword).not.toHaveBeenCalledWith(
             expect.anything(),
             AutoFillConstants.UsernameFieldNames,
+          );
+        });
+
+        it("will not fill a candidate username field that carries a non-login signal on its parent form", async () => {
+          pageDetails.forms = {
+            validFormId: createAutofillFormMock({
+              opid: "validFormId",
+              htmlID: "newsletter-signup",
+            }),
+          };
+
+          await autofillService["generateLoginFillScript"](
+            fillScript,
+            pageDetails,
+            filledFields,
+            options,
+          );
+
+          expect(AutofillService.fillByOpid).not.toHaveBeenCalledWith(
+            fillScript,
+            usernameField,
+            options.cipher.login.username,
+          );
+          expect(AutofillService.fillByOpid).not.toHaveBeenCalledWith(
+            fillScript,
+            emailField,
+            options.cipher.login.username,
+          );
+        });
+
+        it("will not fill a candidate username field when a same-form sibling carries a non-login signal", async () => {
+          const newsletterCheckbox = createAutofillFieldMock({
+            opid: "newsletter-optin",
+            type: "checkbox",
+            form: "validFormId",
+            htmlName: "newsletter",
+            elementNumber: 5,
+          });
+          pageDetails.fields = [
+            usernameField,
+            emailField,
+            telephoneField,
+            totpField,
+            nonViewableField,
+            newsletterCheckbox,
+          ];
+
+          await autofillService["generateLoginFillScript"](
+            fillScript,
+            pageDetails,
+            filledFields,
+            options,
+          );
+
+          expect(AutofillService.fillByOpid).not.toHaveBeenCalledWith(
+            fillScript,
+            usernameField,
+            options.cipher.login.username,
+          );
+          expect(AutofillService.fillByOpid).not.toHaveBeenCalledWith(
+            fillScript,
+            emailField,
+            options.cipher.login.username,
           );
         });
 

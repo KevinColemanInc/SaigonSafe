@@ -1317,7 +1317,11 @@ export default class MainBackground {
       this.webPushConnectionService = new UnsupportedWebPushConnectionService();
     }
 
-    this.actionsService = new BrowserActionsService(this.logService, this.platformUtilsService);
+    this.actionsService = new BrowserActionsService(
+      this.logService,
+      this.platformUtilsService,
+      this.authService,
+    );
 
     if (isNotificationsSupported()) {
       this.systemNotificationService = new BrowserSystemNotificationService(
@@ -1650,9 +1654,6 @@ export default class MainBackground {
       this.phishingDataService,
       this.phishingDetectionSettingsService,
       messageListener,
-      this.eventCollectionService,
-      this.organizationService,
-      this.accountService,
     );
 
     this.ipcContentScriptManagerService = new IpcContentScriptManagerService(this.configService);

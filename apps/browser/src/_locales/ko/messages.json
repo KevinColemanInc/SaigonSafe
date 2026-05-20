@@ -6,7 +6,7 @@
     "message": "Saigon Safe 로고"
   },
   "extName": {
-    "message": "Kevinwarden Password Manager",
+    "message": "Saigon Safe",
     "description": "Extension name, MUST be less than 40 characters (Safari restriction)"
   },
   "extDesc": {
@@ -166,6 +166,15 @@
   },
   "copyPassportNumber": {
     "message": "여권 번호 복사"
+  },
+  "copyFirstName": {
+    "message": "Copy first name"
+  },
+  "copyMiddleName": {
+    "message": "Copy middle name"
+  },
+  "copyLastName": {
+    "message": "Copy last name"
   },
   "copyLicenseNumber": {
     "message": "운전면허 번호 복사"
@@ -708,6 +717,22 @@
   "rateExtension": {
     "message": "확장 프로그램 평가"
   },
+  "troubleshooting": {
+    "message": "Troubleshooting"
+  },
+  "experiencingAnIssue": {
+    "message": "Experiencing an issue?"
+  },
+  "downloadDiagnosticReportWith": {
+    "message": "Download then share the diagnostic report with"
+  },
+  "bitwardenSupport": {
+    "message": "Saigon Safe support",
+    "description": "Link text following the troubleshooting description sentence. 'Saigon Safe' should not be translated."
+  },
+  "download": {
+    "message": "Download"
+  },
   "browserNotSupportClipboard": {
     "message": "사용하고 있는 웹 브라우저가 쉬운 클립보드 복사를 지원하지 않습니다. 직접 복사하세요."
   },
@@ -744,7 +769,7 @@
       },
       "hostname": {
         "content": "$2",
-        "example": "bitwarden.com"
+        "example": "saigonsafe.com"
       }
     }
   },
@@ -756,7 +781,7 @@
     "placeholders": {
       "host": {
         "content": "$1",
-        "example": "vault.bitwarden.com"
+        "example": "vault.saigonsafe.com"
       }
     }
   },
@@ -1053,7 +1078,7 @@
   },
   "addDomain": {
     "message": "도메인 추가",
-    "description": "'Domain' here refers to an internet domain name (e.g. 'bitwarden.com') and the message in whole described the act of putting a domain value into the context."
+    "description": "'Domain' here refers to an internet domain name (e.g. 'saigonsafe.com') and the message in whole described the act of putting a domain value into the context."
   },
   "addedItem": {
     "message": "항목 추가함"
@@ -1698,7 +1723,7 @@
   },
   "authenticatorAppDescV2": {
     "message": "Saigon Safe 인증같은 인증 앱을 통해 코드를 생성하여 입력해주세요",
-    "description": "'Bitwarden Authenticator' is a product name and should not be translated."
+    "description": "'Saigon Safe Authenticator' is a product name and should not be translated."
   },
   "yubiKeyTitleV2": {
     "message": "YubiKey OTP 보안 키"
@@ -2165,6 +2190,54 @@
   "typeBankAccountSubtitle": {
     "message": "Banking details"
   },
+  "typeDriversLicense": {
+    "message": "License"
+  },
+  "typeDriversLicenseSubtitle": {
+    "message": "Drivers license or ID"
+  },
+  "driversLicenseDetails": {
+    "message": "License details"
+  },
+  "dateOfBirth": {
+    "message": "Date of birth"
+  },
+  "birthMonth": {
+    "message": "Birth month"
+  },
+  "birthDay": {
+    "message": "Birth day"
+  },
+  "birthYear": {
+    "message": "Birth year"
+  },
+  "issuingCountry": {
+    "message": "Issuing country"
+  },
+  "issuingState": {
+    "message": "Issuing state / province"
+  },
+  "issuingAuthority": {
+    "message": "Issuing authority"
+  },
+  "issueDate": {
+    "message": "Issue date"
+  },
+  "issueMonth": {
+    "message": "Issue month"
+  },
+  "issueDay": {
+    "message": "Issue day"
+  },
+  "issueYear": {
+    "message": "Issue year"
+  },
+  "expirationDay": {
+    "message": "Expiration day"
+  },
+  "licenseClass": {
+    "message": "License class"
+  },
   "newItemHeaderLogin": {
     "message": "새 로그인",
     "description": "Header for new login item type"
@@ -2197,12 +2270,12 @@
     "message": "New passport",
     "description": "Header for new passport item type"
   },
-  "newItemHeaderTextSend": {
-    "message": "새 텍스트 Send",
+  "newItemHeaderTextSendV2": {
+    "message": "New text",
     "description": "Header for new text send"
   },
-  "newItemHeaderFileSend": {
-    "message": "새 파일 Send",
+  "newItemHeaderFileSendV2": {
+    "message": "New file",
     "description": "Header for new file send"
   },
   "editItemHeaderLogin": {
@@ -2229,7 +2302,7 @@
     "message": "Edit bank account",
     "description": "Header for edit bank account item type"
   },
-  "editItemHeaderDriversLicense": {
+  "editItemHeaderLicense": {
     "message": "Edit license",
     "description": "Header for edit license item type"
   },
@@ -2237,12 +2310,12 @@
     "message": "Edit passport",
     "description": "Header for edit passport item type"
   },
-  "editItemHeaderTextSend": {
-    "message": "텍스트 Send 편집",
+  "editItemHeaderTextSendV2": {
+    "message": "Edit text",
     "description": "Header for edit text send"
   },
-  "editItemHeaderFileSend": {
-    "message": "파일 Send 편집",
+  "editItemHeaderFileSendV2": {
+    "message": "Edit file",
     "description": "Header for edit file send"
   },
   "viewItemHeaderLogin": {
@@ -2269,7 +2342,7 @@
     "message": "View bank account",
     "description": "Header for view bank account item type"
   },
-  "viewItemHeaderDriversLicense": {
+  "viewItemHeaderLicense": {
     "message": "View license",
     "description": "Header for view license item type"
   },
@@ -2995,7 +3068,7 @@
   },
   "updateInBitwardenSlideDesc": {
     "message": "Saigon Safe will then prompt you to update the password in the password manager.",
-    "description": "Description of the update in Bitwarden slide on the at-risk password page carousel"
+    "description": "Description of the update in Saigon Safe slide on the at-risk password page carousel"
   },
   "updateInBitwardenSlideImgAltPeriod": {
     "message": "로그인 변경을 권유하는 Saigon Safe의 알림에 대한 삽화."
@@ -3052,11 +3125,11 @@
   },
   "send": {
     "message": "보내기",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendDetails": {
     "message": "보내기 세부 정보",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendTypeText": {
     "message": "텍스트"
@@ -3069,7 +3142,7 @@
   },
   "allSends": {
     "message": "모든 Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "maxAccessCountReached": {
     "message": "최대 접근 횟수 도달",
@@ -3089,7 +3162,7 @@
   },
   "copySendLink": {
     "message": " Send 링크 복사",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "removePassword": {
     "message": "비밀번호 제거"
@@ -3102,11 +3175,11 @@
   },
   "deletedSend": {
     "message": " Send  삭제함",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendLink": {
     "message": "링크 보내기",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "disabled": {
     "message": "비활성화됨"
@@ -3116,26 +3189,26 @@
   },
   "deleteSend": {
     "message": " Send 삭제",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "deleteSendConfirmation": {
     "message": "정말 이  Send를 삭제하시겠습니까?",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "deleteSendPermanentConfirmation": {
     "message": "이  Send을 영구적으로 삭제하시겠습니까?",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "editSend": {
     "message": " Send 편집",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "deletionDate": {
     "message": "삭제 날짜"
   },
   "deletionDateDescV2": {
     "message": "이  Send가 이 날짜에 영구적으로 삭제됩니다.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "expirationDate": {
     "message": "만료 날짜"
@@ -3157,34 +3230,34 @@
   },
   "createSend": {
     "message": "새 Send 생성",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "newPassword": {
     "message": "새 비밀번호"
   },
   "sendDisabled": {
     "message": "Send 비활성화됨",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendDisabledWarning": {
     "message": "엔터프라이즈 정책으로 인해 이미 생성된 Send를 삭제하는 것만 허용됩니다.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "createdSend": {
     "message": "Send 생성함",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "createdSendSuccessfully": {
     "message": "Send가 성공적으로 생성되었습니다!",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendExpiresInHoursSingle": {
     "message": "이 Send는 링크가 있는 누구나 향후 1시간 동안 이용할 수 있습니다.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendExpiresInHours": {
     "message": "이 전송은 링크가 있는 누구나 향후 $HOURS$ 시간 동안 이용할 수 있습니다.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated.",
     "placeholders": {
       "hours": {
         "content": "$1",
@@ -3194,11 +3267,11 @@
   },
   "sendExpiresInDaysSingle": {
     "message": "이 Send은 향후 1일 동안 링크가 있는 누구나 이용할 수 있습니다.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendExpiresInDays": {
     "message": "이 Send은 향후 $DAYS$일 동안 링크가 있는 누구나 이용할 수 있습니다.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated.",
     "placeholders": {
       "days": {
         "content": "$1",
@@ -3217,7 +3290,7 @@
   },
   "sendCreatedDescriptionV2": {
     "message": "Send 링크를 복사 및 공유합니다. 이 Send는 링크가 있는 누구나 향후 $TIME$ 동안 이용할 수 있습니다.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated.",
     "placeholders": {
       "time": {
         "content": "$1",
@@ -3227,7 +3300,7 @@
   },
   "sendCreatedDescriptionPassword": {
     "message": "Send 링크를 복사 및 공유합니다. 이 Send는 링크와 설정하신 비밀번호가 있는 누구나 향후 $TIME$ 동안 이용할 수 있습니다.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated.",
     "placeholders": {
       "time": {
         "content": "$1",
@@ -3237,7 +3310,7 @@
   },
   "sendCreatedDescriptionEmail": {
     "message": "Send 링크를 복사 및 공유합니다. 이 Send는 지정한 인원만 향후 $TIME$ 동안 이용할 수 있습니다.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated.",
     "placeholders": {
       "time": {
         "content": "$1",
@@ -3247,11 +3320,11 @@
   },
   "sendLinkCopied": {
     "message": "Send 링크 복사됨",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "editedSend": {
     "message": "Send 수정됨",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "popOut": {
     "message": "새 창에서 열기"
@@ -3460,33 +3533,18 @@
   "exportingPersonalVaultTitle": {
     "message": "개인 보관함을 내보내는 중"
   },
-  "exportingIndividualVaultDescription": {
-    "message": "$EMAIL$과 관련된 개별 보관함 항목만 내보냅니다. 조직 보관함 항목은 포함되지 않습니다. 보관함 항목 정보만 내보내며 관련 첨부 파일은 포함되지 않습니다",
-    "placeholders": {
-      "email": {
-        "content": "$1",
-        "example": "name@example.com"
-      }
-    }
-  },
-  "exportingIndividualVaultWithAttachmentsDescription": {
-    "message": "$EMAIL$ 계정과 관련된 개인 보관함 항목과 첨부 파일만 내보내집니다. 조직 보관함 항목은 포함되지 않습니다.",
-    "placeholders": {
-      "email": {
-        "content": "$1",
-        "example": "name@example.com"
-      }
-    }
-  },
   "exportingOrganizationVaultTitle": {
     "message": "조직 보관함을 내보내는 중"
   },
-  "exportingOrganizationVaultDesc": {
-    "message": "$ORGANIZATION$ 조직과 연관된 조직 보관함만 내보내기됩니다. 개인 보관함이나 다른 조직의 항목은 포함되지 않습니다.",
+  "exportingIndividualVaultScopeDescription": {
+    "message": "Only items in your individual vault will export."
+  },
+  "exportingOrganizationVaultScopeDescription": {
+    "message": "Only items associated with the $ORGANIZATION$ vault will export. Items in individual vaults will not.",
     "placeholders": {
       "organization": {
         "content": "$1",
-        "example": "ACME Moving Co."
+        "example": "My Org Name"
       }
     }
   },
@@ -4183,11 +4241,11 @@
   },
   "sendsTitleNoItems": {
     "message": "민감한 정보 안전하게 보내세요",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendsBodyNoItems": {
     "message": "플랫폼에 구애받지 않고 누구에게나 파일과 데이터를 안전하게 공유하세요. 전송하는 정보는 종단 간 암호화로 보호되어 외부 노출이 최소화됩니다.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "inputRequired": {
     "message": "입력이 필요합니다."
@@ -4577,6 +4635,18 @@
   "exportError": {
     "message": "An error occurred while exporting your vault data"
   },
+  "exportSuccessSkippedAttachment": {
+    "message": "1 corrupted attachment was skipped during export. All other vault data and attachments exported successfully."
+  },
+  "exportSuccessSkippedAttachments": {
+    "message": "$COUNT$ corrupted attachments were skipped during export. All other vault data and attachments exported successfully.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
   "typePasskey": {
     "message": "패스키"
   },
@@ -4773,7 +4843,7 @@
   },
   "uriMatchDefaultStrategyHint": {
     "message": "Saigon Safe에서 자동 채우기 제안을 식별하는 방법은 URI 일치 감지입니다.",
-    "description": "Explains to the user that URI match detection determines how Bitwarden suggests autofill options, and clarifies that this default strategy applies when no specific match detection is set for a login item."
+    "description": "Explains to the user that URI match detection determines how Saigon Safe suggests autofill options, and clarifies that this default strategy applies when no specific match detection is set for a login item."
   },
   "regExAdvancedOptionWarning": {
     "message": "\"Regular expression\" is an advanced option with increased risk of exposing credentials.",
@@ -5695,7 +5765,7 @@
   },
   "saveToBitwarden": {
     "message": "Saigon Safe에 저장",
-    "description": "Confirmation message for saving a login to Bitwarden"
+    "description": "Confirmation message for saving a login to Saigon Safe"
   },
   "spaceCharacterDescriptor": {
     "message": "스페이스",
@@ -5989,7 +6059,7 @@
     "placeholders": {
       "product": {
         "content": "$1",
-        "example": "Bitwarden Phishing Blocker"
+        "example": "Saigon Safe Phishing Blocker"
       }
     }
   },
@@ -6348,10 +6418,28 @@
   },
   "sendPasswordHelperText": {
     "message": "개인은 Send를 보려면 비밀번호를 입력해야 합니다",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "userVerificationFailed": {
     "message": "사용자 인증에 실패했습니다."
+  },
+  "enterMonth": {
+    "message": "Enter month."
+  },
+  "enterDay": {
+    "message": "Enter day."
+  },
+  "enterYear": {
+    "message": "Enter year."
+  },
+  "invalidDay": {
+    "message": "Enter a valid day."
+  },
+  "invalidYear": {
+    "message": "Enter a valid year."
+  },
+  "searchDriversLicense": {
+    "message": "Search licenses"
   },
   "bankName": {
     "message": "Bank name"
@@ -6423,14 +6511,31 @@
   "bankAccountTypeOther": {
     "message": "Other"
   },
-  "newBankAccountNudgeTitle": {
-    "message": "Securely store your bank details"
-  },
-  "newBankAccountNudgeBody": {
-    "message": "Save your bank account information to access it easily and securely across your devices."
-  },
   "downloadFailed": {
     "message": "Failed to download."
+  },
+  "maxAccessCount": {
+    "message": "Maximum access count",
+    "description": "This text will be displayed after a Send has been accessed the maximum amount of times."
+  },
+  "hideMyEmail": {
+    "message": "Hide my email address from recipients."
+  },
+  "viewTextSendHeader": {
+    "message": "View text"
+  },
+  "viewFileSendHeader": {
+    "message": "View file"
+  },
+  "sendCreated": {
+    "message": "Send created",
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
+  },
+  "numericInputError": {
+    "message": "Input must be numeric"
+  },
+  "integerInputError": {
+    "message": "Input must be a whole number"
   },
   "sideNavigation": {
     "message": "Side navigation"
@@ -6448,7 +6553,7 @@
   },
   "saveSendEditsFailed": {
     "message": "Saving Send edits failed",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "hideEmailPolicyInEffect": {
     "message": "Your organization requires email visibility. Uncheck \"Hide your email from viewers\" to save."

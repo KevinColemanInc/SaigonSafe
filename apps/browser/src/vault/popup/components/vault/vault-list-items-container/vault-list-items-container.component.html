@@ -97,7 +97,7 @@
           *cdkVirtualFor="let cipher of group.ciphers"
           class="tw-group/vault-item"
           [ngClass]="{
-            'hover:tw-bg-hover-default hover:tw-cursor-pointer': showFillTextOnHover(),
+            'hover:tw-bg-hover-default hover:tw-cursor-pointer': showViewTextOnHover(),
           }"
         >
           <button
@@ -136,16 +136,29 @@
           </button>
 
           <ng-container slot="end">
-            @if (showFillTextOnHover()) {
+            @if (showViewTextOnHover()) {
               <bit-item-action>
                 <button
                   type="button"
-                  (click)="doAutofill(cipher)"
+                  (click)="onViewCipher(cipher)"
                   class="tw-opacity-0 tw-text-primary-600 tw-font-semibold tw-px-2 tw-bg-transparent tw-border-0 group-hover/vault-item:tw-opacity-100 group-focus-within/vault-item:tw-opacity-100"
                   bitTypography="body2"
                 >
-                  {{ "fill" | i18n }}
+                  {{ "view" | i18n }}
                 </button>
+              </bit-item-action>
+            }
+            @if (showViewButton()) {
+              <bit-item-action>
+                <button
+                  type="button"
+                  bit-chip-action
+                  variant="primary"
+                  (click)="onViewCipher(cipher)"
+                  [title]="'viewItemTitle' | i18n: cipher.name"
+                  [attr.aria-label]="'viewItemTitle' | i18n: cipher.name"
+                  [label]="'view' | i18n"
+                ></button>
               </bit-item-action>
             }
             @if (showAutofillBadge()) {

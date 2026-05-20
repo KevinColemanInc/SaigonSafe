@@ -77,6 +77,36 @@ export class VaultItemCopyActionsComponent {
     return this.findSingleCopyableItem(this.cipher(), identityItems);
   }
 
+  get singleCopyableBankAccount() {
+    const bankAccountItems: CipherItem[] = [
+      { key: "accountNumber", field: "accountNumber" },
+      { key: "bankRoutingNumber", field: "routingNumber" },
+      { key: "pin", field: "pin" },
+      { key: "iban", field: "iban" },
+    ];
+    return this.findSingleCopyableItem(this.cipher(), bankAccountItems);
+  }
+
+  get singleCopyableDriversLicense() {
+    const driversLicenseItems: CipherItem[] = [
+      { key: "firstName", field: "firstName" },
+      { key: "middleName", field: "middleName" },
+      { key: "lastName", field: "lastName" },
+      { key: "licenseNumber", field: "licenseNumber" },
+    ];
+    return this.findSingleCopyableItem(this.cipher(), driversLicenseItems);
+  }
+
+  get singleCopyablePassport() {
+    const passportItems: CipherItem[] = [
+      { key: "firstName", field: "givenName" },
+      { key: "lastName", field: "surname" },
+      { key: "passportNumber", field: "passportNumber" },
+      { key: "nationalIdentificationNumber", field: "nationalIdentificationNumber" },
+    ];
+    return this.findSingleCopyableItem(this.cipher(), passportItems);
+  }
+
   /*
    * Given a list of CipherItems, if there is only one item with a value,
    * return it with the translated key. Otherwise return null.
@@ -109,6 +139,18 @@ export class VaultItemCopyActionsComponent {
 
   get hasSshKeyValues() {
     return this.getNumberOfSshKeyValues(this.cipher()) > 0;
+  }
+
+  get hasBankAccountValues() {
+    return this.getNumberOfBankAccountValues(this.cipher()) > 0;
+  }
+
+  get hasDriversLicenseValues() {
+    return this.getNumberOfDriversLicenseValues(this.cipher()) > 0;
+  }
+
+  get hasPassportValues() {
+    return this.getNumberOfPassportValues(this.cipher()) > 0;
   }
 
   /** Sets the number of populated login values for the cipher */
@@ -173,5 +215,58 @@ export class VaultItemCopyActionsComponent {
     return [cipher.sshKey.privateKey, cipher.sshKey.publicKey, cipher.sshKey.keyFingerprint].filter(
       Boolean,
     ).length;
+  }
+
+  private getNumberOfBankAccountValues(cipher: CipherViewLike) {
+    if (CipherViewLikeUtils.isCipherListView(cipher)) {
+      const copyableBankAccountFields: CopyableCipherFields[] = [
+        "BankAccountAccountNumber",
+        "BankAccountRoutingNumber",
+      ];
+
+      return cipher.copyableFields.filter((field) => copyableBankAccountFields.includes(field))
+        .length;
+    }
+
+    return [
+      cipher.bankAccount.accountNumber,
+      cipher.bankAccount.routingNumber,
+      cipher.bankAccount.pin,
+      cipher.bankAccount.iban,
+    ].filter(Boolean).length;
+  }
+
+  private getNumberOfDriversLicenseValues(cipher: CipherViewLike) {
+    if (CipherViewLikeUtils.isCipherListView(cipher)) {
+      const copyableDriversLicenseFields: CopyableCipherFields[] = [
+        "DriversLicenseLicenseNumber",
+      ];
+
+      return cipher.copyableFields.filter((field) =>
+        copyableDriversLicenseFields.includes(field),
+      ).length;
+    }
+
+    return [
+      cipher.driversLicense.firstName,
+      cipher.driversLicense.middleName,
+      cipher.driversLicense.lastName,
+      cipher.driversLicense.licenseNumber,
+    ].filter(Boolean).length;
+  }
+
+  private getNumberOfPassportValues(cipher: CipherViewLike) {
+    if (CipherViewLikeUtils.isCipherListView(cipher)) {
+      const copyablePassportFields: CopyableCipherFields[] = ["PassportPassportNumber"];
+
+      return cipher.copyableFields.filter((field) => copyablePassportFields.includes(field)).length;
+    }
+
+    return [
+      cipher.passport.givenName,
+      cipher.passport.surname,
+      cipher.passport.passportNumber,
+      cipher.passport.nationalIdentificationNumber,
+    ].filter(Boolean).length;
   }
 }

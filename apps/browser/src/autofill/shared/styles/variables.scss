@@ -1,4 +1,7 @@
-﻿$dark-icon-themes: "theme_dark";
+@use "sass:color";
+@use "sass:map";
+
+$dark-icon-themes: "theme_dark";
 
 $font-family-sans-serif: Inter, "Helvetica Neue", Helvetica, Arial, sans-serif;
 $font-family-source-code-pro: "Source Code Pro", monospace;
@@ -17,7 +20,7 @@ $error-color-light: #c83522;
 $text-color-dark: #ffffff;
 $muted-text-color-dark: #bac0ce;
 $background-color-dark: #2f343d;
-$background-offset-color-dark: darken(#2f343d, 2.75%);
+$background-offset-color-dark: color.adjust(#2f343d, $lightness: -2.75%);
 $border-color-dark: #ddd;
 $brand-primary-dark: #5f86bf;
 $password-special-color-dark: #ff8d85;
@@ -41,7 +44,7 @@ $themes: (
     primaryColor: $brand-primary-light,
     buttonPrimaryColor: $brand-primary-light,
     textContrast: $background-color-light,
-    inputBorderColor: darken($border-color-dark, 2.75%),
+    inputBorderColor: color.adjust($border-color-dark, $lightness: -2.75%),
     inputBackgroundColor: $background-color-light,
     borderColor: $border-color,
     focusOutlineColor: $focus-outline-color,
@@ -62,7 +65,7 @@ $themes: (
     inputBorderColor: #4c525f,
     inputBackgroundColor: $background-color-dark,
     borderColor: #4c525f,
-    focusOutlineColor: lighten($focus-outline-color, 25%),
+    focusOutlineColor: color.adjust($focus-outline-color, $lightness: 25%),
     successColor: $success-color-dark,
     errorColor: $error-color-dark,
     passkeysAuthenticating: $muted-grey,
@@ -76,8 +79,8 @@ $themes: (
     .theme_#{$theme} & {
       $theme-map: () !global;
       @each $key, $submap in $map {
-        $value: map-get(map-get($themes, $theme), "#{$key}");
-        $theme-map: map-merge(
+        $value: map.get($themes, $theme, $key);
+        $theme-map: map.merge(
           $theme-map,
           (
             $key: $value,
@@ -91,5 +94,5 @@ $themes: (
 }
 
 @function themed($key) {
-  @return map-get($theme-map, $key);
+  @return map.get($theme-map, $key);
 }

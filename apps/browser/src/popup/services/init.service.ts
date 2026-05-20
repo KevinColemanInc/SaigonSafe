@@ -10,6 +10,7 @@ import { StateService } from "@bitwarden/common/platform/abstractions/state.serv
 import { MigrationRunner } from "@bitwarden/common/platform/services/migration-runner";
 
 import BrowserPopupUtils from "../../platform/browser/browser-popup-utils";
+import { BrowserEnvironmentService } from "../../platform/services/browser-environment.service";
 import { PopupSizeService } from "../../platform/popup/layout/popup-size.service";
 import { PopupColorPaletteService } from "../../platform/popup/theming/popup-color-palette.service";
 import { PopupViewCacheService } from "../../platform/popup/view-cache/popup-view-cache.service";
@@ -26,6 +27,7 @@ export class InitService {
     private logService: LogServiceAbstraction,
     private themingService: AbstractThemingService,
     private popupColorPaletteService: PopupColorPaletteService,
+    private browserEnvironmentService: BrowserEnvironmentService,
     private sdkLoadService: SdkLoadService,
     private viewCacheService: PopupViewCacheService,
     private readonly migrationRunner: MigrationRunner,
@@ -37,6 +39,7 @@ export class InitService {
       await this.sdkLoadService.loadAndInit();
       await this.migrationRunner.waitForCompletion(); // Browser background is responsible for migrations
       await this.i18nService.init();
+      await this.browserEnvironmentService.syncManagedEnvironment();
       this.twoFactorService.init();
       await this.viewCacheService.init();
       await this.sizeService.init();

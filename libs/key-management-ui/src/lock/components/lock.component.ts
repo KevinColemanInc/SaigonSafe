@@ -4,8 +4,11 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angula
 import { Router, ActivatedRoute } from "@angular/router";
 import {
   BehaviorSubject,
+  debounceTime,
   filter,
   firstValueFrom,
+  fromEvent,
+  merge,
   timer,
   mergeMap,
   Subject,
@@ -186,6 +189,9 @@ export class LockComponent implements OnInit, OnDestroy {
   ) {}
 
   async ngOnInit() {
+    // Identify client before wiring subscriptions that may emit synchronously on init.
+    this.clientType = this.platformUtilsService.getClientType();
+
     this.listenForActiveUnlockOptionChanges();
 
     // Listen for active account changes
@@ -193,13 +199,11 @@ export class LockComponent implements OnInit, OnDestroy {
 
     this.listenForUnlockOptionsChanges();
 
-    // Identify client
-    this.clientType = this.platformUtilsService.getClientType();
-
     if (this.clientType === ClientType.Desktop) {
       await this.desktopOnInit();
     } else if (this.clientType === ClientType.Browser) {
       this.biometricUnlockBtnText = this.lockComponentService.getBiometricsUnlockBtnText();
+      this.listenForBrowserActivityBarFocus();
     }
   }
 
@@ -262,6 +266,14 @@ export class LockComponent implements OnInit, OnDestroy {
         switchMap(async (account) => {
           await this.handleActiveAccountChange(account);
           this.loading = false;
+
+          if (this.clientType === ClientType.Browser && this.inBrowserActivityBar()) {
+            if (await this.popOutFirefoxSidebarForTypedUnlock()) {
+              return;
+            }
+
+            this.focusInputSoon();
+          }
         }),
         takeUntil(this.destroy$),
       )
@@ -299,6 +311,7 @@ export class LockComponent implements OnInit, OnDestroy {
     if (this.unlockOptions?.biometrics.enabled) {
       await this.handleBiometricsUnlockEnabled();
     }
+
   }
 
   private resetDataOnActiveAccountChange() {
@@ -593,6 +606,16 @@ export class LockComponent implements OnInit, OnDestroy {
     await this.keyService.setUserKey(key, this.activeAccount.id);
     await this.pinService.userUnlocked(this.activeAccount.id);
 
+    if (
+      this.clientType === ClientType.Browser &&
+      !(await this.configService.getFeatureFlag(FeatureFlag.UnlockViaSDK)) &&
+      (await firstValueFrom(
+        this.biometricStateService.biometricUnlockEnabled$(this.activeAccount.id),
+      ))
+    ) {
+      await this.biometricService.setBiometricProtectedUnlockKeyForUser(this.activeAccount.id, key);
+    }
+
     // Now that we have a decrypted user key in memory, we can check if we
     // need to establish trust on the current device
     await this.deviceTrustService.trustDeviceIfRequired(this.activeAccount.id);
@@ -782,10 +805,116 @@ export class LockComponent implements OnInit, OnDestroy {
     this.showPassword = false;
   }
 
-  private focusInput() {
-    if (this.unlockOptions) {
-      document.getElementById(this.unlockOptions.pin.enabled ? "pin" : "masterPassword")?.focus();
+  private listenForBrowserActivityBarFocus() {
+    if (!this.inBrowserActivityBar()) {
+      return;
     }
+
+    merge(
+      fromEvent(window, "focus"),
+      fromEvent(document, "visibilitychange").pipe(
+        filter(() => document.visibilityState === "visible"),
+      ),
+    )
+      .pipe(debounceTime(50), takeUntil(this.destroy$))
+      .subscribe(() => this.focusInputSoon());
+  }
+
+  private inBrowserActivityBar(): boolean {
+    if (typeof window === "undefined") {
+      return false;
+    }
+
+    return (
+      window.location.href.includes("uilocation=sidebar") ||
+      window.location.href.includes("uilocation=sidepanel")
+    );
+  }
+
+  private focusInputSoon() {
+    window.setTimeout(() => {
+      if (this.activateBrowserActivityBarUnlockInput()) {
+        window.setTimeout(() => this.focusInput(), 0);
+        return;
+      }
+
+      this.focusInput();
+    }, 0);
+  }
+
+  private async popOutFirefoxSidebarForTypedUnlock(): Promise<boolean> {
+    if (this.platformUtilsService.getDevice() !== DeviceType.FirefoxExtension) {
+      return false;
+    }
+
+    if (
+      this.activeUnlockOption !== UnlockOption.MasterPassword &&
+      this.activeUnlockOption !== UnlockOption.Pin
+    ) {
+      return false;
+    }
+
+    await this.lockComponentService.popOutBrowserExtension();
+    this.shouldClosePopout = true;
+    return true;
+  }
+
+  private activateBrowserActivityBarUnlockInput(): boolean {
+    if (
+      !this.inBrowserActivityBar() ||
+      !this.unlockOptions ||
+      this.activeUnlockOption !== UnlockOption.Biometrics
+    ) {
+      return false;
+    }
+
+    if (this.unlockOptions.masterPassword.enabled) {
+      this.activeUnlockOption = UnlockOption.MasterPassword;
+      return true;
+    }
+
+    if (this.unlockOptions.pin.enabled) {
+      this.activeUnlockOption = UnlockOption.Pin;
+      return true;
+    }
+
+    return false;
+  }
+
+  private focusInput() {
+    const inputId = this.getActiveUnlockInputId();
+    if (inputId == null) {
+      return;
+    }
+
+    document.getElementById(inputId)?.focus();
+  }
+
+  private getActiveUnlockInputId(): "pin" | "masterPassword" | null {
+    if (!this.unlockOptions) {
+      return null;
+    }
+
+    if (this.activeUnlockOption === UnlockOption.Pin && this.unlockOptions.pin.enabled) {
+      return "pin";
+    }
+
+    if (
+      this.activeUnlockOption === UnlockOption.MasterPassword &&
+      this.unlockOptions.masterPassword.enabled
+    ) {
+      return "masterPassword";
+    }
+
+    if (this.unlockOptions.pin.enabled) {
+      return "pin";
+    }
+
+    if (this.unlockOptions.masterPassword.enabled) {
+      return "masterPassword";
+    }
+
+    return null;
   }
 
   // -----------------------------------------------------------------------------------------------

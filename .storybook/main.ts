@@ -1,8 +1,12 @@
+// This file has been automatically migrated to valid ESM format by Storybook.
+import { createRequire } from "node:module";
 import { dirname, join } from "path";
 
 import { StorybookConfig } from "@storybook/angular";
 import remarkGfm from "remark-gfm";
 import TsconfigPathsPlugin from "tsconfig-paths-webpack-plugin";
+
+const require = createRequire(import.meta.url);
 
 const config: StorybookConfig = {
   stories: [
@@ -24,8 +28,6 @@ const config: StorybookConfig = {
     "../apps/web/src/**/*.stories.@(js|jsx|ts|tsx)",
     "../apps/browser/src/**/*.mdx",
     "../apps/browser/src/**/*.stories.@(js|jsx|ts|tsx)",
-    "../bitwarden_license/bit-web/src/**/*.mdx",
-    "../bitwarden_license/bit-web/src/**/*.stories.@(js|jsx|ts|tsx)",
     "../libs/angular/src/**/*.stories.@(js|jsx|ts|tsx)",
   ],
   addons: [

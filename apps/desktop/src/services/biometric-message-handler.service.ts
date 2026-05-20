@@ -261,6 +261,28 @@ export class BiometricMessageHandlerService {
           appId,
         );
       }
+      case BiometricsCommands.SetBiometricUnlockKeyForUser: {
+        const stored = await this.handleStoreBiometricUnlockKeyForUser(message, appId, false);
+        return await this.send(
+          {
+            command: BiometricsCommands.SetBiometricUnlockKeyForUser,
+            messageId,
+            response: stored,
+          },
+          appId,
+        );
+      }
+      case BiometricsCommands.PersistBiometricUnlockKeyForUser: {
+        const stored = await this.handleStoreBiometricUnlockKeyForUser(message, appId, true);
+        return await this.send(
+          {
+            command: BiometricsCommands.PersistBiometricUnlockKeyForUser,
+            messageId,
+            response: stored,
+          },
+          appId,
+        );
+      }
       default:
         this.logService.error("NativeMessage, got unknown command: " + message.command);
         break;
@@ -430,6 +452,28 @@ export class BiometricMessageHandlerService {
       await this.connectedApps.set(appId, appToValidate);
     }
 
+    return true;
+  }
+
+  private async handleStoreBiometricUnlockKeyForUser(
+    message: LegacyMessage,
+    appId: string,
+    persist: boolean,
+  ) {
+    const messageUserId = message.userId as UserId;
+
+    if (message.keyB64 == null || !(await this.validateFingerprint(appId))) {
+      return false;
+    }
+
+    const key = SymmetricCryptoKey.fromString(message.keyB64);
+
+    if (persist) {
+      await this.biometricsService.enrollPersistent(messageUserId, key);
+      return true;
+    }
+
+    await this.biometricsService.setBiometricProtectedUnlockKeyForUser(messageUserId, key);
     return true;
   }
 }

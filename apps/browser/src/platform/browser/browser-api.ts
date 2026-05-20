@@ -37,15 +37,17 @@ export class BrowserApi {
    * Returns `true` if the message sender appears to originate from within this extension.
    *
    * Returns `false` when:
-   * - `sender` is absent or has no `origin` property
+   * - `sender` is absent or has neither an `origin` nor a parseable `url` property
    * - The extension's own URL cannot be determined at runtime
    * - The sender's origin does not match the extension's origin (compared by scheme, host, and port;
    *   senders without a host such as `file:` or `data:` URLs are always rejected)
    * - The message comes from a sub-frame rather than the top-level frame
    *
-   * Note: this is a best-effort check that relies on the browser correctly populating `sender.origin`.
+   * Note: this is a best-effort check that relies on the browser correctly populating `sender.origin`
+   * or `sender.url`.
    *
-   * @param sender - The message sender to validate. `undefined` or a sender without `origin` returns `false`.
+   * @param sender - The message sender to validate. `undefined` or a sender without `origin` or
+   * `url` returns `false`.
    * @param logger - Optional logger; rejections are reported at `warning` level, acceptance at `info`.
    * @returns `true` if the sender appears to be internal to the extension; `false` otherwise.
    */
@@ -53,7 +55,17 @@ export class BrowserApi {
     sender: chrome.runtime.MessageSender | undefined,
     logger?: LogService,
   ): boolean {
-    if (!sender?.origin) {
+    let senderOrigin = sender?.origin ?? null;
+    if (senderOrigin == null && sender?.url != null) {
+      try {
+        senderOrigin = new URL(sender.url).origin;
+      } catch {
+        logger?.warning("[BrowserApi] Message sender URL is invalid");
+        return false;
+      }
+    }
+
+    if (!senderOrigin) {
       logger?.warning("[BrowserApi] Message sender has no origin");
       return false;
     }
@@ -65,9 +77,9 @@ export class BrowserApi {
       return false;
     }
 
-    if (!urlOriginsMatch(extensionUrl, sender.origin)) {
+    if (!urlOriginsMatch(extensionUrl, senderOrigin)) {
       logger?.warning(
-        `[BrowserApi] Message sender origin (${sender.origin}) does not match extension URL (${extensionUrl})`,
+        `[BrowserApi] Message sender origin (${senderOrigin}) does not match extension URL (${extensionUrl})`,
       );
       return false;
     }
@@ -856,7 +868,7 @@ export class BrowserApi {
         target,
         files: details.file ? [details.file] : null,
         injectImmediately: details.runAt === "document_start",
-        world: scriptingApiDetails?.world || chrome.scripting.ExecutionWorld.ISOLATED,
+        world: scriptingApiDetails?.world || ("ISOLATED" as chrome.scripting.ExecutionWorld),
       });
     }
 

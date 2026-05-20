@@ -26,6 +26,7 @@ import { ExtensionLockComponentService } from "./extension-lock-component.servic
 
 describe("ExtensionLockComponentService", () => {
   let service: ExtensionLockComponentService;
+  const originalUserAgent = navigator.userAgent;
 
   let userDecryptionOptionsService: MockProxy<UserDecryptionOptionsServiceAbstraction>;
   let platformUtilsService: MockProxy<PlatformUtilsService>;
@@ -64,6 +65,13 @@ describe("ExtensionLockComponentService", () => {
     });
 
     service = TestBed.inject(ExtensionLockComponentService);
+  });
+
+  afterEach(() => {
+    Object.defineProperty(window.navigator, "userAgent", {
+      configurable: true,
+      value: originalUserAgent,
+    });
   });
 
   it("instantiates", () => {
@@ -108,20 +116,26 @@ describe("ExtensionLockComponentService", () => {
         .mockResolvedValue(undefined);
     });
 
-    it("opens pop-out when the current window is neither a pop-out nor a sidebar", async () => {
+    it("opens pop-out when the current window is not already a pop-out", async () => {
       jest.spyOn(BrowserPopupUtils, "inPopout").mockReturnValue(false);
-      jest.spyOn(BrowserPopupUtils, "inSidebar").mockReturnValue(false);
 
       await service.popOutBrowserExtension();
 
       expect(openPopoutSpy).toHaveBeenCalledWith(global.window);
     });
 
-    test.each([
-      [true, false],
-      [false, true],
-      [true, true],
-    ])("should not open pop-out under other conditions.", async (inPopout, inSidebar) => {
+    it("opens pop-out when the current window is a sidebar", async () => {
+      jest.spyOn(BrowserPopupUtils, "inPopout").mockReturnValue(false);
+      jest.spyOn(BrowserPopupUtils, "inSidebar").mockReturnValue(true);
+
+      await service.popOutBrowserExtension();
+
+      expect(openPopoutSpy).toHaveBeenCalledWith(global.window);
+    });
+
+    it("does not open pop-out when already in a pop-out", async () => {
+      const inPopout = true;
+      const inSidebar = false;
       jest.spyOn(BrowserPopupUtils, "inPopout").mockReturnValue(inPopout);
       jest.spyOn(BrowserPopupUtils, "inSidebar").mockReturnValue(inSidebar);
 
@@ -165,12 +179,23 @@ describe("ExtensionLockComponentService", () => {
     it("returns the biometric unlock button text", () => {
       expect(service.getBiometricsUnlockBtnText()).toBe("unlockWithBiometrics");
     });
+
+    it("returns the Touch ID unlock text on macOS", () => {
+      Object.defineProperty(window.navigator, "userAgent", {
+        configurable: true,
+        value: "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5) Firefox/126.0",
+      });
+
+      expect(service.getBiometricsUnlockBtnText()).toBe("unlockWithTouchId");
+    });
   });
 
   describe("getAvailableUnlockOptions$", () => {
     interface MockInputs {
       hasMasterPassword: boolean;
       biometricUnlockEnabled: boolean;
+      allowBiometricUnlockOnRestart: boolean;
+      biometricUnlockSessionReady: boolean;
       biometricsStatusForUser: BiometricsStatus;
       hasBiometricEncryptedUserKeyStored: boolean;
       platformSupportsSecureStorage: boolean;
@@ -183,6 +208,8 @@ describe("ExtensionLockComponentService", () => {
         {
           hasMasterPassword: true,
           biometricUnlockEnabled: true,
+          allowBiometricUnlockOnRestart: true,
+          biometricUnlockSessionReady: false,
           biometricsStatusForUser: BiometricsStatus.Available,
           hasBiometricEncryptedUserKeyStored: true,
           platformSupportsSecureStorage: true,
@@ -209,6 +236,8 @@ describe("ExtensionLockComponentService", () => {
         {
           hasMasterPassword: false,
           biometricUnlockEnabled: true,
+          allowBiometricUnlockOnRestart: true,
+          biometricUnlockSessionReady: false,
           biometricsStatusForUser: BiometricsStatus.Available,
           hasBiometricEncryptedUserKeyStored: true,
           platformSupportsSecureStorage: true,
@@ -235,6 +264,8 @@ describe("ExtensionLockComponentService", () => {
         {
           hasMasterPassword: false,
           biometricUnlockEnabled: true,
+          allowBiometricUnlockOnRestart: true,
+          biometricUnlockSessionReady: false,
           biometricsStatusForUser: BiometricsStatus.Available,
           hasBiometricEncryptedUserKeyStored: true,
           platformSupportsSecureStorage: false,
@@ -261,6 +292,8 @@ describe("ExtensionLockComponentService", () => {
         {
           hasMasterPassword: false,
           biometricUnlockEnabled: true,
+          allowBiometricUnlockOnRestart: true,
+          biometricUnlockSessionReady: false,
           biometricsStatusForUser: BiometricsStatus.Available,
           hasBiometricEncryptedUserKeyStored: false,
           platformSupportsSecureStorage: false,
@@ -287,6 +320,8 @@ describe("ExtensionLockComponentService", () => {
         {
           hasMasterPassword: false,
           biometricUnlockEnabled: true,
+          allowBiometricUnlockOnRestart: false,
+          biometricUnlockSessionReady: false,
           biometricsStatusForUser: BiometricsStatus.UnlockNeeded,
           hasBiometricEncryptedUserKeyStored: true,
           platformSupportsSecureStorage: true,
@@ -313,6 +348,8 @@ describe("ExtensionLockComponentService", () => {
         {
           hasMasterPassword: false,
           biometricUnlockEnabled: true,
+          allowBiometricUnlockOnRestart: true,
+          biometricUnlockSessionReady: true,
           biometricsStatusForUser: BiometricsStatus.NotEnabledInConnectedDesktopApp,
           hasBiometricEncryptedUserKeyStored: false,
           platformSupportsSecureStorage: true,
@@ -339,6 +376,8 @@ describe("ExtensionLockComponentService", () => {
         {
           hasMasterPassword: false,
           biometricUnlockEnabled: true,
+          allowBiometricUnlockOnRestart: true,
+          biometricUnlockSessionReady: true,
           biometricsStatusForUser: BiometricsStatus.HardwareUnavailable,
           hasBiometricEncryptedUserKeyStored: true,
           platformSupportsSecureStorage: true,
@@ -365,6 +404,8 @@ describe("ExtensionLockComponentService", () => {
         {
           hasMasterPassword: true,
           biometricUnlockEnabled: false,
+          allowBiometricUnlockOnRestart: true,
+          biometricUnlockSessionReady: false,
           biometricsStatusForUser: BiometricsStatus.Available, // irrelevant — should not be called
           hasBiometricEncryptedUserKeyStored: false,
           platformSupportsSecureStorage: false,
@@ -403,6 +444,12 @@ describe("ExtensionLockComponentService", () => {
       biometricStateService.biometricUnlockEnabled$.mockReturnValue(
         of(mockInputs.biometricUnlockEnabled),
       );
+      biometricStateService.allowBiometricUnlockOnRestart$.mockReturnValue(
+        of(mockInputs.allowBiometricUnlockOnRestart),
+      );
+      biometricStateService.biometricUnlockSessionReady$.mockReturnValue(
+        of(mockInputs.biometricUnlockSessionReady),
+      );
 
       //  PIN
       pinService.isPinDecryptionAvailable.mockResolvedValue(mockInputs.pinDecryptionAvailable);
@@ -414,7 +461,12 @@ describe("ExtensionLockComponentService", () => {
 
       expect(unlockOptions).toEqual(expectedOutput);
       expect(biometricStateService.biometricUnlockEnabled$).toHaveBeenCalledWith(userId);
-      if (mockInputs.biometricUnlockEnabled) {
+      expect(biometricStateService.allowBiometricUnlockOnRestart$).toHaveBeenCalledWith(userId);
+      expect(biometricStateService.biometricUnlockSessionReady$).toHaveBeenCalledWith(userId);
+      if (
+        mockInputs.biometricUnlockEnabled &&
+        (mockInputs.allowBiometricUnlockOnRestart || mockInputs.biometricUnlockSessionReady)
+      ) {
         expect(biometricsService.getBiometricsStatusForUser).toHaveBeenCalledWith(userId);
       } else {
         expect(biometricsService.getBiometricsStatusForUser).not.toHaveBeenCalled();

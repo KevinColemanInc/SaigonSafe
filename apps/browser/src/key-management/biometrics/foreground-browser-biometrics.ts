@@ -19,7 +19,10 @@ export class ForegroundBrowserBiometricsService extends BiometricsService {
       error: string;
     }>(BiometricsCommands.AuthenticateWithBiometrics);
     if (!response.result) {
-      throw response.error;
+      if (response.error) {
+        throw new Error(response.error);
+      }
+      return false;
     }
     return response.result;
   }
@@ -79,5 +82,27 @@ export class ForegroundBrowserBiometricsService extends BiometricsService {
   async setBiometricProtectedUnlockKeyForUser(
     userId: UserId,
     value: SymmetricCryptoKey,
-  ): Promise<void> {}
+  ): Promise<void> {
+    await BrowserApi.sendMessageWithResponse<{
+      result: boolean;
+      error: string;
+    }>(BiometricsCommands.SetBiometricUnlockKeyForUser, {
+      userId,
+      keyB64: value.keyB64,
+    });
+  }
+
+  async enrollPersistent(userId: UserId, key: SymmetricCryptoKey): Promise<void> {
+    await BrowserApi.sendMessageWithResponse<{
+      result: boolean;
+      error: string;
+    }>(BiometricsCommands.PersistBiometricUnlockKeyForUser, {
+      userId,
+      keyB64: key.keyB64,
+    });
+  }
+
+  async hasPersistentKey(_userId: UserId): Promise<boolean> {
+    return false;
+  }
 }

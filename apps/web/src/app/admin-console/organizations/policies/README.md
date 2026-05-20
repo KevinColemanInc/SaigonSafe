@@ -29,18 +29,13 @@ export enum PolicyType {
 
 ## Step 2: Creating the Policy Definition and Component
 
-### Policy Licensing and Location
+### Policy Location
 
-The location where you create your policy depends on its licensing:
-
-- **Open Source (OSS) Policies**: Create in `apps/web/src/app/admin-console/organizations/policies/policy-edit-definitions/`
-- **Bitwarden Licensed Policies**: Create in `bitwarden_license/bit-web/src/app/admin-console/policies/`
-
-Most policies should be OSS licensed unless they specifically relate to premium/enterprise features that are part of Bitwarden's commercial offerings.
+Create policy UI and registration under `apps/web/src/app/admin-console/organizations/policies/policy-edit-definitions/`.
 
 Create a new component file in the appropriate `policy-edit-definitions/` folder following the naming pattern `your-policy-name.component.ts`.
 
-**Note:** you may also create the policy files in your own team's code if you prefer to own your own definition. The same licensing considerations apply.
+**Note:** you may also create the policy files in your own team's code if you prefer to own your own definition, but maintained policy entrypoints should stay in the OSS-owned web app tree.
 
 ### Basic Structure
 

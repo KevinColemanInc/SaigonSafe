@@ -153,11 +153,16 @@ export class AutofillInlineMenuList extends AutofillInlineMenuPageElement {
    * Facilitates the ability to unlock the extension from the inline menu.
    */
   private buildLockedInlineMenu() {
+    const userIsLoggedOut = this.authStatus === AuthenticationStatus.LoggedOut;
     const lockedInlineMenu = globalThis.document.createElement("div");
     lockedInlineMenu.id = "locked-inline-menu-description";
-    lockedInlineMenu.classList.add("locked-inline-menu", "inline-menu-list-message");
+    lockedInlineMenu.classList.add(
+      "locked-inline-menu",
+      "inline-menu-list-message",
+      "inline-menu-list-message--auth-required",
+    );
     lockedInlineMenu.textContent = this.getTranslation(
-      "unlockYourAccountToViewAutofillSuggestions",
+      userIsLoggedOut ? "logInToBitwarden" : "unlockYourAccountToViewAutofillSuggestions",
     );
 
     const unlockButtonElement = globalThis.document.createElement("button");
@@ -167,13 +172,20 @@ export class AutofillInlineMenuList extends AutofillInlineMenuPageElement {
       "unlock-button",
       "inline-menu-list-button",
       "inline-menu-list-action",
+      "inline-menu-list-button--auth-required",
     );
-    unlockButtonElement.textContent = this.getTranslation("unlockAccount");
-    unlockButtonElement.setAttribute("aria-label", this.getTranslation("unlockAccountAria"));
+    unlockButtonElement.textContent = this.getTranslation(
+      userIsLoggedOut ? "logIn" : "unlockAccount",
+    );
+    unlockButtonElement.setAttribute(
+      "aria-label",
+      this.getTranslation(userIsLoggedOut ? "logInToBitwarden" : "unlockAccountAria"),
+    );
     unlockButtonElement.prepend(buildSvgDomElement(lockIcon));
     unlockButtonElement.addEventListener(EVENTS.CLICK, this.handleUnlockButtonClick);
 
     const inlineMenuListButtonContainer = this.buildButtonContainer(unlockButtonElement);
+    inlineMenuListButtonContainer.classList.add("inline-menu-list-button-container--auth-required");
 
     this.inlineMenuListContainer.append(lockedInlineMenu, inlineMenuListButtonContainer);
   }

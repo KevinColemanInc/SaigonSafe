@@ -18,6 +18,7 @@
     "src/autofill/fido2/content/fido2-page-script.ts",
     "src/autofill/fido2/content/fido2-page-script-delay-append.mv2.ts",
     "src/platform/background.ts",
+    "src/platform/offscreen-document/offscreen-document.ts",
     "src/platform/ipc/content/ipc-content-script.ts",
     "src/autofill/notification/bar.ts",
     "src/autofill/overlay/inline-menu/pages/button/bootstrap-autofill-inline-menu-button.ts",

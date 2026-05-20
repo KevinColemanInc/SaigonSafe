@@ -78,6 +78,7 @@ export type LockedVaultPendingNotificationsData = {
       contextMenuOnClickData?: chrome.contextMenus.OnClickData;
       folder?: string;
       edit?: boolean;
+      closeActivityBarAfterAutofill?: boolean;
     };
     sender: chrome.runtime.MessageSender;
   };

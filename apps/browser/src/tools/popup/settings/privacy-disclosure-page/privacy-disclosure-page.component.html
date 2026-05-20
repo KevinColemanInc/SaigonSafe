@@ -1,0 +1,99 @@
+<popup-page>
+  <popup-header slot="header" pageTitle="Privacy &amp; Data Use" showBackButton>
+    <ng-container slot="end">
+      <app-pop-out></app-pop-out>
+    </ng-container>
+  </popup-header>
+
+  <bit-card>
+    <p bitTypography="body2" class="tw-m-0">
+      This page explains the browser access and network activity used by the Saigon Safe extension.
+      It is a product disclosure summary for the extension itself.
+    </p>
+  </bit-card>
+
+  <h2 bitTypography="h6" class="tw-mt-6">What the extension can access</h2>
+  <bit-card>
+    <ul class="tw-list-disc tw-pl-5 tw-space-y-2 tw-m-0">
+      <li>
+        The extension can run on HTTP and HTTPS pages so it can detect login forms, offer
+        autofill, save logins, and support passkeys across websites.
+      </li>
+      <li>
+        The extension reads page structure and URLs needed for autofill, passkey flows, phishing
+        checks, and vault matching. It is not intended to collect the full contents of every page.
+      </li>
+    </ul>
+  </bit-card>
+
+  <h2 bitTypography="h6" class="tw-mt-6">Local-only features</h2>
+  <bit-card>
+    <ul class="tw-list-disc tw-pl-5 tw-space-y-2 tw-m-0">
+      <li>
+        Vault data, autofill decisions, and most page analysis happen inside the extension on your
+        device.
+      </li>
+      <li>
+        Clipboard actions are used for copy and paste features. In Manifest V3 builds, clipboard
+        reads and writes can use an offscreen document provided by the browser.
+      </li>
+      <li>
+        Biometric unlock uses native messaging to communicate with the local desktop app on your
+        device only after you enable the feature and grant that permission.
+      </li>
+    </ul>
+  </bit-card>
+
+  <h2 bitTypography="h6" class="tw-mt-6">Network activity</h2>
+  <bit-card>
+    <ul class="tw-list-disc tw-pl-5 tw-space-y-2 tw-m-0">
+      <li>
+        The extension connects to your configured Saigon Safe server or web vault for account,
+        sync, and vault operations.
+      </li>
+      <li>
+        The phishing blocker downloads remote blocklist data used to identify known phishing sites.
+        Those downloads are separate from your normal vault sync traffic.
+      </li>
+      <li>
+        The browser extension does not upload phishing warning, bypass, or exit events as part of
+        the phishing protection flow.
+      </li>
+    </ul>
+  </bit-card>
+
+  <h2 bitTypography="h6" class="tw-mt-6">User controls</h2>
+  <bit-card>
+    <ul class="tw-list-disc tw-pl-5 tw-space-y-2 tw-m-0">
+      <li>
+        You can review and change extension settings for autofill, clipboard timeout, browser
+        privacy integration, phishing protection, and biometrics.
+      </li>
+      <li>
+        Browser-managed permissions such as privacy settings access and biometric native messaging
+        may require an additional prompt or browser-level opt-in.
+      </li>
+      <li>
+        If you do not want the extension to operate on a site, use the blocked or excluded domain
+        settings where available.
+      </li>
+    </ul>
+  </bit-card>
+
+  <h2 bitTypography="h6" class="tw-mt-6">Source and updates</h2>
+  <bit-card>
+    <p bitTypography="body2" class="tw-m-0">
+      Current source, release notes, and implementation details are published in the Saigon Safe
+      project repository.
+    </p>
+    <a
+      class="tw-text-primary-600 tw-mt-4 tw-inline-flex tw-no-underline tw-gap-2 tw-items-center"
+      bitLink
+      href="https://github.com/kevincolemaninc/saigonsafe"
+      target="_blank"
+      endIcon="bwi-external-link"
+    >
+      Open project repository
+    </a>
+  </bit-card>
+</popup-page>

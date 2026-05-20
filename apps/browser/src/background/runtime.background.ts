@@ -14,6 +14,7 @@ import { MessagingService } from "@bitwarden/common/platform/abstractions/messag
 import { MessageListener, isExternalMessage } from "@bitwarden/common/platform/messaging";
 import { devFlagEnabled } from "@bitwarden/common/platform/misc/flags";
 import { Utils } from "@bitwarden/common/platform/misc/utils";
+import { SymmetricCryptoKey } from "@bitwarden/common/platform/models/domain/symmetric-crypto-key";
 import { CipherType } from "@bitwarden/common/vault/enums";
 import { VaultMessages } from "@bitwarden/common/vault/enums/vault-messages.enum";
 import { BiometricsCommands } from "@bitwarden/key-management";
@@ -73,6 +74,7 @@ export default class RuntimeBackground {
       return;
     }
 
+    await this.environmentService.syncManagedEnvironment();
     await this.checkOnInstalled();
 
     const backgroundMessageListener = (
@@ -85,12 +87,30 @@ export default class RuntimeBackground {
         BiometricsCommands.GetBiometricsStatus,
         BiometricsCommands.UnlockWithBiometricsForUser,
         BiometricsCommands.GetBiometricsStatusForUser,
+        BiometricsCommands.SetBiometricUnlockKeyForUser,
         BiometricsCommands.CanEnableBiometricUnlock,
         "getUserPremiumStatus",
         "getUrlAutofillTargetingRules",
       ];
 
+      const biometricsMessagesWithResponse = [
+        BiometricsCommands.AuthenticateWithBiometrics,
+        BiometricsCommands.GetBiometricsStatus,
+        BiometricsCommands.UnlockWithBiometricsForUser,
+        BiometricsCommands.GetBiometricsStatusForUser,
+        BiometricsCommands.SetBiometricUnlockKeyForUser,
+        BiometricsCommands.CanEnableBiometricUnlock,
+      ];
+
       if (messagesWithResponse.includes(msg.command)) {
+        if (
+          biometricsMessagesWithResponse.includes(msg.command) &&
+          !BrowserApi.senderIsInternal(sender, this.logService)
+        ) {
+          sendResponse({ error: { message: "unauthorized" } });
+          return false;
+        }
+
         this.processMessageWithSender(msg, sender).then(
           (value) => sendResponse({ result: value }),
           (error) => sendResponse({ error: { ...error, message: error.message } }),
@@ -208,6 +228,13 @@ export default class RuntimeBackground {
       }
       case BiometricsCommands.GetBiometricsStatusForUser: {
         return await this.main.biometricsService.getBiometricsStatusForUser(msg.userId);
+      }
+      case BiometricsCommands.SetBiometricUnlockKeyForUser: {
+        await this.main.biometricsService.setBiometricProtectedUnlockKeyForUser(
+          msg.userId,
+          SymmetricCryptoKey.fromString(msg.keyB64),
+        );
+        return true;
       }
       case BiometricsCommands.CanEnableBiometricUnlock: {
         return await this.main.biometricsService.canEnableBiometricUnlock();
@@ -495,7 +522,7 @@ export default class RuntimeBackground {
           !(await firstValueFrom(this.browserInitialInstallService.extensionInstalled$))
         ) {
           if (!devFlagEnabled("skipWelcomeOnInstall")) {
-            void BrowserApi.createNewTab("https://bitwarden.com/browser-start/");
+            void BrowserApi.createNewTab("https://github.com/kevincolemaninc/saigonsafe");
           }
 
           await this.autofillSettingsService.setInlineMenuVisibility(

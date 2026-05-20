@@ -9,7 +9,10 @@ import { UserId } from "@bitwarden/common/types/guid";
 
 import {
   BIOMETRIC_UNLOCK_ENABLED,
+  BIOMETRIC_ENROLLED_KEY_ID,
+  BIOMETRIC_UNLOCK_SESSION_READY,
   ENCRYPTED_CLIENT_KEY_HALF,
+  REQUIRE_PASSWORD_ON_START,
   PROMPT_AUTOMATICALLY,
   PROMPT_CANCELLED,
   FINGERPRINT_VALIDATED,
@@ -23,6 +26,16 @@ export abstract class BiometricStateService {
    * @returns An observable that emits `true` if the user has elected to store a biometric key to unlock their vault.
    */
   abstract biometricUnlockEnabled$(userId?: UserId): Observable<boolean>;
+  /**
+   * Returns whether the user allows biometric unlock immediately after client restart.
+   * Defaults to true when the setting has not been configured.
+   */
+  abstract allowBiometricUnlockOnRestart$(userId?: UserId): Observable<boolean>;
+  /**
+   * Returns whether the user has already unlocked once in the current client session.
+   * This is only relevant when restart-time biometric unlock is disabled.
+   */
+  abstract biometricUnlockSessionReady$(userId?: UserId): Observable<boolean>;
   /**
    * If the user has elected to require a password on first unlock of an application instance, this key will store the
    * encrypted client key half used to unlock the vault.
@@ -52,6 +65,13 @@ export abstract class BiometricStateService {
    * @param enabled whether or not to store a biometric key to unlock the vault
    */
   abstract setBiometricUnlockEnabled(enabled: boolean): Promise<void>;
+  abstract setAllowBiometricUnlockOnRestart(
+    enabled: boolean,
+    userId?: UserId,
+  ): Promise<void>;
+  abstract getAllowBiometricUnlockOnRestart(userId?: UserId): Promise<boolean>;
+  abstract setBiometricUnlockSessionReady(ready: boolean, userId?: UserId): Promise<void>;
+  abstract getBiometricUnlockSessionReady(userId?: UserId): Promise<boolean>;
 
   /**
    * Gets the biometric unlock enabled state for the given user.
@@ -63,6 +83,10 @@ export abstract class BiometricStateService {
   abstract setEncryptedClientKeyHalf(encryptedKeyHalf: EncString, userId?: UserId): Promise<void>;
 
   abstract getEncryptedClientKeyHalf(userId: UserId): Promise<EncString | null>;
+
+  abstract getBiometricEnrolledKeyId(userId: UserId): Promise<string | null>;
+
+  abstract setBiometricEnrolledKeyId(userId: UserId, keyId: string | null): Promise<void>;
 
   /**
    * Updates the active user's state to reflect that they've cancelled the biometric prompt.
@@ -101,11 +125,15 @@ export abstract class BiometricStateService {
 
 export class DefaultBiometricStateService implements BiometricStateService {
   private biometricUnlockEnabledState: ActiveUserState<boolean>;
+  private requirePasswordOnStartState: ActiveUserState<boolean>;
+  private biometricUnlockSessionReadyState: ActiveUserState<boolean>;
   private encryptedClientKeyHalfState: ActiveUserState<EncryptedString>;
   private promptCancelledState: GlobalState<Record<UserId, boolean>>;
   private promptAutomaticallyState: ActiveUserState<boolean>;
   private fingerprintValidatedState: GlobalState<boolean>;
   private lastProcessReloadState: GlobalState<Date>;
+  private activeAllowBiometricUnlockOnRestart$: Observable<boolean>;
+  private activeBiometricUnlockSessionReady$: Observable<boolean>;
   encryptedClientKeyHalf$: Observable<EncString | null>;
   promptCancelled$: Observable<boolean>;
   promptAutomatically$: Observable<boolean>;
@@ -114,6 +142,16 @@ export class DefaultBiometricStateService implements BiometricStateService {
 
   constructor(private stateProvider: StateProvider) {
     this.biometricUnlockEnabledState = this.stateProvider.getActive(BIOMETRIC_UNLOCK_ENABLED);
+    this.requirePasswordOnStartState = this.stateProvider.getActive(REQUIRE_PASSWORD_ON_START);
+    this.activeAllowBiometricUnlockOnRestart$ = this.requirePasswordOnStartState.state$.pipe(
+      map((requirePasswordOnStart) => requirePasswordOnStart !== true),
+    );
+    this.biometricUnlockSessionReadyState = this.stateProvider.getActive(
+      BIOMETRIC_UNLOCK_SESSION_READY,
+    );
+    this.activeBiometricUnlockSessionReady$ = this.biometricUnlockSessionReadyState.state$.pipe(
+      map(Boolean),
+    );
 
     this.encryptedClientKeyHalfState = this.stateProvider.getActive(ENCRYPTED_CLIENT_KEY_HALF);
     this.encryptedClientKeyHalf$ = this.encryptedClientKeyHalfState.state$.pipe(
@@ -152,6 +190,62 @@ export class DefaultBiometricStateService implements BiometricStateService {
     return this.biometricUnlockEnabledState.state$.pipe(map(Boolean));
   }
 
+  allowBiometricUnlockOnRestart$(userId?: UserId): Observable<boolean> {
+    if (userId != null) {
+      return this.stateProvider
+        .getUser(userId, REQUIRE_PASSWORD_ON_START)
+        .state$.pipe(map((requirePasswordOnStart) => requirePasswordOnStart !== true));
+    }
+    return this.activeAllowBiometricUnlockOnRestart$;
+  }
+
+  biometricUnlockSessionReady$(userId?: UserId): Observable<boolean> {
+    if (userId != null) {
+      return this.stateProvider
+        .getUser(userId, BIOMETRIC_UNLOCK_SESSION_READY)
+        .state$.pipe(map(Boolean));
+    }
+    return this.activeBiometricUnlockSessionReady$;
+  }
+
+  async setAllowBiometricUnlockOnRestart(enabled: boolean, userId?: UserId): Promise<void> {
+    if (userId != null) {
+      await this.stateProvider
+        .getUser(userId, REQUIRE_PASSWORD_ON_START)
+        .update(() => !enabled);
+      return;
+    }
+
+    await this.requirePasswordOnStartState.update(() => !enabled);
+  }
+
+  async getAllowBiometricUnlockOnRestart(userId?: UserId): Promise<boolean> {
+    if (userId != null) {
+      return await firstValueFrom(this.allowBiometricUnlockOnRestart$(userId));
+    }
+
+    return await firstValueFrom(this.activeAllowBiometricUnlockOnRestart$);
+  }
+
+  async setBiometricUnlockSessionReady(ready: boolean, userId?: UserId): Promise<void> {
+    if (userId != null) {
+      await this.stateProvider
+        .getUser(userId, BIOMETRIC_UNLOCK_SESSION_READY)
+        .update(() => ready);
+      return;
+    }
+
+    await this.biometricUnlockSessionReadyState.update(() => ready);
+  }
+
+  async getBiometricUnlockSessionReady(userId?: UserId): Promise<boolean> {
+    if (userId != null) {
+      return await firstValueFrom(this.biometricUnlockSessionReady$(userId));
+    }
+
+    return await firstValueFrom(this.activeBiometricUnlockSessionReady$);
+  }
+
   async getBiometricUnlockEnabled(userId: UserId): Promise<boolean> {
     return await firstValueFrom(
       this.stateProvider.getUser(userId, BIOMETRIC_UNLOCK_ENABLED).state$.pipe(map(Boolean)),
@@ -175,8 +269,21 @@ export class DefaultBiometricStateService implements BiometricStateService {
     );
   }
 
+  async getBiometricEnrolledKeyId(userId: UserId): Promise<string | null> {
+    return await firstValueFrom(
+      this.stateProvider
+        .getUser(userId, BIOMETRIC_ENROLLED_KEY_ID)
+        .state$.pipe(map((value) => value ?? null)),
+    );
+  }
+
+  async setBiometricEnrolledKeyId(userId: UserId, keyId: string | null): Promise<void> {
+    await this.stateProvider.getUser(userId, BIOMETRIC_ENROLLED_KEY_ID).update(() => keyId);
+  }
+
   async logout(userId: UserId): Promise<void> {
     await this.stateProvider.getUser(userId, ENCRYPTED_CLIENT_KEY_HALF).update(() => null);
+    await this.stateProvider.getUser(userId, BIOMETRIC_UNLOCK_SESSION_READY).update(() => null);
     await this.resetUserPromptCancelled(userId);
     // Persist auto prompt setting through logout
     // Persist dismissed require password on start callout through logout

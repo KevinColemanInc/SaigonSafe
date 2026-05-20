@@ -18,9 +18,33 @@ import { BrowserApi } from "../platform/browser/browser-api";
 
 import MainBackground from "./main.background";
 
+const MAIN_SIDE_PANEL_PATH = "popup/index.html?uilocation=sidebar";
+
+type ChromeSidePanelApi = {
+  open?: (options: { tabId?: number; windowId?: number }) => Promise<void>;
+  close?: (options: { windowId: number }) => Promise<void>;
+};
+
+type CommandProcessingOptions = {
+  extensionViewOpenAttempt?: {
+    attempted: boolean;
+    activeAuthStatus: AuthenticationStatus | null;
+  };
+  closeActivityBarAfterAutofill?: boolean;
+};
+
+type ActiveAccountAuthStatusCache = {
+  status: AuthenticationStatus | null;
+};
+
+const activeAccountAuthStatusCache: ActiveAccountAuthStatusCache = {
+  status: null,
+};
+
 export default class CommandsBackground {
   private isSafari: boolean;
   private isVivaldi: boolean;
+  private isFirefox: boolean;
 
   constructor(
     private main: MainBackground,
@@ -32,29 +56,59 @@ export default class CommandsBackground {
   ) {
     this.isSafari = this.platformUtilsService.isSafari();
     this.isVivaldi = this.platformUtilsService.isVivaldi();
+    this.isFirefox = this.platformUtilsService.isFirefox() || this.hasFirefoxSidebarAction();
+    this.setCachedActiveAuthStatus(null);
   }
 
   init() {
+    this.authService.activeAccountStatus$.subscribe((status) => {
+      this.setCachedActiveAuthStatus(status);
+    });
+
     BrowserApi.messageListener("commands.background", (msg: any) => {
-      if (msg.command === "unlockCompleted" && msg.data.target === "commands.background") {
+      this.updateCachedAuthStatusFromMessage(msg);
+
+      if (msg.command === "unlockCompleted" && msg.data?.target === "commands.background") {
+        const commandToRetry = msg.data.commandToRetry;
         this.processCommand(
-          msg.data.commandToRetry.message.command,
-          msg.data.commandToRetry.sender,
+          commandToRetry.message.command,
+          commandToRetry.sender,
+          {
+            closeActivityBarAfterAutofill:
+              commandToRetry.message.closeActivityBarAfterAutofill === true,
+          },
         ).catch((error) => this.main.logService.error(error));
       }
     });
 
-    if (chrome && chrome.commands) {
-      chrome.commands.onCommand.addListener(async (command: string, tab?: chrome.tabs.Tab) => {
-        await this.processCommand(
-          command,
-          tab ? ({ tab } as chrome.runtime.MessageSender) : undefined,
-        );
-      });
+    const commandListener = (command: string, tab?: chrome.tabs.Tab) => {
+      const activeAuthStatus = this.getCachedActiveAuthStatus();
+      const extensionViewOpenAttempt = this.shouldOpenExtensionViewForCommand(
+        command,
+        activeAuthStatus,
+      )
+        ? { attempted: this.openExtensionViewForCommand(tab), activeAuthStatus }
+        : undefined;
+
+      void this.processCommand(
+        command,
+        tab ? ({ tab } as chrome.runtime.MessageSender) : undefined,
+        { extensionViewOpenAttempt },
+      ).catch((error) => this.main.logService.error(error));
+    };
+
+    if (this.isFirefox && typeof browser !== "undefined" && browser.commands?.onCommand) {
+      browser.commands.onCommand.addListener(commandListener);
+    } else if (chrome?.commands) {
+      chrome.commands.onCommand.addListener(commandListener);
     }
   }
 
-  private async processCommand(command: string, sender?: chrome.runtime.MessageSender) {
+  private async processCommand(
+    command: string,
+    sender?: chrome.runtime.MessageSender,
+    options: CommandProcessingOptions = {},
+  ) {
     switch (command) {
       case ExtensionCommand.GeneratePassword:
         await firstValueFrom(this.generatePasswordToClipboard(), { defaultValue: undefined });
@@ -63,18 +117,21 @@ export default class CommandsBackground {
         await this.triggerAutofillCommand(
           sender ? sender.tab : null,
           ExtensionCommand.AutofillCommand,
+          options,
         );
         break;
       case ExtensionCommand.AutofillCard:
         await this.triggerAutofillCommand(
           sender ? sender.tab : null,
           ExtensionCommand.AutofillCard,
+          options,
         );
         break;
       case ExtensionCommand.AutofillIdentity:
         await this.triggerAutofillCommand(
           sender ? sender.tab : null,
           ExtensionCommand.AutofillIdentity,
+          options,
         );
         break;
       case ExtensionCommand.OpenPopup:
@@ -93,6 +150,7 @@ export default class CommandsBackground {
   private async triggerAutofillCommand(
     tab?: chrome.tabs.Tab,
     commandSender?: ExtensionCommandType,
+    options: CommandProcessingOptions = {},
   ) {
     if (!tab) {
       tab = await BrowserApi.getTabFromCurrentWindowId();
@@ -102,10 +160,35 @@ export default class CommandsBackground {
       return;
     }
 
-    if ((await this.authService.getAuthStatus()) < AuthenticationStatus.Unlocked) {
-      const pendingNotification = this.buildLockedVaultPendingNotification(tab, commandSender);
+    const authStatus =
+      options.extensionViewOpenAttempt?.activeAuthStatus ??
+      this.getCachedActiveAuthStatus() ??
+      (await this.authService.getAuthStatus());
 
-      if (await this.openLockedExtensionView(tab, pendingNotification)) {
+    if (authStatus < AuthenticationStatus.Unlocked) {
+      const pendingNotification = this.buildLockedVaultPendingNotification(
+        tab,
+        commandSender,
+        options.extensionViewOpenAttempt?.attempted === true || this.isFirefox,
+      );
+
+      if (options.extensionViewOpenAttempt != null) {
+        if (options.extensionViewOpenAttempt.attempted) {
+          await this.queueLockedVaultPendingNotification(tab, pendingNotification);
+        }
+        return;
+      }
+
+      if (
+        authStatus === AuthenticationStatus.Locked &&
+        !this.isFirefox &&
+        (await this.openLockedExtensionView(tab, pendingNotification))
+      ) {
+        return;
+      }
+
+      if (this.isFirefox) {
+        await openUnlockPopout(tab, pendingNotification);
         return;
       }
 
@@ -114,24 +197,173 @@ export default class CommandsBackground {
     }
 
     await this.main.collectPageDetailsForContentScript(tab, commandSender);
+
+    if (options.closeActivityBarAfterAutofill) {
+      await this.closeActivityBarAfterAutofillForTab(tab);
+    }
   }
 
   private buildLockedVaultPendingNotification(
     tab: chrome.tabs.Tab,
     commandSender: ExtensionCommandType,
+    closeActivityBarAfterAutofill = false,
   ): LockedVaultPendingNotificationsData {
+    const message = {
+      command:
+        commandSender === ExtensionCommand.AutofillCommand
+          ? ExtensionCommand.AutofillLogin
+          : commandSender,
+      ...(closeActivityBarAfterAutofill ? { closeActivityBarAfterAutofill: true } : {}),
+    };
+
     return {
       commandToRetry: {
-        message: {
-          command:
-            commandSender === ExtensionCommand.AutofillCommand
-              ? ExtensionCommand.AutofillLogin
-              : commandSender,
-        },
+        message,
         sender: { tab: tab },
       },
       target: "commands.background",
     };
+  }
+
+  private getCachedActiveAuthStatus(): AuthenticationStatus | null {
+    return activeAccountAuthStatusCache.status;
+  }
+
+  private setCachedActiveAuthStatus(status: AuthenticationStatus | null) {
+    activeAccountAuthStatusCache.status = status;
+  }
+
+  private updateCachedAuthStatusFromMessage(msg: { command?: string }) {
+    switch (msg.command) {
+      case "loggedIn":
+      case "unlocked":
+        this.setCachedActiveAuthStatus(AuthenticationStatus.Unlocked);
+        break;
+      case "locked":
+        this.setCachedActiveAuthStatus(AuthenticationStatus.Locked);
+        break;
+      case "doneLoggingOut":
+      case "loggedOut":
+        this.setCachedActiveAuthStatus(AuthenticationStatus.LoggedOut);
+        break;
+      default:
+        break;
+    }
+  }
+
+  private shouldOpenExtensionViewForCommand(
+    command: string,
+    activeAuthStatus: AuthenticationStatus | null,
+  ): boolean {
+    return (
+      command === ExtensionCommand.AutofillLogin &&
+      activeAuthStatus === AuthenticationStatus.Locked &&
+      this.hasChromeSidePanel()
+    );
+  }
+
+  private hasFirefoxSidebarAction(): boolean {
+    return typeof browser !== "undefined" && typeof browser.sidebarAction?.open === "function";
+  }
+
+  private hasChromeSidePanel(): boolean {
+    if (typeof chrome === "undefined") {
+      return false;
+    }
+
+    const chromeWithSidePanel = chrome as typeof chrome & {
+      sidePanel?: ChromeSidePanelApi;
+    };
+
+    return typeof chromeWithSidePanel.sidePanel?.open === "function";
+  }
+
+  private openExtensionViewForCommand(tab?: chrome.tabs.Tab): boolean {
+    if (this.isFirefox) {
+      return this.openFirefoxSidebarForCommand();
+    }
+
+    return this.openChromeSidePanelForCommand(tab);
+  }
+
+  private openFirefoxSidebarForCommand(): boolean {
+    const sidebarAction =
+      (BrowserApi.getSidebarAction(this.getExtensionGlobal()) as {
+        open?: () => Promise<void>;
+      } | null) ?? (this.hasFirefoxSidebarAction() ? browser.sidebarAction : null);
+
+    if (typeof sidebarAction?.open !== "function") {
+      this.main.logService.error(
+        "[CommandsBackground] Firefox sidebarAction.open is unavailable for autofill shortcut.",
+      );
+      return false;
+    }
+
+    try {
+      void sidebarAction
+        .open()
+        .catch((error) =>
+          this.main.logService.error(
+            "[CommandsBackground] Firefox failed to open sidebar for autofill shortcut.",
+            error,
+          ),
+        );
+      return true;
+    } catch (error) {
+      this.main.logService.error(
+        "[CommandsBackground] Firefox failed to open sidebar for autofill shortcut.",
+        error,
+      );
+      return false;
+    }
+  }
+
+  private openChromeSidePanelForCommand(tab?: chrome.tabs.Tab): boolean {
+    const chromeWithSidePanel = chrome as typeof chrome & {
+      sidePanel?: ChromeSidePanelApi;
+    };
+
+    if (typeof chromeWithSidePanel.sidePanel?.open !== "function") {
+      this.main.logService.warning(
+        "[CommandsBackground] Chrome sidePanel.open is unavailable for autofill shortcut.",
+      );
+      return false;
+    }
+
+    const openOptions = this.buildChromeSidePanelOpenOptions(tab);
+    if (openOptions == null) {
+      this.logMissingSidePanelTarget(tab);
+      return false;
+    }
+
+    void BrowserApi.setSidePanelOptions({
+      path: MAIN_SIDE_PANEL_PATH,
+      enabled: true,
+      ...(tab?.id != null ? { tabId: tab.id } : {}),
+    }).catch((error) =>
+      this.main.logService.error(
+        "[CommandsBackground] Failed to enable side panel options for autofill shortcut.",
+        error,
+      ),
+    );
+
+    try {
+      void chromeWithSidePanel.sidePanel
+        .open(openOptions)
+        .catch((error) =>
+          this.main.logService.error(
+            "[CommandsBackground] Chrome failed to open side panel for autofill shortcut.",
+            error,
+          ),
+        );
+      return true;
+    } catch (error) {
+      this.main.logService.error(
+        "[CommandsBackground] Chrome failed to open side panel for autofill shortcut.",
+        error,
+      );
+      return false;
+    }
   }
 
   private async openLockedExtensionView(
@@ -144,21 +376,31 @@ export default class CommandsBackground {
         return false;
       }
     } catch (error) {
-      this.main.logService.error(error);
+      this.main.logService.error(
+        "[CommandsBackground] Failed to open side panel/sidebar for locked autofill shortcut.",
+        error,
+      );
       return false;
     }
 
+    await this.queueLockedVaultPendingNotification(tab, pendingNotification);
+    return true;
+  }
+
+  private async queueLockedVaultPendingNotification(
+    tab: chrome.tabs.Tab,
+    pendingNotification: LockedVaultPendingNotificationsData,
+  ) {
     await BrowserApi.tabSendMessageData(
       tab,
       "addToLockedVaultPendingNotifications",
       pendingNotification,
     );
     await BrowserApi.tabSendMessageData(tab, "bgUnlockPopoutOpened", {});
-    return true;
   }
 
   private async openExtensionViewForLockedCommand(tab: chrome.tabs.Tab): Promise<boolean> {
-    const sidebarAction = BrowserApi.getSidebarAction(self) as {
+    const sidebarAction = BrowserApi.getSidebarAction(this.getExtensionGlobal()) as {
       open?: () => Promise<void>;
     } | null;
 
@@ -168,17 +410,32 @@ export default class CommandsBackground {
     }
 
     const chromeWithSidePanel = chrome as typeof chrome & {
-      sidePanel?: {
-        open?: (options: { tabId?: number; windowId?: number }) => Promise<void>;
-      };
+      sidePanel?: ChromeSidePanelApi;
     };
 
     if (typeof chromeWithSidePanel.sidePanel?.open !== "function") {
+      this.main.logService.warning(
+        "[CommandsBackground] No side panel/sidebar API available for locked autofill shortcut.",
+      );
       return false;
     }
 
+    // Dispatch options update in the same turn so Chrome preserves the command gesture for `open`.
+    void BrowserApi.setSidePanelOptions({
+      path: MAIN_SIDE_PANEL_PATH,
+      enabled: true,
+      ...(tab.id != null ? { tabId: tab.id } : {}),
+    }).catch((error) =>
+      this.main.logService.error(
+        "[CommandsBackground] Failed to enable side panel options for locked autofill shortcut.",
+        error,
+      ),
+    );
+
     if (tab.id != null) {
-      await chromeWithSidePanel.sidePanel.open({ tabId: tab.id });
+      await chromeWithSidePanel.sidePanel.open(
+        tab.windowId != null ? { tabId: tab.id, windowId: tab.windowId } : { tabId: tab.id },
+      );
       return true;
     }
 
@@ -187,7 +444,94 @@ export default class CommandsBackground {
       return true;
     }
 
+    this.logMissingSidePanelTarget(tab);
     return false;
+  }
+
+  private buildChromeSidePanelOpenOptions(
+    tab?: chrome.tabs.Tab,
+  ): { tabId?: number; windowId?: number } | null {
+    if (tab?.id != null) {
+      return tab.windowId != null ? { tabId: tab.id, windowId: tab.windowId } : { tabId: tab.id };
+    }
+
+    if (tab?.windowId != null) {
+      return { windowId: tab.windowId };
+    }
+
+    return null;
+  }
+
+  private logMissingSidePanelTarget(tab?: chrome.tabs.Tab) {
+    this.main.logService.warning(
+      "[CommandsBackground] Missing tab and window identifiers for autofill shortcut.",
+      { tabId: tab?.id, windowId: tab?.windowId },
+    );
+  }
+
+  private async closeActivityBarAfterAutofillForTab(tab: chrome.tabs.Tab) {
+    if (await this.closeChromeSidePanelForTab(tab)) {
+      return;
+    }
+
+    this.closeExtensionActivityBarViews(tab);
+  }
+
+  private async closeChromeSidePanelForTab(tab: chrome.tabs.Tab): Promise<boolean> {
+    if (tab.windowId == null || typeof chrome === "undefined") {
+      return false;
+    }
+
+    const chromeWithSidePanel = chrome as typeof chrome & {
+      sidePanel?: ChromeSidePanelApi;
+    };
+
+    if (typeof chromeWithSidePanel.sidePanel?.close !== "function") {
+      return false;
+    }
+
+    try {
+      await chromeWithSidePanel.sidePanel.close({ windowId: tab.windowId });
+      return true;
+    } catch (error) {
+      this.main.logService.error(
+        "[CommandsBackground] Failed to close side panel after autofill shortcut unlock.",
+        error,
+      );
+      return false;
+    }
+  }
+
+  private closeExtensionActivityBarViews(tab: chrome.tabs.Tab) {
+    const extensionViews = BrowserApi.getExtensionViews(
+      tab.windowId != null ? { windowId: tab.windowId } : undefined,
+    );
+
+    for (const view of extensionViews) {
+      if (!this.isActivityBarExtensionView(view)) {
+        continue;
+      }
+
+      try {
+        BrowserApi.closePopup(view);
+      } catch (error) {
+        this.main.logService.error(
+          "[CommandsBackground] Failed to close activitybar after autofill shortcut unlock.",
+          error,
+        );
+      }
+    }
+  }
+
+  private isActivityBarExtensionView(view: Window): boolean {
+    return (
+      view.location.href.includes("uilocation=sidebar") ||
+      view.location.href.includes("uilocation=sidepanel")
+    );
+  }
+
+  private getExtensionGlobal(): Window & typeof globalThis {
+    return (typeof self !== "undefined" ? self : globalThis) as Window & typeof globalThis;
   }
 
   private async openPopup() {

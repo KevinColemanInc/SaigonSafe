@@ -113,22 +113,14 @@ jobs:
           BASE_BRANCH: ${{ inputs.base-branch }}
         run: |
           CURRENT_SDK_VERSION=$(git show origin/$BASE_BRANCH:package.json | jq -r '.dependencies."@bitwarden/sdk-internal" // empty')
-          CURRENT_COMMERCIAL_VERSION=$(git show origin/$BASE_BRANCH:package.json | jq -r '.dependencies."@bitwarden/commercial-sdk-internal" // empty')
 
           if [ -z "$CURRENT_SDK_VERSION" ]; then
             echo "::warning::Could not find current @bitwarden/sdk-internal version"
             CURRENT_SDK_VERSION="unknown"
           fi
 
-          if [ -z "$CURRENT_COMMERCIAL_VERSION" ]; then
-            echo "::warning::Could not find current @bitwarden/commercial-sdk-internal version"
-            CURRENT_COMMERCIAL_VERSION="unknown"
-          fi
-
           echo "current-sdk-version=$CURRENT_SDK_VERSION" >> "$GITHUB_OUTPUT"
-          echo "current-commercial-version=$CURRENT_COMMERCIAL_VERSION" >> "$GITHUB_OUTPUT"
           echo "📋 Current SDK version: $CURRENT_SDK_VERSION"
-          echo "📋 Current Commercial SDK version: $CURRENT_COMMERCIAL_VERSION"
 
       - name: Validate SDK version
         id: validate-version
@@ -139,11 +131,6 @@ jobs:
           echo "🔍 Validating SDK version: $SDK_VERSION"
           if ! npm view @bitwarden/sdk-internal@$SDK_VERSION version 2>/dev/null; then
             echo "::error::SDK version $SDK_VERSION not found in npm registry"
-            exit 1
-          fi
-
-          if ! npm view @bitwarden/commercial-sdk-internal@$SDK_VERSION version 2>/dev/null; then
-            echo "::error::Commercial SDK version $SDK_VERSION not found in npm registry"
             exit 1
           fi
 
@@ -249,8 +236,7 @@ jobs:
         run: |
           echo "📦 Installing SDK version: $SDK_VERSION"
           npm install --save-exact @bitwarden/sdk-internal@$SDK_VERSION
-          npm install --save-exact @bitwarden/commercial-sdk-internal@$SDK_VERSION
-          echo "✅ SDK packages updated in package.json"
+          echo "✅ SDK package updated in package.json"
 
       - name: Generate changelog
         id: changelog
@@ -317,7 +303,6 @@ jobs:
           BRANCH_NAME: ${{ steps.check-branch.outputs.branch_name }}
           SDK_VERSION: ${{ inputs.sdk-version }}
           OLD_SDK_VERSION: ${{ steps.get-current-sdk.outputs.current-sdk-version }}
-          OLD_COMMERCIAL_VERSION: ${{ steps.get-current-sdk.outputs.current-commercial-version }}
           CHANGELOG: ${{ steps.changelog.outputs.changelog }}
           BASE_BRANCH: ${{ inputs.base-branch }}
           GITHUB_REPOSITORY: ${{ github.repository }}
@@ -334,7 +319,6 @@ jobs:
             echo ""
             echo "### Changes"
             echo "- \`@bitwarden/sdk-internal\`: \`$OLD_SDK_VERSION\` → \`$SDK_VERSION\`"
-            echo "- \`@bitwarden/commercial-sdk-internal\`: \`$OLD_COMMERCIAL_VERSION\` → \`$SDK_VERSION\`"
             if [ -n "$CHANGELOG" ]; then
               echo ""
               echo "### What's Changed in SDK"
@@ -428,11 +412,6 @@ jobs:
             exit 1
           fi
 
-          if ! npm view @bitwarden/commercial-sdk-internal@$SDK_VERSION version 2>/dev/null; then
-            echo "::error::Commercial SDK version $SDK_VERSION not found in npm registry"
-            exit 1
-          fi
-
           echo "✅ SDK versions exist in npm registry"
 
       - name: Update SDK versions
@@ -441,8 +420,7 @@ jobs:
         run: |
           echo "📦 Installing SDK version: $SDK_VERSION"
           npm install --save-exact @bitwarden/sdk-internal@$SDK_VERSION
-          npm install --save-exact @bitwarden/commercial-sdk-internal@$SDK_VERSION
-          echo "✅ SDK packages updated in package.json"
+          echo "✅ SDK package updated in package.json"
 
       - name: Test summary
         env:

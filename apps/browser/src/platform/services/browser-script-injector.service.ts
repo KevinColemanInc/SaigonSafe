@@ -63,7 +63,7 @@ export class BrowserScriptInjectorService extends ScriptInjectorService {
     if (BrowserApi.isManifestVersion(3)) {
       try {
         await BrowserApi.executeScriptInTab(tabId, injectionDetails, {
-          world: mv3Details?.world ?? chrome.scripting.ExecutionWorld.ISOLATED,
+          world: mv3Details?.world ?? ("ISOLATED" as chrome.scripting.ExecutionWorld),
         });
       } catch (error) {
         // Swallow errors for host permissions, since this is believed to be a Manifest V3 Chrome bug

@@ -1,8 +1,8 @@
-@import "../../../../../libs/angular/src/scss/bwicons/styles/style.scss";
-@import "variables.scss";
-@import "../../../../../libs/angular/src/scss/icons.scss";
-@import "@angular/cdk/overlay-prebuilt.css";
-@import "../../../../../libs/components/src/multi-select/scss/bw.theme";
+@use "../../../../../libs/angular/src/scss/bwicons/styles/style";
+@use "variables" as *;
+@use "../../../../../libs/angular/src/scss/icons";
+@use "@angular/cdk/overlay-prebuilt.css";
+@use "../../../../../libs/components/src/multi-select/scss/bw.theme";
 
 .cdk-virtual-scroll-content-wrapper {
   width: 100%;

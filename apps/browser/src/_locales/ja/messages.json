@@ -6,7 +6,7 @@
     "message": "Saigon Safe ロゴ"
   },
   "extName": {
-    "message": "Kevinwarden Password Manager",
+    "message": "Saigon Safe",
     "description": "Extension name, MUST be less than 40 characters (Safari restriction)"
   },
   "extDesc": {
@@ -166,6 +166,15 @@
   },
   "copyPassportNumber": {
     "message": "パスポート番号をコピー"
+  },
+  "copyFirstName": {
+    "message": "名前をコピー"
+  },
+  "copyMiddleName": {
+    "message": "ミドルネームをコピー"
+  },
+  "copyLastName": {
+    "message": "姓をコピー"
   },
   "copyLicenseNumber": {
     "message": "免許証番号をコピー"
@@ -708,6 +717,22 @@
   "rateExtension": {
     "message": "拡張機能の評価"
   },
+  "troubleshooting": {
+    "message": "トラブルシューティング"
+  },
+  "experiencingAnIssue": {
+    "message": "問題が発生していますか？"
+  },
+  "downloadDiagnosticReportWith": {
+    "message": "ダウンロードして診断レポートを共有してください。"
+  },
+  "bitwardenSupport": {
+    "message": "共有先：Saigon Safe サポート",
+    "description": "Link text following the troubleshooting description sentence. 'Saigon Safe' should not be translated."
+  },
+  "download": {
+    "message": "ダウンロード"
+  },
   "browserNotSupportClipboard": {
     "message": "お使いのブラウザはクリップボードへのコピーに対応していません。手動でコピーしてください"
   },
@@ -744,7 +769,7 @@
       },
       "hostname": {
         "content": "$2",
-        "example": "bitwarden.com"
+        "example": "saigonsafe.com"
       }
     }
   },
@@ -756,7 +781,7 @@
     "placeholders": {
       "host": {
         "content": "$1",
-        "example": "vault.bitwarden.com"
+        "example": "vault.saigonsafe.com"
       }
     }
   },
@@ -1053,7 +1078,7 @@
   },
   "addDomain": {
     "message": "ドメインの追加",
-    "description": "'Domain' here refers to an internet domain name (e.g. 'bitwarden.com') and the message in whole described the act of putting a domain value into the context."
+    "description": "'Domain' here refers to an internet domain name (e.g. 'saigonsafe.com') and the message in whole described the act of putting a domain value into the context."
   },
   "addedItem": {
     "message": "アイテムを追加しました"
@@ -1698,7 +1723,7 @@
   },
   "authenticatorAppDescV2": {
     "message": "Saigon Safe Authenticator のような認証アプリによって生成されたコードを入力してください。",
-    "description": "'Bitwarden Authenticator' is a product name and should not be translated."
+    "description": "'Saigon Safe Authenticator' is a product name and should not be translated."
   },
   "yubiKeyTitleV2": {
     "message": "Yubico OTP セキュリティキー"
@@ -2165,6 +2190,54 @@
   "typeBankAccountSubtitle": {
     "message": "銀行の詳細"
   },
+  "typeDriversLicense": {
+    "message": "免許証"
+  },
+  "typeDriversLicenseSubtitle": {
+    "message": "運転免許証または ID"
+  },
+  "driversLicenseDetails": {
+    "message": "免許証の詳細"
+  },
+  "dateOfBirth": {
+    "message": "生年月日"
+  },
+  "birthMonth": {
+    "message": "誕生月"
+  },
+  "birthDay": {
+    "message": "誕生日"
+  },
+  "birthYear": {
+    "message": "誕生年"
+  },
+  "issuingCountry": {
+    "message": "発行国"
+  },
+  "issuingState": {
+    "message": "発行都道府県"
+  },
+  "issuingAuthority": {
+    "message": "発行機関"
+  },
+  "issueDate": {
+    "message": "発行日"
+  },
+  "issueMonth": {
+    "message": "発行月"
+  },
+  "issueDay": {
+    "message": "発行日"
+  },
+  "issueYear": {
+    "message": "発行年"
+  },
+  "expirationDay": {
+    "message": "有効期限日"
+  },
+  "licenseClass": {
+    "message": "免許種別"
+  },
   "newItemHeaderLogin": {
     "message": "新規ログイン",
     "description": "Header for new login item type"
@@ -2190,19 +2263,19 @@
     "description": "Header for new bank account item type"
   },
   "newItemHeaderDriversLicense": {
-    "message": "新しいライセンス",
+    "message": "新しい免許証",
     "description": "Header for new license item type"
   },
   "newItemHeaderPassport": {
     "message": "新しいパスポート",
     "description": "Header for new passport item type"
   },
-  "newItemHeaderTextSend": {
-    "message": "新しい Send テキスト",
+  "newItemHeaderTextSendV2": {
+    "message": "新規テキスト",
     "description": "Header for new text send"
   },
-  "newItemHeaderFileSend": {
-    "message": "新しい Send ファイル",
+  "newItemHeaderFileSendV2": {
+    "message": "新規ファイル",
     "description": "Header for new file send"
   },
   "editItemHeaderLogin": {
@@ -2229,20 +2302,20 @@
     "message": "銀行口座を編集",
     "description": "Header for edit bank account item type"
   },
-  "editItemHeaderDriversLicense": {
-    "message": "ライセンスを編集",
+  "editItemHeaderLicense": {
+    "message": "免許証を編集",
     "description": "Header for edit license item type"
   },
   "editItemHeaderPassport": {
     "message": "パスポートを編集",
     "description": "Header for edit passport item type"
   },
-  "editItemHeaderTextSend": {
-    "message": "Send テキストを編集",
+  "editItemHeaderTextSendV2": {
+    "message": "テキストを編集",
     "description": "Header for edit text send"
   },
-  "editItemHeaderFileSend": {
-    "message": "Send ファイルを編集",
+  "editItemHeaderFileSendV2": {
+    "message": "ファイルを編集",
     "description": "Header for edit file send"
   },
   "viewItemHeaderLogin": {
@@ -2269,8 +2342,8 @@
     "message": "銀行口座を表示",
     "description": "Header for view bank account item type"
   },
-  "viewItemHeaderDriversLicense": {
-    "message": "ライセンスを表示",
+  "viewItemHeaderLicense": {
+    "message": "免許証を表示",
     "description": "Header for view license item type"
   },
   "viewItemHeaderPassport": {
@@ -2995,7 +3068,7 @@
   },
   "updateInBitwardenSlideDesc": {
     "message": "続いて、 Saigon Safe がパスワードマネージャーに保存されたパスワードを更新するよう促します。",
-    "description": "Description of the update in Bitwarden slide on the at-risk password page carousel"
+    "description": "Description of the update in Saigon Safe slide on the at-risk password page carousel"
   },
   "updateInBitwardenSlideImgAltPeriod": {
     "message": "ユーザーにログイン情報を更新するよう促す Saigon Safe の通知例"
@@ -3052,11 +3125,11 @@
   },
   "send": {
     "message": "Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendDetails": {
     "message": "Send の詳細",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendTypeText": {
     "message": "テキスト"
@@ -3069,7 +3142,7 @@
   },
   "allSends": {
     "message": "すべての Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "maxAccessCountReached": {
     "message": "最大アクセス数に達しました",
@@ -3089,7 +3162,7 @@
   },
   "copySendLink": {
     "message": "Send リンクをコピー",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "removePassword": {
     "message": "パスワードを削除"
@@ -3102,11 +3175,11 @@
   },
   "deletedSend": {
     "message": "削除した Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendLink": {
     "message": "Send リンク",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "disabled": {
     "message": "無効"
@@ -3116,26 +3189,26 @@
   },
   "deleteSend": {
     "message": "Send を削除",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "deleteSendConfirmation": {
     "message": "この Send を削除してもよろしいですか?",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "deleteSendPermanentConfirmation": {
     "message": "この Send を完全に削除してもよろしいですか？",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "editSend": {
     "message": "Send を編集",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "deletionDate": {
     "message": "削除日時"
   },
   "deletionDateDescV2": {
     "message": "Send はこの日付で完全に削除されます。",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "expirationDate": {
     "message": "有効期限"
@@ -3157,34 +3230,34 @@
   },
   "createSend": {
     "message": "新しい Send を作成",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "newPassword": {
     "message": "新しいパスワード"
   },
   "sendDisabled": {
     "message": "Send 無効",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendDisabledWarning": {
     "message": "組織のポリシーにより、既存の Send のみを削除できます。",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "createdSend": {
     "message": "作成した Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "createdSendSuccessfully": {
     "message": "Send を作成しました！",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendExpiresInHoursSingle": {
     "message": "Send は、次の1時間はリンクを知っている全員が利用できます。",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendExpiresInHours": {
     "message": "Send は、次の$HOURS$時間はリンクを知っている人全員が利用できます。",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated.",
     "placeholders": {
       "hours": {
         "content": "$1",
@@ -3194,11 +3267,11 @@
   },
   "sendExpiresInDaysSingle": {
     "message": "Send は、次の1日間はリンクを知っている全員が利用できます。",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendExpiresInDays": {
     "message": "Send は、次の$DAYS$日間はリンクを知っている人全員が利用できます。",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated.",
     "placeholders": {
       "days": {
         "content": "$1",
@@ -3217,7 +3290,7 @@
   },
   "sendCreatedDescriptionV2": {
     "message": "Copy and share this Send link. The Send will be available to anyone with the link for the next $TIME$.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated.",
     "placeholders": {
       "time": {
         "content": "$1",
@@ -3227,7 +3300,7 @@
   },
   "sendCreatedDescriptionPassword": {
     "message": "Copy and share this Send link. The Send will be available to anyone with the link and password you set for the next $TIME$.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated.",
     "placeholders": {
       "time": {
         "content": "$1",
@@ -3237,7 +3310,7 @@
   },
   "sendCreatedDescriptionEmail": {
     "message": "Copy and share this Send link. It can be viewed by the people you specified for the next $TIME$.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated.",
     "placeholders": {
       "time": {
         "content": "$1",
@@ -3247,11 +3320,11 @@
   },
   "sendLinkCopied": {
     "message": "Send リンクをコピーしました",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "editedSend": {
     "message": "編集済みの Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "popOut": {
     "message": "ポップアウト"
@@ -3460,33 +3533,18 @@
   "exportingPersonalVaultTitle": {
     "message": "個人保管庫のエクスポート"
   },
-  "exportingIndividualVaultDescription": {
-    "message": "$EMAIL$ に関連付けられた個人の保管庫アイテムのみがエクスポートされます。組織の保管庫アイテムは含まれません。 保管庫アイテム情報のみがエクスポートされ、関連する添付ファイルはエクスポートされません。",
-    "placeholders": {
-      "email": {
-        "content": "$1",
-        "example": "name@example.com"
-      }
-    }
-  },
-  "exportingIndividualVaultWithAttachmentsDescription": {
-    "message": "$EMAIL$ に関連付けられた個人用保管庫のアイテムのみが、添付ファイルを含めてエクスポートされます。組織用保管庫のアイテムは含まれません。",
-    "placeholders": {
-      "email": {
-        "content": "$1",
-        "example": "name@example.com"
-      }
-    }
-  },
   "exportingOrganizationVaultTitle": {
     "message": "組織保管庫のエクスポート"
   },
-  "exportingOrganizationVaultDesc": {
-    "message": "$ORGANIZATION$ に関連付けられた組織保管庫のみがエクスポートされます。個々の保管庫または他の組織にあるアイテムは含まれません。",
+  "exportingIndividualVaultScopeDescription": {
+    "message": "個人の保管庫のアイテムのみがエクスポートされます。"
+  },
+  "exportingOrganizationVaultScopeDescription": {
+    "message": "$ORGANIZATION$ の保管庫に関連付けられたアイテムのみがエクスポートされます。個人の保管庫内のアイテムはエクスポートされません。",
     "placeholders": {
       "organization": {
         "content": "$1",
-        "example": "ACME Moving Co."
+        "example": "My Org Name"
       }
     }
   },
@@ -4183,11 +4241,11 @@
   },
   "sendsTitleNoItems": {
     "message": "機密情報を安全に送信",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendsBodyNoItems": {
     "message": "どのプラットフォームでも、誰とでも安全にファイルとデータを共有できます。流出を防止しながら、あなたの情報はエンドツーエンドで暗号化されます。",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "inputRequired": {
     "message": "入力が必要です。"
@@ -4577,6 +4635,18 @@
   "exportError": {
     "message": "保管庫データのエクスポート中にエラーが発生しました"
   },
+  "exportSuccessSkippedAttachment": {
+    "message": "1 個の破損した添付ファイルはエクスポート中にスキップされました。その他のすべての保管庫データと添付ファイルは正常にエクスポートされました。"
+  },
+  "exportSuccessSkippedAttachments": {
+    "message": "$COUNT$ 個の破損した添付ファイルはエクスポート中にスキップされました。その他のすべての保管庫データと添付ファイルは正常にエクスポートされました。",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
   "typePasskey": {
     "message": "パスキー"
   },
@@ -4773,7 +4843,7 @@
   },
   "uriMatchDefaultStrategyHint": {
     "message": "URI の一致検出方法は、Saigon Safe が自動入力候補をどのように判別するかを指定します。",
-    "description": "Explains to the user that URI match detection determines how Bitwarden suggests autofill options, and clarifies that this default strategy applies when no specific match detection is set for a login item."
+    "description": "Explains to the user that URI match detection determines how Saigon Safe suggests autofill options, and clarifies that this default strategy applies when no specific match detection is set for a login item."
   },
   "regExAdvancedOptionWarning": {
     "message": "\"Regular expression\" is an advanced option with increased risk of exposing credentials.",
@@ -5695,7 +5765,7 @@
   },
   "saveToBitwarden": {
     "message": "Saigon Safe へ保存",
-    "description": "Confirmation message for saving a login to Bitwarden"
+    "description": "Confirmation message for saving a login to Saigon Safe"
   },
   "spaceCharacterDescriptor": {
     "message": "スペース",
@@ -5989,7 +6059,7 @@
     "placeholders": {
       "product": {
         "content": "$1",
-        "example": "Bitwarden Phishing Blocker"
+        "example": "Saigon Safe Phishing Blocker"
       }
     }
   },
@@ -6348,10 +6418,28 @@
   },
   "sendPasswordHelperText": {
     "message": "この Send を表示するには、各個人がパスワードを入力する必要があります",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "userVerificationFailed": {
     "message": "ユーザー認証に失敗しました。"
+  },
+  "enterMonth": {
+    "message": "月を入力してください。"
+  },
+  "enterDay": {
+    "message": "日を入力してください。"
+  },
+  "enterYear": {
+    "message": "年を入力してください。"
+  },
+  "invalidDay": {
+    "message": "正しい日を入力してください。"
+  },
+  "invalidYear": {
+    "message": "正しい年を入力してください。"
+  },
+  "searchDriversLicense": {
+    "message": "免許証を検索"
   },
   "bankName": {
     "message": "銀行名"
@@ -6423,14 +6511,31 @@
   "bankAccountTypeOther": {
     "message": "その他"
   },
-  "newBankAccountNudgeTitle": {
-    "message": "銀行口座情報を安全に保管します"
-  },
-  "newBankAccountNudgeBody": {
-    "message": "銀行口座情報を保存すると、デバイス間で簡単かつ安全にアクセスできます。"
-  },
   "downloadFailed": {
     "message": "ダウンロードできませんでした。"
+  },
+  "maxAccessCount": {
+    "message": "最大アクセス数",
+    "description": "This text will be displayed after a Send has been accessed the maximum amount of times."
+  },
+  "hideMyEmail": {
+    "message": "受信者に自分のメールアドレスを表示しない"
+  },
+  "viewTextSendHeader": {
+    "message": "テキストを表示"
+  },
+  "viewFileSendHeader": {
+    "message": "ファイルを表示"
+  },
+  "sendCreated": {
+    "message": "Send を作成しました",
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
+  },
+  "numericInputError": {
+    "message": "数値を入力してください"
+  },
+  "integerInputError": {
+    "message": "整数を入力してください"
   },
   "sideNavigation": {
     "message": "サイドバーナビゲーション"
@@ -6448,7 +6553,7 @@
   },
   "saveSendEditsFailed": {
     "message": "Send の編集を保存できませんでした",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "hideEmailPolicyInEffect": {
     "message": "あなたの組織はメールの可視性を必要とします。保存するには、「閲覧者にメールアドレスを見せないようにする」のチェックを外してください。"

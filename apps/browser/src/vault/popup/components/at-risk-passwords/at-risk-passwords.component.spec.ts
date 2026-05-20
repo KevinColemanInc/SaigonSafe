@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, input } from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { By } from "@angular/platform-browser";
+import { Router } from "@angular/router";
 import { mock } from "jest-mock-extended";
 import { BehaviorSubject, firstValueFrom, of } from "rxjs";
 
@@ -19,6 +20,7 @@ import { FakeAccountService, FakeStateProvider } from "@bitwarden/common/spec";
 import { UserId } from "@bitwarden/common/types/guid";
 import { ChangeLoginPasswordService } from "@bitwarden/common/vault/abstractions/change-login-password.service";
 import { CipherService } from "@bitwarden/common/vault/abstractions/cipher.service";
+import { CipherType } from "@bitwarden/common/vault/enums";
 import { CipherView } from "@bitwarden/common/vault/models/view/cipher.view";
 import { EndUserNotificationService } from "@bitwarden/common/vault/notifications";
 import { NotificationView } from "@bitwarden/common/vault/notifications/models";
@@ -26,6 +28,7 @@ import { SecurityTask, SecurityTaskType, TaskService } from "@bitwarden/common/v
 import { DialogService, ToastService } from "@bitwarden/components";
 import { PasswordRepromptService, AtRiskPasswordCalloutService } from "@bitwarden/vault";
 
+import { BrowserApi } from "../../../../platform/browser/browser-api";
 import { PopupHeaderComponent } from "../../../../platform/popup/layout/popup-header.component";
 import { PopupPageComponent } from "../../../../platform/popup/layout/popup-page.component";
 import { AtRiskCarouselDialogResult } from "../at-risk-carousel-dialog/at-risk-carousel-dialog.component";
@@ -76,11 +79,17 @@ describe("AtRiskPasswordsComponent", () => {
   let mockAtRiskPasswordCalloutService: any;
   let stateProvider: FakeStateProvider;
   let mockAccountService: FakeAccountService;
+  const mockNavigate = jest.fn();
   const setInlineMenuVisibility = jest.fn();
   const mockToastService = mock<ToastService>();
   const mockAtRiskPasswordPageService = mock<AtRiskPasswordPageService>();
   const mockChangeLoginPasswordService = mock<ChangeLoginPasswordService>();
   const mockDialogService = mock<DialogService>();
+  const mockPasswordRepromptService = mock<PasswordRepromptService>();
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
 
   beforeEach(async () => {
     mockTasks$ = new BehaviorSubject<SecurityTask[]>([
@@ -121,8 +130,10 @@ describe("AtRiskPasswordsComponent", () => {
 
     calloutDismissed$ = new BehaviorSubject<boolean>(false);
     setInlineMenuVisibility.mockClear();
+    mockNavigate.mockClear();
     mockToastService.showToast.mockClear();
     mockDialogService.open.mockClear();
+    mockPasswordRepromptService.passwordRepromptCheck.mockResolvedValue(true);
     mockAtRiskPasswordPageService.isCalloutDismissed.mockReturnValue(calloutDismissed$);
     mockAccountService = {
       activeAccount$: of({ id: "user" as UserId }),
@@ -159,8 +170,9 @@ describe("AtRiskPasswordsComponent", () => {
         },
         { provide: I18nService, useValue: { t: (key: string) => key } },
         { provide: AccountService, useValue: mockAccountService },
+        { provide: Router, useValue: { navigate: mockNavigate } },
         { provide: PlatformUtilsService, useValue: mock<PlatformUtilsService>() },
-        { provide: PasswordRepromptService, useValue: mock<PasswordRepromptService>() },
+        { provide: PasswordRepromptService, useValue: mockPasswordRepromptService },
         {
           provide: AutofillSettingsServiceAbstraction,
           useValue: {
@@ -206,6 +218,40 @@ describe("AtRiskPasswordsComponent", () => {
 
   it("should create", () => {
     expect(component).toBeTruthy();
+  });
+
+  describe("viewCipher", () => {
+    it("passes the sender tab id when navigating to review an at-risk password", async () => {
+      const cipher = { ...mockCiphers$.value[0], type: CipherType.Login } as CipherView;
+      jest
+        .spyOn(BrowserApi, "getTabFromCurrentWindow")
+        .mockResolvedValue({
+          id: 42,
+          url: "https://example.com",
+        } as chrome.tabs.Tab);
+
+      await component.viewCipher(cipher);
+
+      expect(mockNavigate).toHaveBeenCalledWith(["/view-cipher"], {
+        queryParams: { cipherId: "cipher", type: CipherType.Login, senderTabId: 42 },
+      });
+    });
+
+    it("omits the sender tab id for extension tabs", async () => {
+      const cipher = { ...mockCiphers$.value[0], type: CipherType.Login } as CipherView;
+      jest
+        .spyOn(BrowserApi, "getTabFromCurrentWindow")
+        .mockResolvedValue({
+          id: 42,
+          url: BrowserApi.getRuntimeURL("popup/index.html#/at-risk-passwords"),
+        } as chrome.tabs.Tab);
+
+      await component.viewCipher(cipher);
+
+      expect(mockNavigate).toHaveBeenCalledWith(["/view-cipher"], {
+        queryParams: { cipherId: "cipher", type: CipherType.Login },
+      });
+    });
   });
 
   describe("pending atRiskItems$", () => {

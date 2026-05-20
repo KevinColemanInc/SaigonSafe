@@ -67,11 +67,11 @@ jobs:
       matrix:
         test-group:
           - name: Browser
-            paths: apps/browser bitwarden_license/bit-browser
+            paths: apps/browser
             artifact: jest-coverage-browser
             junit: junit-browser.xml
           - name: Web
-            paths: apps/web bitwarden_license/bit-web
+            paths: apps/web
             artifact: jest-coverage-web
             junit: junit-web.xml
           - name: Desktop
@@ -79,11 +79,11 @@ jobs:
             artifact: jest-coverage-desktop
             junit: junit-desktop.xml
           - name: CLI
-            paths: apps/cli bitwarden_license/bit-cli
+            paths: apps/cli
             artifact: jest-coverage-cli
             junit: junit-cli.xml
           - name: Libs
-            paths: libs bitwarden_license/bit-common
+            paths: libs
             artifact: jest-coverage-libs
             junit: junit-libs.xml
 

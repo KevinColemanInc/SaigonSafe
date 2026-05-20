@@ -5,8 +5,6 @@ import { RouterTestingModule } from "@angular/router/testing";
 import { VaultActive, VaultInactive } from "@bitwarden/assets/svg";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 
-import BrowserPopupUtils from "../../browser/browser-popup-utils";
-
 import { NavButton, PopupTabNavigationComponent } from "./popup-tab-navigation.component";
 
 @Component({
@@ -30,9 +28,7 @@ class TestHostComponent {
 }
 
 describe("PopupTabNavigationComponent", () => {
-  const setup = async (isSidebar: boolean) => {
-    jest.spyOn(BrowserPopupUtils, "inSidebar").mockReturnValue(isSidebar);
-
+  const setup = async () => {
     await TestBed.configureTestingModule({
       imports: [RouterTestingModule.withRoutes([]), TestHostComponent],
       providers: [
@@ -50,27 +46,23 @@ describe("PopupTabNavigationComponent", () => {
   };
 
   afterEach(() => {
-    jest.restoreAllMocks();
     TestBed.resetTestingModule();
   });
 
-  it("renders the navigation above the content in sidebar view", async () => {
-    const fixture = await setup(true);
+  it("renders the navigation above the content", async () => {
+    const fixture = await setup();
     const host = fixture.nativeElement.querySelector("popup-tab-navigation") as HTMLElement;
-    const footer = host.querySelector("footer") as HTMLElement;
+    const nav = host.querySelector("nav") as HTMLElement;
 
-    expect(host.firstElementChild).toBe(footer);
-    expect(footer.classList.contains("tw-border-b")).toBe(true);
-    expect(footer.classList.contains("tw-border-t")).toBe(false);
+    expect(host.firstElementChild).toBe(nav);
+    expect(nav.classList.contains("tw-border-b")).toBe(true);
   });
 
-  it("renders the navigation below the content outside sidebar view", async () => {
-    const fixture = await setup(false);
+  it("renders the content below the navigation", async () => {
+    const fixture = await setup();
     const host = fixture.nativeElement.querySelector("popup-tab-navigation") as HTMLElement;
-    const footer = host.querySelector("footer") as HTMLElement;
+    const content = host.querySelector('[data-testid="content"]') as HTMLElement;
 
-    expect(host.lastElementChild).toBe(footer);
-    expect(footer.classList.contains("tw-border-t")).toBe(true);
-    expect(footer.classList.contains("tw-border-b")).toBe(false);
+    expect(host.lastElementChild?.contains(content)).toBe(true);
   });
 });

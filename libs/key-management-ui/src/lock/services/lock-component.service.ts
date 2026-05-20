@@ -38,8 +38,8 @@ export abstract class LockComponentService {
   abstract getBiometricsError(error: any): string | null;
   abstract getPreviousUrl(): string | null;
   /**
-   * Opens the current page in a popout window if not already in a popout or the sidebar.
-   * If already in a popout or sidebar, does nothing.
+   * Opens the current page in a popout window if not already in a popout.
+   * If already in a popout, does nothing.
    * @throws Error if execution context is not a browser extension.
    */
   abstract popOutBrowserExtension(): Promise<void>;

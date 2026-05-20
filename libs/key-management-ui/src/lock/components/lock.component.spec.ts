@@ -476,6 +476,58 @@ describe("LockComponent", () => {
     );
   });
 
+  describe("browser activitybar focus", () => {
+    afterEach(() => {
+      document.getElementById("masterPassword")?.remove();
+      document.getElementById("pin")?.remove();
+      window.history.pushState({}, "", "/");
+    });
+
+    it("focuses the active master password input when the activitybar window receives focus", fakeAsync(() => {
+      window.history.pushState({}, "", "/popup/index.html?uilocation=sidebar#/lock");
+      component.unlockOptions = {
+        biometrics: { enabled: false, biometricsStatus: BiometricsStatus.NotEnabledLocally },
+        pin: { enabled: false },
+        masterPassword: { enabled: true },
+      } as UnlockOptions;
+      component.activeUnlockOption = UnlockOption.MasterPassword;
+
+      const masterPasswordInput = document.createElement("input");
+      masterPasswordInput.id = "masterPassword";
+      const focusSpy = jest.spyOn(masterPasswordInput, "focus");
+      document.body.append(masterPasswordInput);
+
+      component["listenForBrowserActivityBarFocus"]();
+      window.dispatchEvent(new Event("focus"));
+      tick(50);
+      tick(0);
+
+      expect(focusSpy).toHaveBeenCalled();
+    }));
+
+    it("switches from biometrics to the master password input before focusing", fakeAsync(() => {
+      window.history.pushState({}, "", "/popup/index.html?uilocation=sidebar#/lock");
+      component.unlockOptions = {
+        biometrics: { enabled: true, biometricsStatus: BiometricsStatus.Available },
+        pin: { enabled: true },
+        masterPassword: { enabled: true },
+      } as UnlockOptions;
+      component.activeUnlockOption = UnlockOption.Biometrics;
+
+      const masterPasswordInput = document.createElement("input");
+      masterPasswordInput.id = "masterPassword";
+      const focusSpy = jest.spyOn(masterPasswordInput, "focus");
+      document.body.append(masterPasswordInput);
+
+      component["focusInputSoon"]();
+      tick(0);
+      tick(0);
+
+      expect(component.activeUnlockOption).toBe(UnlockOption.MasterPassword);
+      expect(focusSpy).toHaveBeenCalled();
+    }));
+  });
+
   describe("handleActiveAccountChange", () => {
     const mockActiveAccount: Account = {
       id: userId,
@@ -495,6 +547,52 @@ describe("LockComponent", () => {
       expect(mockKeyService.hasUserKey).toHaveBeenCalledWith(userId);
       expect(mockAnonLayoutWrapperDataService.setAnonLayoutWrapperData).not.toHaveBeenCalled();
     });
+
+    it("waits for loading to finish before scheduling sidebar focus", fakeAsync(() => {
+      window.history.pushState({}, "", "/popup/index.html?uilocation=sidebar#/lock");
+      mockPlatformUtilsService.getClientType.mockReturnValue(ClientType.Browser);
+      mockLockComponentService.getAvailableUnlockOptions$.mockReturnValue(
+        of({
+          biometrics: { enabled: false, biometricsStatus: BiometricsStatus.NotEnabledLocally },
+          pin: { enabled: false },
+          masterPassword: { enabled: true },
+        } as UnlockOptions),
+      );
+
+      const focusInputSoonSpy = jest.spyOn(component as any, "focusInputSoon").mockImplementation(
+        () => {
+          expect(component["loading"]).toBe(false);
+        },
+      );
+
+      void component.ngOnInit();
+      tick();
+
+      expect(focusInputSoonSpy).toHaveBeenCalled();
+    }));
+
+    it("opens a popout for typed unlock in the Firefox sidebar", fakeAsync(() => {
+      window.history.pushState({}, "", "/popup/index.html?uilocation=sidebar#/lock");
+      mockPlatformUtilsService.getClientType.mockReturnValue(ClientType.Browser);
+      mockPlatformUtilsService.getDevice.mockReturnValue(DeviceType.FirefoxExtension);
+      mockLockComponentService.getAvailableUnlockOptions$.mockReturnValue(
+        of({
+          biometrics: { enabled: false, biometricsStatus: BiometricsStatus.NotEnabledLocally },
+          pin: { enabled: false },
+          masterPassword: { enabled: true },
+        } as UnlockOptions),
+      );
+      mockLockComponentService.popOutBrowserExtension.mockResolvedValue();
+
+      const focusInputSoonSpy = jest.spyOn(component as any, "focusInputSoon");
+
+      void component.ngOnInit();
+      tick();
+
+      expect(mockLockComponentService.popOutBrowserExtension).toHaveBeenCalled();
+      expect(component.shouldClosePopout).toBe(true);
+      expect(focusInputSoonSpy).not.toHaveBeenCalled();
+    }));
 
     it("should set email as page subtitle when account is unlocked", async () => {
       mockKeyService.hasUserKey.mockResolvedValue(false);

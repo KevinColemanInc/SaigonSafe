@@ -11,6 +11,7 @@ import { SdkService } from "@bitwarden/common/platform/abstractions/sdk/sdk.serv
 import { CollectionId, OrganizationId, UserId } from "@bitwarden/common/types/guid";
 import {
   Collection as SdkCollection,
+  CollectionType as SdkCollectionType,
   CollectionView as SdkCollectionView,
 } from "@bitwarden/sdk-internal";
 
@@ -29,7 +30,7 @@ const stubSdkCollection: SdkCollection = {
   readOnly: false,
   manage: false,
   defaultUserCollectionEmail: undefined,
-  type: "SharedCollection",
+  type: "SharedCollection" as SdkCollectionType,
 };
 
 function makeCollection(overrides: Partial<Collection> = {}): Collection {
@@ -50,7 +51,7 @@ function makeSdkCollectionView(overrides: Partial<SdkCollectionView> = {}): SdkC
     hidePasswords: false,
     readOnly: false,
     manage: true,
-    type: "SharedCollection",
+    type: "SharedCollection" as SdkCollectionType,
     ...overrides,
   };
 }
@@ -188,7 +189,9 @@ describe("DefaultCollectionEncryptionService", () => {
         type: CollectionTypes.DefaultUserCollection,
       });
       jest.spyOn(collection, "toSdkCollection").mockReturnValue(stubSdkCollection);
-      mockDecrypt.mockReturnValue(makeSdkCollectionView({ type: "DefaultUserCollection" }));
+      mockDecrypt.mockReturnValue(
+        makeSdkCollectionView({ type: "DefaultUserCollection" as SdkCollectionType }),
+      );
 
       const [result] = await service.decryptMany([collection], userId);
 

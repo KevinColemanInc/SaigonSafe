@@ -41,6 +41,9 @@ export const ORGANIZATION_INVITE_LINK_DISK = new StateDefinition("organizationIn
 
 // Billing
 export const BILLING_DISK = new StateDefinition("billing", "disk");
+export const BILLING_DISK_LOCAL = new StateDefinition("billingLocal", "disk", {
+  web: "disk-local",
+});
 export const BILLING_MEMORY = new StateDefinition("billing", "memory");
 
 // Auth
@@ -241,6 +244,7 @@ export const WELCOME_EXTENSION_DIALOG_DISK = new StateDefinition(
 // KM
 
 export const BIOMETRIC_SETTINGS_DISK = new StateDefinition("biometricSettings", "disk");
+export const BIOMETRIC_SETTINGS_MEMORY = new StateDefinition("biometricSettings", "memory");
 export const ENCRYPTED_MIGRATION_DISK = new StateDefinition("encryptedMigration", "disk");
 export const PIN_DISK = new StateDefinition("pinUnlock", "disk");
 export const PIN_MEMORY = new StateDefinition("pinUnlock", "memory");

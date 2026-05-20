@@ -9,9 +9,10 @@ import { DefaultEnvironmentService } from "@bitwarden/common/platform/services/d
 import { StateProvider } from "@bitwarden/common/platform/state";
 
 import { GroupPolicyEnvironment } from "../../admin-console/types/group-policy-environment";
-import { devFlagEnabled, devFlagValue } from "../flags";
 
 export class BrowserEnvironmentService extends DefaultEnvironmentService {
+  private static readonly LEGACY_DEV_MANAGED_BASE_URL = "https://localhost:8080";
+
   constructor(
     private logService: LogService,
     stateProvider: StateProvider,
@@ -50,22 +51,45 @@ export class BrowserEnvironmentService extends DefaultEnvironmentService {
     );
   }
 
+  async syncManagedEnvironment() {
+    if (await this.hasManagedEnvironment()) {
+      if (await this.settingsHaveChanged()) {
+        await this.setUrlsToManagedEnvironment();
+      }
+      return;
+    }
+
+    const globalEnv = await firstValueFrom(this.globalEnvironment$);
+    const urls = globalEnv.getUrls();
+
+    if (
+      globalEnv.getRegion() === Region.SelfHosted &&
+      urls.base === BrowserEnvironmentService.LEGACY_DEV_MANAGED_BASE_URL &&
+      urls.webVault == null &&
+      urls.api == null &&
+      urls.identity == null &&
+      urls.icons == null &&
+      urls.notifications == null &&
+      urls.events == null
+    ) {
+      await this.setEnvironment(Region.US);
+    }
+  }
+
   getManagedEnvironment(): Promise<GroupPolicyEnvironment> {
-    return devFlagEnabled("managedEnvironment")
-      ? new Promise((resolve) => resolve(devFlagValue("managedEnvironment")))
-      : new Promise((resolve, reject) => {
-          if (chrome.storage.managed == null) {
-            return resolve(null);
-          }
+    return new Promise((resolve, reject) => {
+      if (chrome.storage.managed == null) {
+        return resolve(null);
+      }
 
-          chrome.storage.managed.get("environment", (result) => {
-            if (chrome.runtime.lastError) {
-              return reject(chrome.runtime.lastError);
-            }
+      chrome.storage.managed.get("environment", (result) => {
+        if (chrome.runtime.lastError) {
+          return reject(chrome.runtime.lastError);
+        }
 
-            resolve(result.environment);
-          });
-        });
+        resolve(result.environment);
+      });
+    });
   }
 
   async setUrlsToManagedEnvironment() {

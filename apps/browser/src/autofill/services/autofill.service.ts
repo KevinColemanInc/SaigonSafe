@@ -56,7 +56,7 @@ import { AutofillPort } from "../enums/autofill-port.enum";
 import AutofillField from "../models/autofill-field";
 import AutofillPageDetails from "../models/autofill-page-details";
 import AutofillScript from "../models/autofill-script";
-import { fieldContainsKeyword, isNonLoginFormContext } from "../utils/qualification";
+import { fieldContainsKeyword, isNonLoginUsernameField } from "../utils/qualification";
 
 import {
   AutoFillOptions,
@@ -550,7 +550,7 @@ export default class AutofillService implements AutofillServiceInterface {
   }
 
   /**
-   * Autofill the specified tab with the next login item from the cache
+   * Autofill the specified tab with the next matching login item from the cache
    * @param {PageDetail[]} pageDetails The data scraped from the page
    * @param {chrome.tabs.Tab} tab The tab to be autofilled
    * @param {boolean} fromCommand Whether the autofill is triggered by a keyboard shortcut (`true`) or autofill on page load (`false`)
@@ -578,6 +578,10 @@ export default class AutofillService implements AutofillServiceInterface {
     const tabUrl = tab.url;
     if (fromCommand) {
       cipher = await this.cipherService.getNextCipherForUrl(tabUrl, activeUserId);
+
+      if (AutofillService.pageDetailsContainPasswordFields(pageDetails)) {
+        cipher = await this.getNextPasswordAutofillCipher(tabUrl, activeUserId, cipher);
+      }
     } else {
       const lastLaunchedCipher = await this.cipherService.getLastLaunchedForUrl(
         tabUrl,
@@ -621,12 +625,43 @@ export default class AutofillService implements AutofillServiceInterface {
       autoSubmitLogin,
     });
 
-    // Update last used index as autofill has succeeded
     if (fromCommand) {
       this.cipherService.updateLastUsedIndexForUrl(tabUrl);
     }
 
     return totpCode;
+  }
+
+  private async getNextPasswordAutofillCipher(
+    tabUrl: string,
+    userId: UserId,
+    cipher: CipherView,
+  ): Promise<CipherView | null> {
+    if (AutofillService.hasValue(cipher?.login?.password ?? "")) {
+      return cipher;
+    }
+
+    const matchingCiphers = await this.cipherService.getAllDecryptedForUrl(tabUrl, userId);
+    if (!matchingCiphers.some((candidate) => AutofillService.hasValue(candidate.login?.password ?? ""))) {
+      return cipher;
+    }
+
+    for (let attempt = 1; attempt < matchingCiphers.length; attempt++) {
+      this.cipherService.updateLastUsedIndexForUrl(tabUrl);
+
+      const nextCipher = await this.cipherService.getNextCipherForUrl(tabUrl, userId);
+      if (AutofillService.hasValue(nextCipher?.login?.password ?? "")) {
+        return nextCipher;
+      }
+    }
+
+    return cipher;
+  }
+
+  private static pageDetailsContainPasswordFields(pageDetails: PageDetail[]): boolean {
+    return pageDetails.some((pageDetail) =>
+      pageDetail.details?.fields?.some((field) => field.type === "password" && !field.disabled),
+    );
   }
 
   /**
@@ -1241,7 +1276,7 @@ export default class AutofillService implements AutofillServiceInterface {
           !options.skipUsernameOnlyFill &&
           ["email", "tel", "text"].some((t) => t === field.type) &&
           fieldContainsKeyword(field, AutoFillConstants.UsernameFieldNames) &&
-          !isNonLoginFormContext(field, pageDetails);
+          !isNonLoginUsernameField(field, pageDetails);
 
         // Reliable TOTP signals win unconditionally; username wins over ambiguous TOTP signals.
         switch (true) {
@@ -2715,7 +2750,7 @@ export default class AutofillService implements AutofillServiceInterface {
         continue;
       }
 
-      if (isNonLoginFormContext(field, pageDetails)) {
+      if (isNonLoginUsernameField(field, pageDetails)) {
         continue;
       }
 

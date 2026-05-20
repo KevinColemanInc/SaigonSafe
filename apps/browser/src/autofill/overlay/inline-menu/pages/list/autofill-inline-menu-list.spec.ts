@@ -64,7 +64,7 @@ describe("AutofillInlineMenuList", () => {
       expect(container.classList.contains("no-animations")).toBe(true);
     });
 
-    describe("the locked inline menu for an unauthenticated user", () => {
+    describe("the locked inline menu for an authenticated user", () => {
       beforeEach(() => {
         postWindowMessage(
           createInitAutofillInlineMenuListMessageMock({
@@ -80,6 +80,34 @@ describe("AutofillInlineMenuList", () => {
       });
 
       it("allows the user to unlock the vault", () => {
+        const unlockButton =
+          autofillInlineMenuList["inlineMenuListContainer"].querySelector("#unlock-button");
+
+        unlockButton.dispatchEvent(new Event("click"));
+
+        expect(globalThis.parent.postMessage).toHaveBeenCalledWith(
+          { command: "unlockVault", portKey, token: "test-token" },
+          expectedOrigin,
+        );
+      });
+    });
+
+    describe("the auth-required inline menu for a logged out user", () => {
+      beforeEach(() => {
+        postWindowMessage(
+          createInitAutofillInlineMenuListMessageMock({
+            authStatus: AuthenticationStatus.LoggedOut,
+            cipherList: [],
+            portKey,
+          }),
+        );
+      });
+
+      it("creates the views for the logged out inline menu", () => {
+        expect(autofillInlineMenuList["inlineMenuListContainer"]).toMatchSnapshot();
+      });
+
+      it("allows the user to open the auth flow", () => {
         const unlockButton =
           autofillInlineMenuList["inlineMenuListContainer"].querySelector("#unlock-button");
 

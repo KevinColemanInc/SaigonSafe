@@ -53,6 +53,7 @@ import {
   VaultCarouselModule,
 } from "@bitwarden/vault";
 
+import { BrowserApi } from "../../../../platform/browser/browser-api";
 import { PopOutComponent } from "../../../../platform/popup/components/pop-out.component";
 import { PopupHeaderComponent } from "../../../../platform/popup/layout/popup-header.component";
 import { PopupPageComponent } from "../../../../platform/popup/layout/popup-page.component";
@@ -246,8 +247,14 @@ export class AtRiskPasswordsComponent implements OnInit {
     if (!repromptPassed) {
       return;
     }
+
+    const senderTabId = await this.getSenderTabId();
     await this.router.navigate(["/view-cipher"], {
-      queryParams: { cipherId: cipher.id, type: cipher.type },
+      queryParams: {
+        cipherId: cipher.id,
+        type: cipher.type,
+        ...(senderTabId != null ? { senderTabId } : {}),
+      },
     });
   }
 
@@ -269,6 +276,20 @@ export class AtRiskPasswordsComponent implements OnInit {
 
   protected hasLoginUri(cipher: CipherView) {
     return cipher.login?.hasUris;
+  }
+
+  private async getSenderTabId(): Promise<number | undefined> {
+    const tab = await BrowserApi.getTabFromCurrentWindow();
+    const tabUrl = tab?.url ?? tab?.pendingUrl;
+
+    if (
+      tab?.id == null ||
+      (tabUrl != null && tabUrl.startsWith(BrowserApi.getRuntimeURL("")))
+    ) {
+      return undefined;
+    }
+
+    return tab.id;
   }
 
   readonly launchChangePassword = async (cipher: CipherView) => {

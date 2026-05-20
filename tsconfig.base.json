@@ -2,7 +2,7 @@
   "compilerOptions": {
     "strict": false,
     "pretty": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "noImplicitAny": true,
     "target": "ES2016",
     "module": "ES2020",
@@ -27,7 +27,6 @@
       "@bitwarden/auto-confirm": ["./libs/auto-confirm/src/index.ts"],
       "@bitwarden/auto-confirm/angular": ["./libs/auto-confirm/src/angular"],
       "@bitwarden/billing": ["./libs/billing/src"],
-      "@bitwarden/bit-common/*": ["./bitwarden_license/bit-common/src/*"],
       "@bitwarden/browser/*": ["./apps/browser/src/*"],
       "@bitwarden/cli/*": ["./apps/cli/src/*"],
       "@bitwarden/client-type": ["./libs/client-type/src/index.ts"],

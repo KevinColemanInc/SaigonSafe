@@ -1,12 +1,15 @@
 import {
+  AfterViewInit,
   Component,
   computed,
+  ElementRef,
   inject,
   input,
   model,
   OnDestroy,
   OnInit,
   output,
+  viewChild,
 } from "@angular/core";
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { firstValueFrom, Subject, takeUntil } from "rxjs";
@@ -56,7 +59,7 @@ import { UnlockViaPrfComponent } from "../unlock-via-prf.component";
     UnlockViaPrfComponent,
   ],
 })
-export class MasterPasswordLockComponent implements OnInit, OnDestroy {
+export class MasterPasswordLockComponent implements OnInit, OnDestroy, AfterViewInit {
   private readonly accountService = inject(AccountService);
   private readonly masterPasswordUnlockService = inject(MasterPasswordUnlockService);
   private readonly i18nService = inject(I18nService);
@@ -89,6 +92,8 @@ export class MasterPasswordLockComponent implements OnInit, OnDestroy {
 
   protected showPassword = false;
   private destroy$ = new Subject<void>();
+  private readonly masterPasswordInput =
+    viewChild.required<ElementRef<HTMLInputElement>>("masterPasswordInput");
 
   formGroup = new FormGroup({
     masterPassword: new FormControl("", {
@@ -177,7 +182,55 @@ export class MasterPasswordLockComponent implements OnInit, OnDestroy {
     }
   }
 
+  ngAfterViewInit(): void {
+    if (!this.inBrowserActivityBar()) {
+      return;
+    }
+
+    window.setTimeout(() => {
+      this.focusMasterPasswordInput();
+    }, 300);
+  }
+
   onPrfUnlockSuccess(userKey: UserKey): void {
     this.prfUnlockSuccess.emit(userKey);
+  }
+
+  private inBrowserActivityBar(): boolean {
+    if (typeof window === "undefined") {
+      return false;
+    }
+
+    return (
+      this.platformUtilsService.getClientType() === ClientType.Browser &&
+      (window.location.href.includes("uilocation=sidebar") ||
+        window.location.href.includes("uilocation=sidepanel"))
+    );
+  }
+
+  private focusMasterPasswordInput(attempt = 1): void {
+    const masterPasswordInput = this.masterPasswordInput().nativeElement;
+
+    window.focus();
+    masterPasswordInput.focus();
+    masterPasswordInput.setSelectionRange(
+      masterPasswordInput.value.length,
+      masterPasswordInput.value.length,
+    );
+
+    const focused = document.activeElement === masterPasswordInput;
+    const documentHasFocus = document.hasFocus();
+    const readyForTyping = focused && documentHasFocus;
+
+    this.logService.debug("[MasterPasswordLockComponent] Master password input focus attempted", {
+      attempt,
+      focused,
+      documentHasFocus,
+      readyForTyping,
+    });
+
+    if (!readyForTyping && attempt < 5) {
+      window.setTimeout(() => this.focusMasterPasswordInput(attempt + 1), 100);
+    }
   }
 }

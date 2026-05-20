@@ -64,10 +64,6 @@ export class AutofillInlineMenuButton extends AutofillInlineMenuPageElement {
     this.buttonElement.tabIndex = -1;
     this.buttonElement.type = "button";
     this.buttonElement.classList.add("inline-menu-button");
-    this.buttonElement.setAttribute(
-      "aria-label",
-      this.getTranslation("toggleBitwardenVaultOverlay"),
-    );
     this.buttonElement.addEventListener(EVENTS.CLICK, this.handleButtonElementClick);
     this.postMessageToParent({ command: "updateAutofillInlineMenuColorScheme" });
 
@@ -84,13 +80,38 @@ export class AutofillInlineMenuButton extends AutofillInlineMenuPageElement {
    */
   private updateAuthStatus(authStatus: AuthenticationStatus) {
     this.authStatus = authStatus;
+    const requiresAuth = this.authStatus !== AuthenticationStatus.Unlocked;
 
     this.buttonElement.innerHTML = "";
+    this.buttonElement.classList.toggle("inline-menu-button--requires-auth", requiresAuth);
+    this.buttonElement.classList.toggle(
+      "inline-menu-button--logged-out",
+      this.authStatus === AuthenticationStatus.LoggedOut,
+    );
+    this.buttonElement.classList.toggle(
+      "inline-menu-button--locked",
+      this.authStatus === AuthenticationStatus.Locked,
+    );
+    this.buttonElement.setAttribute("aria-label", this.getButtonLabel());
+    this.buttonElement.title = this.getButtonLabel();
+
     const iconElement =
       this.authStatus === AuthenticationStatus.Unlocked
         ? this.logoIconElement
         : this.logoLockedIconElement;
     this.buttonElement.append(iconElement);
+  }
+
+  private getButtonLabel() {
+    if (this.authStatus === AuthenticationStatus.LoggedOut) {
+      return this.getTranslation("logInToBitwarden");
+    }
+
+    if (this.authStatus === AuthenticationStatus.Locked) {
+      return this.getTranslation("unlockAccount");
+    }
+
+    return this.getTranslation("toggleBitwardenVaultOverlay");
   }
 
   /**

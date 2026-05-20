@@ -1,4 +1,7 @@
-﻿/**
+@use "sass:color";
+@use "sass:map";
+
+/**
  * DEPRECATED: DO NOT MODIFY OR USE!
  */
 
@@ -11,14 +14,14 @@ $border-color-dark: #ddd;
 $brand-primary: #082c5f;
 $brand-success: #017e45;
 $background-color: #f0f0f0;
-$button-color-primary: darken($brand-primary, 8%);
+$button-color-primary: color.adjust($brand-primary, $lightness: -8%);
 
 $themes: (
   light: (
     textColor: $text-color,
     borderColor: $border-color-dark,
     backgroundColor: $background-color,
-    inputBorderColor: darken($border-color-dark, 7%),
+    inputBorderColor: color.adjust($border-color-dark, $lightness: -7%),
     inputBackgroundColor: #ffffff,
     buttonPrimaryColor: $button-color-primary,
     primaryColor: $brand-primary,
@@ -45,8 +48,8 @@ $themes: (
     html.theme_#{$theme} & {
       $theme-map: () !global;
       @each $key, $submap in $map {
-        $value: map-get(map-get($themes, $theme), "#{$key}");
-        $theme-map: map-merge(
+        $value: map.get($themes, $theme, $key);
+        $theme-map: map.merge(
           $theme-map,
           (
             $key: $value,
@@ -60,5 +63,5 @@ $themes: (
 }
 
 @function themed($key) {
-  @return map-get($theme-map, $key);
+  @return map.get($theme-map, $key);
 }

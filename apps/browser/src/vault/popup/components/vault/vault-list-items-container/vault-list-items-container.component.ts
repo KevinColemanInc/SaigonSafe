@@ -313,11 +313,18 @@ export class VaultListItemsContainerComponent implements AfterViewInit {
   });
 
   /**
-   * Whether to show the "Fill" text on hover.
+   * Whether to show the "View" text on hover.
    * Only shown when feature flag is enabled AND this is an autofill list.
    */
-  readonly showFillTextOnHover = computed(
+  readonly showViewTextOnHover = computed(
     () => this.simplifiedItemActionEnabled() && this.canAutofill(),
+  );
+
+  /**
+   * Whether to show the legacy "View" chip action when row click performs autofill.
+   */
+  readonly showViewButton = computed(
+    () => !this.simplifiedItemActionEnabled() && this.primaryActionAutofill(),
   );
 
   /**

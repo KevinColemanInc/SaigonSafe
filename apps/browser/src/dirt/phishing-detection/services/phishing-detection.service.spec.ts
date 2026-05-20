@@ -1,9 +1,6 @@
 import { mock, MockProxy } from "jest-mock-extended";
 import { BehaviorSubject, Subject } from "rxjs";
 
-import { OrganizationService } from "@bitwarden/common/admin-console/abstractions/organization/organization.service.abstraction";
-import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
-import { EventCollectionService } from "@bitwarden/common/dirt/event-logs";
 import { PhishingDetectionSettingsServiceAbstraction } from "@bitwarden/common/dirt/services/abstractions/phishing-detection-settings.service.abstraction";
 import { LogService } from "@bitwarden/common/platform/abstractions/log.service";
 import { MessageListener } from "@bitwarden/messaging";
@@ -28,9 +25,6 @@ describe("PhishingDetectionService", () => {
   let logService: LogService;
   let phishingDataService: MockProxy<PhishingDataService>;
   let phishingDetectionSettingsService: MockProxy<PhishingDetectionSettingsServiceAbstraction>;
-  let eventCollectionService: MockProxy<EventCollectionService>;
-  let organizationService: MockProxy<OrganizationService>;
-  let accountService: MockProxy<AccountService>;
   let messageSubject: Subject<any>;
   let onEnabled$: BehaviorSubject<boolean>;
   // Fresh Subjects per test to prevent stale subscriptions from previous tests
@@ -64,9 +58,6 @@ describe("PhishingDetectionService", () => {
     phishingDetectionSettingsService = {
       on$: onEnabled$,
     } as any;
-    eventCollectionService = mock<EventCollectionService>();
-    organizationService = mock<OrganizationService>();
-    accountService = mock<AccountService>();
 
     jest.spyOn(BrowserApi, "navigateTabToUrl").mockResolvedValue(undefined);
     jest.spyOn(BrowserApi, "closeTab").mockResolvedValue(undefined);
@@ -86,9 +77,6 @@ describe("PhishingDetectionService", () => {
       phishingDataService,
       phishingDetectionSettingsService,
       listener,
-      eventCollectionService,
-      organizationService,
-      accountService,
     );
   }
 

@@ -6,7 +6,7 @@
     "message": "Saigon Safe logo"
   },
   "extName": {
-    "message": "Kevinwarden Password Manager",
+    "message": "Saigon Safe",
     "description": "Extension name, MUST be less than 40 characters (Safari restriction)"
   },
   "extDesc": {
@@ -166,6 +166,15 @@
   },
   "copyPassportNumber": {
     "message": "複製護照號碼"
+  },
+  "copyFirstName": {
+    "message": "複製名字"
+  },
+  "copyMiddleName": {
+    "message": "複製中間名"
+  },
+  "copyLastName": {
+    "message": "複製姓氏"
   },
   "copyLicenseNumber": {
     "message": "複製證照號碼"
@@ -708,6 +717,22 @@
   "rateExtension": {
     "message": "評分此擴充功能"
   },
+  "troubleshooting": {
+    "message": "疑難排解"
+  },
+  "experiencingAnIssue": {
+    "message": "遇到問題了嗎？"
+  },
+  "downloadDiagnosticReportWith": {
+    "message": "下載後將診斷報告分享給"
+  },
+  "bitwardenSupport": {
+    "message": "Saigon Safe 支援團隊",
+    "description": "Link text following the troubleshooting description sentence. 'Saigon Safe' should not be translated."
+  },
+  "download": {
+    "message": "下載"
+  },
   "browserNotSupportClipboard": {
     "message": "您的瀏覽器不支援剪貼簿複製功能，請手動複製。"
   },
@@ -744,7 +769,7 @@
       },
       "hostname": {
         "content": "$2",
-        "example": "bitwarden.com"
+        "example": "saigonsafe.com"
       }
     }
   },
@@ -756,7 +781,7 @@
     "placeholders": {
       "host": {
         "content": "$1",
-        "example": "vault.bitwarden.com"
+        "example": "vault.saigonsafe.com"
       }
     }
   },
@@ -1053,7 +1078,7 @@
   },
   "addDomain": {
     "message": "新增網域",
-    "description": "'Domain' here refers to an internet domain name (e.g. 'bitwarden.com') and the message in whole described the act of putting a domain value into the context."
+    "description": "'Domain' here refers to an internet domain name (e.g. 'saigonsafe.com') and the message in whole described the act of putting a domain value into the context."
   },
   "addedItem": {
     "message": "項目已新增"
@@ -1698,7 +1723,7 @@
   },
   "authenticatorAppDescV2": {
     "message": "輸入驗證器應用程式產生的驗證碼，例如 Saigon Safe 驗證器。",
-    "description": "'Bitwarden Authenticator' is a product name and should not be translated."
+    "description": "'Saigon Safe Authenticator' is a product name and should not be translated."
   },
   "yubiKeyTitleV2": {
     "message": "YubiKey OTP 安全金鑰"
@@ -2133,19 +2158,19 @@
     "message": "SSH 金鑰"
   },
   "bankAccount": {
-    "message": "Bank account"
+    "message": "銀行帳戶"
   },
   "typeNote": {
     "message": "備註"
   },
   "typeBankAccount": {
-    "message": "Bank account"
+    "message": "銀行帳戶"
   },
   "typeLoginSubtitle": {
     "message": "網站或應用程式"
   },
   "typeCardSubtitle": {
-    "message": "信用卡或金融卡"
+    "message": "信用卡或簽帳金融卡"
   },
   "typeIdentitySubtitle": {
     "message": "個人資料"
@@ -2163,7 +2188,55 @@
     "message": "整理共享項目"
   },
   "typeBankAccountSubtitle": {
-    "message": "Banking details"
+    "message": "銀行資料"
+  },
+  "typeDriversLicense": {
+    "message": "駕照"
+  },
+  "typeDriversLicenseSubtitle": {
+    "message": "駕照或身分證件"
+  },
+  "driversLicenseDetails": {
+    "message": "License details"
+  },
+  "dateOfBirth": {
+    "message": "Date of birth"
+  },
+  "birthMonth": {
+    "message": "Birth month"
+  },
+  "birthDay": {
+    "message": "Birth day"
+  },
+  "birthYear": {
+    "message": "Birth year"
+  },
+  "issuingCountry": {
+    "message": "Issuing country"
+  },
+  "issuingState": {
+    "message": "Issuing state / province"
+  },
+  "issuingAuthority": {
+    "message": "Issuing authority"
+  },
+  "issueDate": {
+    "message": "Issue date"
+  },
+  "issueMonth": {
+    "message": "Issue month"
+  },
+  "issueDay": {
+    "message": "Issue day"
+  },
+  "issueYear": {
+    "message": "Issue year"
+  },
+  "expirationDay": {
+    "message": "Expiration day"
+  },
+  "licenseClass": {
+    "message": "License class"
   },
   "newItemHeaderLogin": {
     "message": "新增登入資料",
@@ -2186,23 +2259,23 @@
     "description": "Header for new SSH key item type"
   },
   "newItemHeaderBankAccount": {
-    "message": "New bank account",
+    "message": "新增銀行帳戶",
     "description": "Header for new bank account item type"
   },
   "newItemHeaderDriversLicense": {
-    "message": "New license",
+    "message": "新增駕照",
     "description": "Header for new license item type"
   },
   "newItemHeaderPassport": {
-    "message": "New passport",
+    "message": "新增護照",
     "description": "Header for new passport item type"
   },
-  "newItemHeaderTextSend": {
-    "message": "新增文字 Send",
+  "newItemHeaderTextSendV2": {
+    "message": "新增文字",
     "description": "Header for new text send"
   },
-  "newItemHeaderFileSend": {
-    "message": "新增檔案 Send",
+  "newItemHeaderFileSendV2": {
+    "message": "新增檔案",
     "description": "Header for new file send"
   },
   "editItemHeaderLogin": {
@@ -2226,23 +2299,23 @@
     "description": "Header for edit SSH key item type"
   },
   "editItemHeaderBankAccount": {
-    "message": "Edit bank account",
+    "message": "編輯銀行帳戶",
     "description": "Header for edit bank account item type"
   },
-  "editItemHeaderDriversLicense": {
-    "message": "Edit license",
+  "editItemHeaderLicense": {
+    "message": "編輯駕照",
     "description": "Header for edit license item type"
   },
   "editItemHeaderPassport": {
-    "message": "Edit passport",
+    "message": "編輯護照",
     "description": "Header for edit passport item type"
   },
-  "editItemHeaderTextSend": {
-    "message": "編輯文字 Send",
+  "editItemHeaderTextSendV2": {
+    "message": "編輯文字",
     "description": "Header for edit text send"
   },
-  "editItemHeaderFileSend": {
-    "message": "編輯檔案 Send",
+  "editItemHeaderFileSendV2": {
+    "message": "編輯檔案",
     "description": "Header for edit file send"
   },
   "viewItemHeaderLogin": {
@@ -2266,15 +2339,15 @@
     "description": "Header for view SSH key item type"
   },
   "viewItemHeaderBankAccount": {
-    "message": "View bank account",
+    "message": "檢視銀行帳戶",
     "description": "Header for view bank account item type"
   },
-  "viewItemHeaderDriversLicense": {
-    "message": "View license",
+  "viewItemHeaderLicense": {
+    "message": "檢視駕照",
     "description": "Header for view license item type"
   },
   "viewItemHeaderPassport": {
-    "message": "View passport",
+    "message": "檢視護照",
     "description": "Header for view passport item type"
   },
   "chooseItemToAdd": {
@@ -2995,7 +3068,7 @@
   },
   "updateInBitwardenSlideDesc": {
     "message": "之後 Saigon Safe 會提示你在密碼管理器中更新該密碼。",
-    "description": "Description of the update in Bitwarden slide on the at-risk password page carousel"
+    "description": "Description of the update in Saigon Safe slide on the at-risk password page carousel"
   },
   "updateInBitwardenSlideImgAltPeriod": {
     "message": "Saigon Safe 通知使用者更新登入資訊的示意圖。"
@@ -3052,11 +3125,11 @@
   },
   "send": {
     "message": "Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendDetails": {
     "message": "Send 詳細資訊",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendTypeText": {
     "message": "文字"
@@ -3069,7 +3142,7 @@
   },
   "allSends": {
     "message": "所有 Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "maxAccessCountReached": {
     "message": "已達最大存取次數",
@@ -3089,7 +3162,7 @@
   },
   "copySendLink": {
     "message": "複製 Send 連結",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "removePassword": {
     "message": "移除密碼"
@@ -3102,11 +3175,11 @@
   },
   "deletedSend": {
     "message": "Send 已刪除",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendLink": {
     "message": "Send 連結",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "disabled": {
     "message": "已停用"
@@ -3116,26 +3189,26 @@
   },
   "deleteSend": {
     "message": "刪除 Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "deleteSendConfirmation": {
     "message": "您確定要刪除此 Send 嗎？",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "deleteSendPermanentConfirmation": {
     "message": "您確定要永久刪除此 Send 嗎？",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "editSend": {
     "message": "編輯 Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "deletionDate": {
     "message": "刪除日期"
   },
   "deletionDateDescV2": {
     "message": "此 Send 將在指定的日期後被永久刪除。",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "expirationDate": {
     "message": "到期日期"
@@ -3157,34 +3230,34 @@
   },
   "createSend": {
     "message": "建立新 Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "newPassword": {
     "message": "新密碼"
   },
   "sendDisabled": {
     "message": "Send 已停用",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendDisabledWarning": {
     "message": "由於企業政策限制，您只能刪除現有的 Send。",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "createdSend": {
     "message": "Send 已建立",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "createdSendSuccessfully": {
     "message": "Send 建立成功！",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendExpiresInHoursSingle": {
     "message": "在接下來的 1 小時內，任何人都可以透過連結訪問此 Send。",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendExpiresInHours": {
     "message": "在接下來的 $HOURS$ 小時內，任何人都可以透過連結訪問此 Send。",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated.",
     "placeholders": {
       "hours": {
         "content": "$1",
@@ -3194,11 +3267,11 @@
   },
   "sendExpiresInDaysSingle": {
     "message": "在接下來的 1 天內，任何人都可以透過連結訪問此 Send。",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendExpiresInDays": {
     "message": "在接下來的 $DAYS$ 天內，任何人都可以透過連結訪問此 Send。",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated.",
     "placeholders": {
       "days": {
         "content": "$1",
@@ -3217,7 +3290,7 @@
   },
   "sendCreatedDescriptionV2": {
     "message": "複製並分享此 Send 連結。任何擁有此連結的人，都可在接下來的 $TIME$ 內存取該 Send。",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated.",
     "placeholders": {
       "time": {
         "content": "$1",
@@ -3227,7 +3300,7 @@
   },
   "sendCreatedDescriptionPassword": {
     "message": "複製並分享此 Send 連結。任何擁有此連結與您所設定密碼的人，都可在接下來的 $TIME$ 內存取該 Send。",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated.",
     "placeholders": {
       "time": {
         "content": "$1",
@@ -3237,7 +3310,7 @@
   },
   "sendCreatedDescriptionEmail": {
     "message": "複製並分享此 Send 連結。在接下來的 $TIME$ 內，只有您指定的人可以檢視。",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated.",
     "placeholders": {
       "time": {
         "content": "$1",
@@ -3247,11 +3320,11 @@
   },
   "sendLinkCopied": {
     "message": "已複製 Send 連結",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "editedSend": {
     "message": "Send 已儲存",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "popOut": {
     "message": "彈出"
@@ -3460,33 +3533,18 @@
   "exportingPersonalVaultTitle": {
     "message": "正在匯出個人密碼庫"
   },
-  "exportingIndividualVaultDescription": {
-    "message": "僅匯出與 $EMAIL$ 相關的個人密碼庫項目，不包含組織密碼庫項目。僅匯出項目資訊，不包含相關附件。",
-    "placeholders": {
-      "email": {
-        "content": "$1",
-        "example": "name@example.com"
-      }
-    }
-  },
-  "exportingIndividualVaultWithAttachmentsDescription": {
-    "message": "只會匯出與 $EMAIL$ 關聯的個人密碼庫（包含附件）。組織密碼庫的項目不包含在內。",
-    "placeholders": {
-      "email": {
-        "content": "$1",
-        "example": "name@example.com"
-      }
-    }
-  },
   "exportingOrganizationVaultTitle": {
     "message": "正在匯出組織密碼庫"
   },
-  "exportingOrganizationVaultDesc": {
-    "message": "只會匯出與 $ORGANIZATION$ 相關的組織密碼庫資料。不包括個人密碼庫和其他組織中的項目。",
+  "exportingIndividualVaultScopeDescription": {
+    "message": "只會匯出您個人保管庫中的項目。"
+  },
+  "exportingOrganizationVaultScopeDescription": {
+    "message": "只會匯出與 $ORGANIZATION$ 保管庫相關聯的項目。個人保管庫中的項目不會被匯出。",
     "placeholders": {
       "organization": {
         "content": "$1",
-        "example": "ACME Moving Co."
+        "example": "My Org Name"
       }
     }
   },
@@ -4183,11 +4241,11 @@
   },
   "sendsTitleNoItems": {
     "message": "安全傳送機密的資訊",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendsBodyNoItems": {
     "message": "安全的和任何人及任何平臺分享檔案及資料。您的資料會受到端對端加密的保護。",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "inputRequired": {
     "message": "必須輸入內容。"
@@ -4544,7 +4602,7 @@
     "message": "選擇檔案"
   },
   "chooseFileSentenceCase": {
-    "message": "Choose file"
+    "message": "選擇檔案"
   },
   "noFileChosen": {
     "message": "未選擇任何檔案"
@@ -4576,6 +4634,18 @@
   },
   "exportError": {
     "message": "匯出密碼庫資料時發生錯誤"
+  },
+  "exportSuccessSkippedAttachment": {
+    "message": "匯出時已略過 1 個損毀的附件。其餘保管庫資料與附件皆已成功匯出。"
+  },
+  "exportSuccessSkippedAttachments": {
+    "message": "匯出時已略過 $COUNT$ 個損毀的附件。其餘保管庫資料與附件皆已成功匯出。",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
   },
   "typePasskey": {
     "message": "密碼金鑰"
@@ -4773,7 +4843,7 @@
   },
   "uriMatchDefaultStrategyHint": {
     "message": "URI 匹配偵測是 Saigon Safe 用來識別自動填入建議的方式。",
-    "description": "Explains to the user that URI match detection determines how Bitwarden suggests autofill options, and clarifies that this default strategy applies when no specific match detection is set for a login item."
+    "description": "Explains to the user that URI match detection determines how Saigon Safe suggests autofill options, and clarifies that this default strategy applies when no specific match detection is set for a login item."
   },
   "regExAdvancedOptionWarning": {
     "message": "「正則表達式」是進階選項，可能會增加憑證外洩的風險。",
@@ -5248,7 +5318,7 @@
     }
   },
   "cardNumberEndsWith": {
-    "message": "以此號碼結尾的信用卡",
+    "message": "以此號碼結尾的付款卡",
     "description": "Used within the inline menu to provide an aria description when users are attempting to fill a card cipher."
   },
   "loginCredentials": {
@@ -5695,7 +5765,7 @@
   },
   "saveToBitwarden": {
     "message": "已儲存至 Saigon Safe。",
-    "description": "Confirmation message for saving a login to Bitwarden"
+    "description": "Confirmation message for saving a login to Saigon Safe"
   },
   "spaceCharacterDescriptor": {
     "message": "空格",
@@ -5989,7 +6059,7 @@
     "placeholders": {
       "product": {
         "content": "$1",
-        "example": "Bitwarden Phishing Blocker"
+        "example": "Saigon Safe Phishing Blocker"
       }
     }
   },
@@ -6147,7 +6217,7 @@
     "message": "郵編 / 郵政代碼"
   },
   "cardNumberLabel": {
-    "message": "付款卡號碼"
+    "message": "卡號"
   },
   "errorCannotDecrypt": {
     "message": "錯誤：無法解密"
@@ -6348,89 +6418,124 @@
   },
   "sendPasswordHelperText": {
     "message": "對方必須輸入密碼才能檢視此 Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "userVerificationFailed": {
     "message": "使用者驗證失敗。"
   },
+  "enterMonth": {
+    "message": "請輸入月份。"
+  },
+  "enterDay": {
+    "message": "請輸入日期。"
+  },
+  "enterYear": {
+    "message": "請輸入年份。"
+  },
+  "invalidDay": {
+    "message": "請輸入有效的日期。"
+  },
+  "invalidYear": {
+    "message": "請輸入有效的年份。"
+  },
+  "searchDriversLicense": {
+    "message": "搜尋駕照"
+  },
   "bankName": {
-    "message": "Bank name"
+    "message": "銀行名稱"
   },
   "nameOnAccount": {
-    "message": "Name on account"
+    "message": "帳戶名稱"
   },
   "bankAccountType": {
-    "message": "Account type"
+    "message": "帳戶類型"
   },
   "bankAccountTypeCompany": {
-    "message": "Company (business)"
+    "message": "公司（商業）"
   },
   "bankAccountTypeIndividual": {
-    "message": "Individual (personal)"
+    "message": "個人（私人）"
   },
   "accountNumber": {
-    "message": "Account number"
+    "message": "帳號"
   },
   "bankRoutingNumber": {
-    "message": "Routing number",
+    "message": "匯款路徑編號",
     "description": "Used in the bank account cipher type"
   },
   "branchNumber": {
-    "message": "Branch/institution number"
+    "message": "分行／機構代碼"
   },
   "swiftCode": {
-    "message": "SWIFT code"
+    "message": "SWIFT 代碼"
   },
   "iban": {
     "message": "IBAN"
   },
   "bankContactPhone": {
-    "message": "Bank contact phone"
+    "message": "銀行聯絡電話"
   },
   "searchBankAccount": {
-    "message": "Search bank account"
+    "message": "搜尋銀行帳戶"
   },
   "copyAccountNumber": {
-    "message": "Copy account number"
+    "message": "複製帳號"
   },
   "copyRoutingNumber": {
-    "message": "Copy routing number"
+    "message": "複製匯款路徑編號"
   },
   "copyPin": {
-    "message": "Copy PIN"
+    "message": "複製 PIN 碼"
   },
   "copyIban": {
-    "message": "Copy IBAN"
+    "message": "複製 IBAN"
   },
   "bankAccountTypeChecking": {
-    "message": "Checking"
+    "message": "支票帳戶"
   },
   "bankAccountTypeSavings": {
-    "message": "Savings"
+    "message": "儲蓄帳戶"
   },
   "bankAccountTypeCertificateOfDeposit": {
-    "message": "Certificate of deposit"
+    "message": "定期存款"
   },
   "bankAccountTypeLineOfCredit": {
-    "message": "Line of credit"
+    "message": "信用額度"
   },
   "bankAccountTypeInvestmentBrokerage": {
-    "message": "Investment/brokerage"
+    "message": "投資／券商帳戶"
   },
   "bankAccountTypeMoneyMarket": {
-    "message": "Money market"
+    "message": "貨幣市場帳戶"
   },
   "bankAccountTypeOther": {
-    "message": "Other"
-  },
-  "newBankAccountNudgeTitle": {
-    "message": "Securely store your bank details"
-  },
-  "newBankAccountNudgeBody": {
-    "message": "Save your bank account information to access it easily and securely across your devices."
+    "message": "其他"
   },
   "downloadFailed": {
     "message": "下載失敗"
+  },
+  "maxAccessCount": {
+    "message": "最大存取次數",
+    "description": "This text will be displayed after a Send has been accessed the maximum amount of times."
+  },
+  "hideMyEmail": {
+    "message": "向收件者隱藏我的電子郵件地址。"
+  },
+  "viewTextSendHeader": {
+    "message": "檢視文字"
+  },
+  "viewFileSendHeader": {
+    "message": "檢視檔案"
+  },
+  "sendCreated": {
+    "message": "Send 已建立",
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
+  },
+  "numericInputError": {
+    "message": "輸入內容必須為數字"
+  },
+  "integerInputError": {
+    "message": "輸入內容必須為整數"
   },
   "sideNavigation": {
     "message": "側邊導覽"
@@ -6447,10 +6552,10 @@
     "description": "This is the name of a page component that displays progress to the user. This string will be used to label the progress bar for a screenreader when multiple progress bars are on a page, like 'Progress bar 1' and 'Progress bar 2'."
   },
   "saveSendEditsFailed": {
-    "message": "Saving Send edits failed",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "message": "儲存 Send 編輯失敗",
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "hideEmailPolicyInEffect": {
-    "message": "Your organization requires email visibility. Uncheck \"Hide your email from viewers\" to save."
+    "message": "您的組織要求電子郵件可見性。請取消勾選「向檢視者隱藏您的電子郵件」後再儲存。"
   }
 }

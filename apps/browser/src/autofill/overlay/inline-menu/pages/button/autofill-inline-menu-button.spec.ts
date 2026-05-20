@@ -25,10 +25,25 @@ describe("AutofillInlineMenuButton", () => {
   });
 
   describe("initAutofillInlineMenuButton", () => {
-    it("creates the button element with the locked icon when the user's auth status is not Unlocked", async () => {
+    it("creates the button element with the locked icon when the user's auth status is Locked", async () => {
       postWindowMessage(
         createInitAutofillInlineMenuButtonMessageMock({
           authStatus: AuthenticationStatus.Locked,
+          portKey,
+        }),
+      );
+      await flushPromises();
+
+      expect(autofillInlineMenuButton["buttonElement"]).toMatchSnapshot();
+      expect(autofillInlineMenuButton["buttonElement"].querySelector("svg")).toBe(
+        autofillInlineMenuButton["logoLockedIconElement"],
+      );
+    });
+
+    it("creates the button element with requires-auth styling when the user's auth status is LoggedOut", async () => {
+      postWindowMessage(
+        createInitAutofillInlineMenuButtonMessageMock({
+          authStatus: AuthenticationStatus.LoggedOut,
           portKey,
         }),
       );

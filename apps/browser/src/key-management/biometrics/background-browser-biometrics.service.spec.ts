@@ -1,9 +1,12 @@
 import { mock } from "jest-mock-extended";
+import { of } from "rxjs";
 
 import { PinServiceAbstraction } from "@bitwarden/common/key-management/pin/pin.service.abstraction";
 import { VaultTimeoutSettingsService } from "@bitwarden/common/key-management/vault-timeout";
 import { LogService } from "@bitwarden/common/platform/abstractions/log.service";
 import { MessagingService } from "@bitwarden/common/platform/abstractions/messaging.service";
+import { SymmetricCryptoKey } from "@bitwarden/common/platform/models/domain/symmetric-crypto-key";
+import { UserId } from "@bitwarden/common/types/guid";
 import { KeyService, BiometricStateService, BiometricsStatus } from "@bitwarden/key-management";
 
 import { NativeMessagingBackground } from "../../background/nativeMessaging.background";
@@ -23,6 +26,8 @@ describe("background browser biometrics service tests", function () {
 
   beforeEach(() => {
     jest.resetAllMocks();
+    biometricStateService.biometricUnlockEnabled$.mockReturnValue(of(false));
+    biometricStateService.getAllowBiometricUnlockOnRestart.mockResolvedValue(true);
     service = new BackgroundBrowserBiometricsService(
       () => nativeMessagingBackground,
       logService,
@@ -60,5 +65,47 @@ describe("background browser biometrics service tests", function () {
         expect(result).toBe(expected);
       },
     );
+  });
+
+  describe("setBiometricProtectedUnlockKeyForUser", () => {
+    const userId = "user-1" as UserId;
+    const userKey = new SymmetricCryptoKey(new Uint8Array(64));
+
+    it("stores a session key and persists it when restart unlock is allowed", async () => {
+      nativeMessagingBackground.callCommand.mockResolvedValue({ response: true });
+      nativeMessagingBackground.connected = true;
+
+      await service.setBiometricProtectedUnlockKeyForUser(userId, userKey);
+
+      expect(nativeMessagingBackground.callCommand).toHaveBeenNthCalledWith(1, {
+        command: "setBiometricUnlockKeyForUser",
+        userId,
+        keyB64: userKey.keyB64,
+      });
+      expect(nativeMessagingBackground.callCommand).toHaveBeenNthCalledWith(2, {
+        command: "persistBiometricUnlockKeyForUser",
+        userId,
+        keyB64: userKey.keyB64,
+      });
+      expect(biometricStateService.setBiometricUnlockSessionReady).toHaveBeenCalledWith(
+        true,
+        userId,
+      );
+    });
+
+    it("skips persistence when restart unlock is not allowed", async () => {
+      nativeMessagingBackground.callCommand.mockResolvedValue({ response: true });
+      nativeMessagingBackground.connected = true;
+      biometricStateService.getAllowBiometricUnlockOnRestart.mockResolvedValue(false);
+
+      await service.setBiometricProtectedUnlockKeyForUser(userId, userKey);
+
+      expect(nativeMessagingBackground.callCommand).toHaveBeenCalledTimes(1);
+      expect(nativeMessagingBackground.callCommand).toHaveBeenCalledWith({
+        command: "setBiometricUnlockKeyForUser",
+        userId,
+        keyB64: userKey.keyB64,
+      });
+    });
   });
 });

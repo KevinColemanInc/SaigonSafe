@@ -129,11 +129,6 @@ export default tseslint.config(
               message: "Libs should not import app-specific code.",
             },
             {
-              target: ["libs/**/*"],
-              from: ["bitwarden_license/**/*"],
-              message: "Libs should not import licensed code from bitwarden_license/.",
-            },
-            {
               // avoid specific frameworks or large dependencies in common
               target: "./libs/common/**/*",
               from: [
@@ -296,17 +291,10 @@ export default tseslint.config(
     },
   },
   {
-    files: ["bitwarden_license/bit-common/src/**/*.ts"],
-    rules: {
-      "no-restricted-imports": buildNoRestrictedImports(["@bitwarden/bit-common/*"]),
-    },
-  },
-  {
     files: ["apps/**/*.ts"],
     rules: {
       // Catches static imports
       "no-restricted-imports": buildNoRestrictedImports([
-        "bitwarden_license/**",
         "@bitwarden/bit-common/*",
         "@bitwarden/bit-web/*",
       ]),
@@ -316,7 +304,6 @@ export default tseslint.config(
     files: ["apps/web/src/**/*.ts"],
     rules: {
       "no-restricted-imports": buildNoRestrictedImports([
-        "bitwarden_license/**",
         "@bitwarden/bit-common/*",
         "@bitwarden/bit-web/*",
 
@@ -334,10 +321,8 @@ export default tseslint.config(
     rules: {
       "no-restricted-imports": buildNoRestrictedImports([
         "@angular",
-        "bitwarden_license/**",
         "@bitwarden/bit-common/*",
         "@bitwarden/bit-web/*",
-
         "**/popup/*",
       ]),
     },
@@ -347,7 +332,6 @@ export default tseslint.config(
     files: ["apps/browser/src/**/popup/**/*.ts"],
     rules: {
       "no-restricted-imports": buildNoRestrictedImports([
-        "bitwarden_license/**",
         "@bitwarden/bit-common/*",
         "@bitwarden/bit-web/*",
       ]),
@@ -359,14 +343,16 @@ export default tseslint.config(
       "no-console": "off",
     },
   },
+  {
+    files: ["scripts/**/*.js", "jest.config.js"],
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+      "no-console": "off",
+    },
+  },
   // Tailwind migrated clients & libs
   {
-    files: [
-      "apps/web/**/*.html",
-      "apps/browser/**/*.html",
-      "bitwarden_license/bit-web/**/*.html",
-      "libs/**/*.html",
-    ],
+    files: ["apps/web/**/*.html", "apps/browser/**/*.html", "libs/**/*.html"],
     rules: {
       "tailwindcss/no-custom-classname": [
         "error",
@@ -637,8 +623,6 @@ export default tseslint.config(
     files: [
       "apps/cli/src/admin-console/**/*.ts",
       "apps/web/src/app/admin-console/**/*.ts",
-      "bitwarden_license/bit-cli/src/admin-console/**/*.ts",
-      "bitwarden_license/bit-web/src/app/admin-console/**/*.ts",
       "libs/admin-console/src/**/*.ts",
     ],
     rules: {
@@ -733,12 +717,6 @@ function buildNoRestrictedImports(additionalForbiddenPatterns = [], skipPlatform
   return [
     "error",
     {
-      paths: [
-        {
-          name: "@bitwarden/commercial-sdk-internal",
-          message: "Use @bitwarden/sdk-internal instead.",
-        },
-      ],
       patterns: [
         ...(skipPlatform ? [] : ["**/platform/**/internal", "**/platform/messaging/**"]),
         "**/src/**/*", // Prevent relative imports across libs.

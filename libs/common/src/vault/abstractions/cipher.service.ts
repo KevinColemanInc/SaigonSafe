@@ -97,12 +97,12 @@ export abstract class CipherService implements UserKeyRotationDataProvider<Ciphe
   abstract getLastUsedForUrl(
     url: string,
     userId: UserId,
-    autofillOnPageLoad: boolean,
+    autofillOnPageLoad?: boolean,
   ): Promise<CipherView>;
   abstract getLastLaunchedForUrl(
     url: string,
     userId: UserId,
-    autofillOnPageLoad: boolean,
+    autofillOnPageLoad?: boolean,
   ): Promise<CipherView>;
   abstract getNextCipherForUrl(url: string, userId: UserId): Promise<CipherView>;
   abstract updateLastUsedIndexForUrl(url: string): void;

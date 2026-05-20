@@ -1,4 +1,4 @@
-import { combineLatest, defer, switchMap, map, Observable } from "rxjs";
+import { combineLatest, defer, switchMap, Observable } from "rxjs";
 
 import { UserDecryptionOptionsServiceAbstraction } from "@bitwarden/auth/common";
 import { PinServiceAbstraction } from "@bitwarden/common/key-management/pin/pin.service.abstraction";
@@ -20,6 +20,7 @@ import BrowserPopupUtils from "../../../platform/browser/browser-popup-utils";
 // FIXME (PM-22628): Popup imports are forbidden in background
 // eslint-disable-next-line no-restricted-imports
 import { BrowserRouterService } from "../../../platform/popup/services/browser-router.service";
+import { getBrowserBiometricUnlockTextKey } from "../../biometrics/browser-biometric-text";
 
 export class ExtensionLockComponentService implements LockComponentService {
   constructor(
@@ -46,7 +47,7 @@ export class ExtensionLockComponentService implements LockComponentService {
   }
 
   async popOutBrowserExtension(): Promise<void> {
-    if (!BrowserPopupUtils.inPopout(global.window) && !BrowserPopupUtils.inSidebar(global.window)) {
+    if (!BrowserPopupUtils.inPopout(global.window)) {
       await BrowserPopupUtils.openCurrentPagePopout(global.window);
     }
   }
@@ -62,21 +63,14 @@ export class ExtensionLockComponentService implements LockComponentService {
   }
 
   getBiometricsUnlockBtnText(): string {
-    return "unlockWithBiometrics";
+    return getBrowserBiometricUnlockTextKey();
   }
 
   getAvailableUnlockOptions$(userId: UserId): Observable<UnlockOptions> {
     return combineLatest([
-      // Check biometricUnlockEnabled$ first to avoid background native messaging & IPC calls when biometrics is disabled.
-      this.biometricStateService
-        .biometricUnlockEnabled$(userId)
-        .pipe(
-          switchMap(async (enabled) =>
-            enabled
-              ? await this.biometricsService.getBiometricsStatusForUser(userId)
-              : BiometricsStatus.NotEnabledLocally,
-          ),
-        ),
+      this.biometricStateService.biometricUnlockEnabled$(userId),
+      this.biometricStateService.allowBiometricUnlockOnRestart$(userId),
+      this.biometricStateService.biometricUnlockSessionReady$(userId),
       this.userDecryptionOptionsService.userDecryptionOptionsById$(userId),
       defer(() => this.pinService.isPinDecryptionAvailable(userId)),
       defer(async () => {
@@ -84,24 +78,42 @@ export class ExtensionLockComponentService implements LockComponentService {
         return { available };
       }),
     ]).pipe(
-      map(([biometricsStatus, userDecryptionOptions, pinDecryptionAvailable, prfUnlockInfo]) => {
-        const unlockOpts: UnlockOptions = {
-          masterPassword: {
-            enabled: userDecryptionOptions?.hasMasterPassword,
-          },
-          pin: {
-            enabled: pinDecryptionAvailable,
-          },
-          biometrics: {
-            enabled: biometricsStatus === BiometricsStatus.Available,
-            biometricsStatus: biometricsStatus,
-          },
-          prf: {
-            enabled: prfUnlockInfo.available,
-          },
-        };
-        return unlockOpts;
-      }),
+      switchMap(
+        async ([
+          biometricUnlockEnabled,
+          allowBiometricUnlockOnRestart,
+          biometricUnlockSessionReady,
+          userDecryptionOptions,
+          pinDecryptionAvailable,
+          prfUnlockInfo,
+        ]) => {
+          let biometricsStatus = BiometricsStatus.NotEnabledLocally;
+
+          if (biometricUnlockEnabled) {
+            biometricsStatus =
+              allowBiometricUnlockOnRestart || biometricUnlockSessionReady
+                ? await this.biometricsService.getBiometricsStatusForUser(userId)
+                : BiometricsStatus.UnlockNeeded;
+          }
+
+          const unlockOpts: UnlockOptions = {
+            masterPassword: {
+              enabled: userDecryptionOptions?.hasMasterPassword,
+            },
+            pin: {
+              enabled: pinDecryptionAvailable,
+            },
+            biometrics: {
+              enabled: biometricsStatus === BiometricsStatus.Available,
+              biometricsStatus: biometricsStatus,
+            },
+            prf: {
+              enabled: prfUnlockInfo.available,
+            },
+          };
+          return unlockOpts;
+        },
+      ),
     );
   }
 }

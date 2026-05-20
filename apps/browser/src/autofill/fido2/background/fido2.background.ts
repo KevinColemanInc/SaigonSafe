@@ -242,7 +242,7 @@ export class Fido2Background implements Fido2BackgroundInterface {
       mv2Details: { file: await this.getFido2PageScriptAppendFileName() },
       mv3Details: {
         file: Fido2ContentScript.PageScript,
-        world: chrome.scripting.ExecutionWorld.MAIN,
+        world: "MAIN" as chrome.scripting.ExecutionWorld,
       },
     });
 

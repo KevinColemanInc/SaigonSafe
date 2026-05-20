@@ -10,7 +10,6 @@ import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.servic
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
 import { GlobalStateProvider } from "@bitwarden/common/platform/state";
 import { CipherService } from "@bitwarden/common/vault/abstractions/cipher.service";
-import { VaultSettingsService } from "@bitwarden/common/vault/abstractions/vault-settings/vault-settings.service";
 import { CipherType } from "@bitwarden/common/vault/enums";
 import { CompactModeService, DialogService, ToastService } from "@bitwarden/components";
 import { StateProvider } from "@bitwarden/state";
@@ -21,6 +20,7 @@ import { VaultPopupAutofillService } from "../../../services/vault-popup-autofil
 import { VaultPopupItemsService } from "../../../services/vault-popup-items.service";
 import { PopupCipherViewLike } from "../../../views/popup-cipher.view";
 import { SimplifiedAutofillInfoComponent } from "../simplified-autofill-info/simplified-autofill-info.component";
+import { VaultListItemsContainerComponent } from "../vault-list-items-container/vault-list-items-container.component";
 
 import { AutofillVaultListItemsComponent } from "./autofill-vault-list-items.component";
 
@@ -31,7 +31,6 @@ describe("AutofillVaultListItemsComponent", () => {
   const hasFilterApplied$ = new BehaviorSubject<boolean>(false);
   const autofillAllowed$ = new BehaviorSubject<boolean>(true);
   const currentTabIsOnBlocklist$ = new BehaviorSubject<boolean>(false);
-  const clickItemsToAutofillVaultView$ = new BehaviorSubject<boolean>(true);
 
   beforeEach(async () => {
     // Mock getAnimations for all span elements before any components are created
@@ -82,10 +81,6 @@ describe("AutofillVaultListItemsComponent", () => {
             currentAutofillTab$: of(null),
           },
         },
-        {
-          provide: VaultSettingsService,
-          useValue: { clickItemsToAutofillVaultView$ },
-        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -113,5 +108,12 @@ describe("AutofillVaultListItemsComponent", () => {
         fixture.debugElement.query(By.directive(SimplifiedAutofillInfoComponent)),
       ).not.toBeNull();
     });
+  });
+
+  it("always configures autofill suggestions to autofill on row click", () => {
+    const container = fixture.debugElement.query(By.directive(VaultListItemsContainerComponent))
+      .componentInstance as VaultListItemsContainerComponent;
+
+    expect(container.primaryActionAutofill()).toBe(true);
   });
 });

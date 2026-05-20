@@ -1,5 +1,5 @@
 import { DebugElement } from "@angular/core";
-import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, fakeAsync, TestBed, tick } from "@angular/core/testing";
 import { FormBuilder, ReactiveFormsModule } from "@angular/forms";
 import { By } from "@angular/platform-browser";
 import { mock } from "jest-mock-extended";
@@ -325,6 +325,35 @@ describe("MasterPasswordLockComponent", () => {
 
       expect(messageListener.messages$).toHaveBeenCalledWith(new CommandDefinition("windowHidden"));
     });
+  });
+
+  describe("ngAfterViewInit", () => {
+    afterEach(() => {
+      window.history.pushState({}, "", "/");
+    });
+
+    it("focuses the master password input in the browser sidebar", fakeAsync(() => {
+      platformUtilsService.getClientType.mockReturnValue(ClientType.Browser);
+      window.history.pushState({}, "", "/popup/index.html?uilocation=sidebar#/lock");
+      jest.spyOn(document, "hasFocus").mockReturnValue(true);
+
+      const focusSpy = jest.spyOn(HTMLInputElement.prototype, "focus");
+      setupComponent();
+      tick(300);
+
+      expect(focusSpy).toHaveBeenCalled();
+    }));
+
+    it("does not focus the master password input outside the browser sidebar", fakeAsync(() => {
+      platformUtilsService.getClientType.mockReturnValue(ClientType.Browser);
+      window.history.pushState({}, "", "/popup/index.html#/lock");
+
+      const focusSpy = jest.spyOn(HTMLInputElement.prototype, "focus");
+      setupComponent();
+      tick(300);
+
+      expect(focusSpy).not.toHaveBeenCalled();
+    }));
   });
 
   describe("logout", () => {

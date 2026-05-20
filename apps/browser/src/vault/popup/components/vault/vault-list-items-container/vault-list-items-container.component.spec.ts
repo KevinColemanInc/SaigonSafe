@@ -102,11 +102,25 @@ describe("VaultListItemsContainerComponent", () => {
         fixture.detectChanges();
       });
 
-      it("should not show fill text on hover", () => {
+      it("should not show view text on hover", () => {
         fixture.componentRef.setInput("isAutofillList", true);
         fixture.detectChanges();
 
-        expect(component.showFillTextOnHover()).toBe(false);
+        expect(component.showViewTextOnHover()).toBe(false);
+      });
+
+      it("should show the view button when primaryActionAutofill is true", () => {
+        fixture.componentRef.setInput("primaryActionAutofill", true);
+        fixture.detectChanges();
+
+        expect(component.showViewButton()).toBe(true);
+      });
+
+      it("should hide the view button when primaryActionAutofill is false", () => {
+        fixture.componentRef.setInput("primaryActionAutofill", false);
+        fixture.detectChanges();
+
+        expect(component.showViewButton()).toBe(false);
       });
 
       it("should show autofill badge when showAutofillButton is true and primaryActionAutofill is false", () => {
@@ -188,18 +202,25 @@ describe("VaultListItemsContainerComponent", () => {
         fixture.detectChanges();
       });
 
-      it("should show fill text on hover for autofill list items", () => {
+      it("should show view text on hover for autofill list items", () => {
         fixture.componentRef.setInput("isAutofillList", true);
         fixture.detectChanges();
 
-        expect(component.showFillTextOnHover()).toBe(true);
+        expect(component.showViewTextOnHover()).toBe(true);
       });
 
-      it("should not show fill text on hover for non-autofill list items", () => {
+      it("should not show the legacy view button", () => {
+        fixture.componentRef.setInput("isAutofillList", true);
+        fixture.detectChanges();
+
+        expect(component.showViewButton()).toBe(false);
+      });
+
+      it("should not show view text on hover for non-autofill list items", () => {
         fixture.componentRef.setInput("isAutofillList", false);
         fixture.detectChanges();
 
-        expect(component.showFillTextOnHover()).toBe(false);
+        expect(component.showViewTextOnHover()).toBe(false);
       });
 
       it("should not show autofill badge", () => {

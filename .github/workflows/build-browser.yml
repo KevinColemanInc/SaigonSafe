@@ -127,20 +127,11 @@ jobs:
 
 
   build-source:
-    name: Build browser source - ${{matrix.license_type.readable}}
+    name: Build browser source
     runs-on: ubuntu-22.04
     needs:
       - setup
       - locales-test
-    strategy:
-      matrix:
-        license_type:
-          - include_bitwarden_license_folder: false
-            archive_name_prefix: ""
-            readable: "open source license"
-          - include_bitwarden_license_folder: true
-            archive_name_prefix: "bit-"
-            readable: "commercial license"
     env:
       _BUILD_NUMBER: ${{ needs.setup.outputs.adj_build_number }}
       _NODE_VERSION: ${{ needs.setup.outputs.node_version }}
@@ -180,12 +171,6 @@ jobs:
           mkdir -p browser-source/apps/browser
           cp -r apps/browser/* browser-source/apps/browser
 
-          # Copy bitwarden_license/bit-browser to the Browser source directory
-          if [[ ${{matrix.license_type.include_bitwarden_license_folder}} == "true" ]]; then
-            mkdir -p browser-source/bitwarden_license/bit-browser
-            cp -r bitwarden_license/bit-browser/* browser-source/bitwarden_license/bit-browser
-          fi
-
           # Copy libs to Browser source directory
           mkdir browser-source/libs
           cp -r libs/* browser-source/libs
@@ -195,13 +180,13 @@ jobs:
       - name: Upload browser source
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
-          name: ${{matrix.license_type.archive_name_prefix}}browser-source-${{ env._BUILD_NUMBER }}.zip
+          name: browser-source-${{ env._BUILD_NUMBER }}.zip
           path: browser-source.zip
           if-no-files-found: error
 
 
   build:
-    name: Build ${{ matrix.browser.name }} - ${{ matrix.license_type.readable }}
+    name: Build ${{ matrix.browser.name }}
     runs-on: ubuntu-22.04
     needs:
       - setup
@@ -212,23 +197,6 @@ jobs:
       _NODE_VERSION: ${{ needs.setup.outputs.node_version }}
     strategy:
       matrix:
-        license_type:
-          - build_prefix: ""
-            artifact_prefix: ""
-            source_archive_name_prefix: ""
-            archive_name_prefix: ""
-            npm_command_prefix: "dist:"
-            npm_package_dev_prefix: "package:dev:"
-            readable: "open source license"
-            type: "oss"
-          - build_prefix: "bit-"
-            artifact_prefix: "bit-"
-            source_archive_name_prefix: "bit-"
-            archive_name_prefix: "bit-"
-            npm_command_prefix: "dist:bit:"
-            npm_package_dev_prefix: "package:bit:dev:"
-            readable: "commercial license"
-            type: "commercial"
         browser:
           - name: "chrome"
             npm_command_suffix: "chrome"
@@ -274,7 +242,7 @@ jobs:
       - name: Download browser source
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
-          name: ${{matrix.license_type.source_archive_name_prefix}}browser-source-${{ env._BUILD_NUMBER }}.zip
+          name: browser-source-${{ env._BUILD_NUMBER }}.zip
 
       - name: Unzip browser source artifact
         run: |
@@ -285,13 +253,8 @@ jobs:
         run: npm ci
         working-directory: browser-source/
 
-      - name: Remove commercial packages
-        if: ${{ matrix.license_type.type == 'oss' }}
-        run: rm -rf node_modules/@bitwarden/commercial-sdk-internal
-        working-directory: browser-source/
-
       - name: Download SDK artifacts
-        if: ${{ inputs.sdk_branch != '' && matrix.license_type.type != 'commercial' }}
+        if: ${{ inputs.sdk_branch != '' }}
         uses: bitwarden/gh-actions/download-artifacts@main
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -304,27 +267,9 @@ jobs:
           if_no_artifact_found: fail
 
       - name: Override SDK
-        if: ${{ inputs.sdk_branch != '' && matrix.license_type.type != 'commercial' }}
+        if: ${{ inputs.sdk_branch != '' }}
         working-directory: browser-source/
         run: npm link ../sdk-internal
-
-      - name: Download Commercial SDK Artifacts
-        if: ${{ inputs.sdk_branch != '' && matrix.license_type.type == 'commercial' }}
-        uses: bitwarden/gh-actions/download-artifacts@main
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          workflow: build-wasm-internal.yml
-          workflow_conclusion: success
-          branch: ${{ inputs.sdk_branch }}
-          artifacts: commercial-sdk-internal
-          repo: bitwarden/sdk-internal
-          path: commercial-sdk-internal
-          if_no_artifact_found: fail
-
-      - name: Override Commercial SDK
-        if: ${{ inputs.sdk_branch != '' && matrix.license_type.type == 'commercial' }}
-        working-directory: browser-source/
-        run: npm link ../commercial-sdk-internal
 
       - name: Check source file size
         if: ${{ startsWith(matrix.browser.name, 'firefox') }}
@@ -350,32 +295,32 @@ jobs:
           fi
 
       - name: Build extension
-        run: npm run ${{matrix.license_type.npm_command_prefix}}${{ matrix.browser.npm_command_suffix }}
+        run: npm run dist:${{ matrix.browser.npm_command_suffix }}
         working-directory: browser-source/apps/browser
 
       - name: Upload extension artifact
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
-          name: ${{ matrix.license_type.artifact_prefix }}${{ matrix.browser.artifact_name }}-${{ env._BUILD_NUMBER }}.zip
-          path: browser-source/apps/browser/dist/${{matrix.license_type.archive_name_prefix}}${{ matrix.browser.archive_name }}
+          name: ${{ matrix.browser.artifact_name }}-${{ env._BUILD_NUMBER }}.zip
+          path: browser-source/apps/browser/dist/${{ matrix.browser.archive_name }}
           if-no-files-found: error
 
       - name: Package dev extension
         if: ${{ matrix.browser.archive_name_dev != '' }}
-        run: npm run ${{ matrix.license_type.npm_package_dev_prefix }}${{ matrix.browser.npm_command_suffix }}
+        run: npm run package:dev:${{ matrix.browser.npm_command_suffix }}
         working-directory: browser-source/apps/browser
 
       - name: Upload dev extension artifact
         if: ${{ matrix.browser.archive_name_dev != '' }}
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
-          name: ${{ matrix.license_type.artifact_prefix }}${{ matrix.browser.artifact_name_dev }}-${{ env._BUILD_NUMBER }}.zip
-          path: browser-source/apps/browser/dist/${{matrix.license_type.archive_name_prefix}}${{ matrix.browser.archive_name_dev }}
+          name: ${{ matrix.browser.artifact_name_dev }}-${{ env._BUILD_NUMBER }}.zip
+          path: browser-source/apps/browser/dist/${{ matrix.browser.archive_name_dev }}
           if-no-files-found: error
 
 
   build-safari:
-    name: Build Safari - ${{ matrix.license_type.readable }}
+    name: Build Safari
     runs-on: macos-15
     permissions:
       contents: read
@@ -384,21 +329,6 @@ jobs:
       - setup
       - locales-test
     if: ${{ needs.setup.outputs.has_secrets == 'true' }}
-    strategy:
-      matrix:
-        license_type:
-          - build_prefix: ""
-            artifact_prefix: ""
-            archive_name_prefix: ""
-            npm_command_prefix: "dist:"
-            readable: "open source license"
-            type: "oss"
-          - build_prefix: "bit-"
-            artifact_prefix: "bit-"
-            archive_name_prefix: "bit-"
-            npm_command_prefix: "dist:bit:"
-            readable: "commercial license"
-            type: "commercial"
     env:
       _BUILD_NUMBER: ${{ needs.setup.outputs.adj_build_number }}
       _NODE_VERSION: ${{ needs.setup.outputs.node_version }}
@@ -492,13 +422,8 @@ jobs:
         run: npm ci
         working-directory: ./
 
-      - name: Remove commercial packages
-        if: ${{ matrix.license_type.type == 'oss' }}
-        run: rm -rf node_modules/@bitwarden/commercial-sdk-internal
-        working-directory: ./
-
       - name: Download SDK Artifacts
-        if: ${{ inputs.sdk_branch != '' && matrix.license_type.type != 'commercial' }}
+        if: ${{ inputs.sdk_branch != '' }}
         uses: bitwarden/gh-actions/download-artifacts@main
         with:
           github_token: ${{secrets.GITHUB_TOKEN}}
@@ -511,46 +436,27 @@ jobs:
           if_no_artifact_found: fail
 
       - name: Override SDK
-        if: ${{ inputs.sdk_branch != '' && matrix.license_type.type != 'commercial' }}
+        if: ${{ inputs.sdk_branch != '' }}
         working-directory: ./
         run: |
           npm link ../sdk-internal
 
-      - name: Download Commercial SDK Artifacts
-        if: ${{ inputs.sdk_branch != '' && matrix.license_type.type == 'commercial' }}
-        uses: bitwarden/gh-actions/download-artifacts@main
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          workflow: build-wasm-internal.yml
-          workflow_conclusion: success
-          branch: ${{ inputs.sdk_branch }}
-          artifacts: commercial-sdk-internal
-          repo: bitwarden/sdk-internal
-          path: ../commercial-sdk-internal
-          if_no_artifact_found: fail
-
-      - name: Override Commercial SDK
-        if: ${{ inputs.sdk_branch != '' && matrix.license_type.type == 'commercial' }}
-        working-directory: ./
-        run: |
-          npm link ../commercial-sdk-internal
-
       - name: Build Safari extension
-        run: npm run ${{matrix.license_type.npm_command_prefix}}safari
+        run: npm run dist:safari
         working-directory: apps/browser
 
       - name: Zip Safari build artifact
         run: |
           cd apps/browser/dist
-          zip ${{matrix.license_type.archive_name_prefix }}dist-safari.zip ./Safari/**/build/Release/safari.appex -r
+          zip dist-safari.zip ./Safari/**/build/Release/safari.appex -r
           pwd
           ls -la
 
       - name: Upload Safari artifact
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
-          name: ${{matrix.license_type.archive_name_prefix}}dist-safari-${{ env._BUILD_NUMBER }}.zip
-          path: apps/browser/dist/${{matrix.license_type.archive_name_prefix}}dist-safari.zip
+          name: dist-safari-${{ env._BUILD_NUMBER }}.zip
+          path: apps/browser/dist/dist-safari.zip
           if-no-files-found: error
 
   crowdin-push:

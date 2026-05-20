@@ -6,7 +6,7 @@
     "message": "Logo Saigon Safe"
   },
   "extName": {
-    "message": "Kevinwarden Password Manager",
+    "message": "Saigon Safe",
     "description": "Extension name, MUST be less than 40 characters (Safari restriction)"
   },
   "extDesc": {
@@ -167,8 +167,17 @@
   "copyPassportNumber": {
     "message": "Kopírovat číslo pasu"
   },
+  "copyFirstName": {
+    "message": "Kopírovat křestní jméno"
+  },
+  "copyMiddleName": {
+    "message": "Kopírovat prostřední jméno"
+  },
+  "copyLastName": {
+    "message": "Kopírovat příjmení"
+  },
   "copyLicenseNumber": {
-    "message": "Kopírovat číslo dokladu totožnosti"
+    "message": "Kopírovat číslo řidičského průkazu"
   },
   "copyPrivateKey": {
     "message": "Kopírovat soukromý klíč"
@@ -708,6 +717,22 @@
   "rateExtension": {
     "message": "Ohodnotit rozšíření"
   },
+  "troubleshooting": {
+    "message": "Řešení problémů"
+  },
+  "experiencingAnIssue": {
+    "message": "Máte problém?"
+  },
+  "downloadDiagnosticReportWith": {
+    "message": "Stáhněte si a pak sdílejte diagnostický report s"
+  },
+  "bitwardenSupport": {
+    "message": "podporou Saigon Safe",
+    "description": "Link text following the troubleshooting description sentence. 'Saigon Safe' should not be translated."
+  },
+  "download": {
+    "message": "Stáhnout"
+  },
   "browserNotSupportClipboard": {
     "message": "Váš webový prohlížeč nepodporuje automatické kopírování do schránky. Musíte ho zkopírovat ručně."
   },
@@ -744,7 +769,7 @@
       },
       "hostname": {
         "content": "$2",
-        "example": "bitwarden.com"
+        "example": "saigonsafe.com"
       }
     }
   },
@@ -756,7 +781,7 @@
     "placeholders": {
       "host": {
         "content": "$1",
-        "example": "vault.bitwarden.com"
+        "example": "vault.saigonsafe.com"
       }
     }
   },
@@ -1053,7 +1078,7 @@
   },
   "addDomain": {
     "message": "Přidat doménu",
-    "description": "'Domain' here refers to an internet domain name (e.g. 'bitwarden.com') and the message in whole described the act of putting a domain value into the context."
+    "description": "'Domain' here refers to an internet domain name (e.g. 'saigonsafe.com') and the message in whole described the act of putting a domain value into the context."
   },
   "addedItem": {
     "message": "Položka byla přidána"
@@ -1698,7 +1723,7 @@
   },
   "authenticatorAppDescV2": {
     "message": "Zadejte kód vygenerovaný ověřovací aplikací, jako je Saigon Safe Authenticator.",
-    "description": "'Bitwarden Authenticator' is a product name and should not be translated."
+    "description": "'Saigon Safe Authenticator' is a product name and should not be translated."
   },
   "yubiKeyTitleV2": {
     "message": "Bezpečnostní klíč YubiKey OTP"
@@ -2165,6 +2190,54 @@
   "typeBankAccountSubtitle": {
     "message": "Údaje o bance"
   },
+  "typeDriversLicense": {
+    "message": "Řidičský průkaz"
+  },
+  "typeDriversLicenseSubtitle": {
+    "message": "Řidičský nebo občanský průkaz"
+  },
+  "driversLicenseDetails": {
+    "message": "Podrobnosti řidičského průkazu"
+  },
+  "dateOfBirth": {
+    "message": "Datum narození"
+  },
+  "birthMonth": {
+    "message": "Měsíc narození"
+  },
+  "birthDay": {
+    "message": "Den narození"
+  },
+  "birthYear": {
+    "message": "Rok narození"
+  },
+  "issuingCountry": {
+    "message": "Země vydání průkazu"
+  },
+  "issuingState": {
+    "message": "Vydávající stát/Provincie"
+  },
+  "issuingAuthority": {
+    "message": "Vydávající orgán"
+  },
+  "issueDate": {
+    "message": "Datum vystavení"
+  },
+  "issueMonth": {
+    "message": "Měsíc vystavení"
+  },
+  "issueDay": {
+    "message": "Den vystavení"
+  },
+  "issueYear": {
+    "message": "Rok vystavení"
+  },
+  "expirationDay": {
+    "message": "Den vypršení platnosti"
+  },
+  "licenseClass": {
+    "message": "Skupina řidičského průkazu"
+  },
   "newItemHeaderLogin": {
     "message": "Nové přihlášení",
     "description": "Header for new login item type"
@@ -2197,12 +2270,12 @@
     "message": "Nový pas",
     "description": "Header for new passport item type"
   },
-  "newItemHeaderTextSend": {
-    "message": "Nový textový Send",
+  "newItemHeaderTextSendV2": {
+    "message": "Nový text",
     "description": "Header for new text send"
   },
-  "newItemHeaderFileSend": {
-    "message": "Nový Send se soubory",
+  "newItemHeaderFileSendV2": {
+    "message": "Nový soubor",
     "description": "Header for new file send"
   },
   "editItemHeaderLogin": {
@@ -2229,20 +2302,20 @@
     "message": "Upravit bankovní účet",
     "description": "Header for edit bank account item type"
   },
-  "editItemHeaderDriversLicense": {
-    "message": "Upravit licenci",
+  "editItemHeaderLicense": {
+    "message": "Upravit řidičský průkaz",
     "description": "Header for edit license item type"
   },
   "editItemHeaderPassport": {
     "message": "Upravit pas",
     "description": "Header for edit passport item type"
   },
-  "editItemHeaderTextSend": {
-    "message": "Upravit textový Send",
+  "editItemHeaderTextSendV2": {
+    "message": "Upravit text",
     "description": "Header for edit text send"
   },
-  "editItemHeaderFileSend": {
-    "message": "Upravit Send se soubory",
+  "editItemHeaderFileSendV2": {
+    "message": "Upravit soubor",
     "description": "Header for edit file send"
   },
   "viewItemHeaderLogin": {
@@ -2269,8 +2342,8 @@
     "message": "Zobrazit bankovní účet",
     "description": "Header for view bank account item type"
   },
-  "viewItemHeaderDriversLicense": {
-    "message": "Zobrazit licenci",
+  "viewItemHeaderLicense": {
+    "message": "Zobrazit řidičský průkaz",
     "description": "Header for view license item type"
   },
   "viewItemHeaderPassport": {
@@ -2995,7 +3068,7 @@
   },
   "updateInBitwardenSlideDesc": {
     "message": "Saigon Safe Vás poté požádá o aktualizaci hesla ve správci hesel.",
-    "description": "Description of the update in Bitwarden slide on the at-risk password page carousel"
+    "description": "Description of the update in Saigon Safe slide on the at-risk password page carousel"
   },
   "updateInBitwardenSlideImgAltPeriod": {
     "message": "Ilustrace oznámení v Saigon Safeu, která uživatele vyzývá k aktualizaci přihlášení."
@@ -3052,11 +3125,11 @@
   },
   "send": {
     "message": "Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendDetails": {
     "message": "Podrobnosti Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendTypeText": {
     "message": "Text"
@@ -3069,7 +3142,7 @@
   },
   "allSends": {
     "message": "Všechny Sends",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "maxAccessCountReached": {
     "message": "Dosažen maximální počet přístupů",
@@ -3089,7 +3162,7 @@
   },
   "copySendLink": {
     "message": "Zkopírovat odkaz Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "removePassword": {
     "message": "Odebrat heslo"
@@ -3102,11 +3175,11 @@
   },
   "deletedSend": {
     "message": "Send smazán",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendLink": {
     "message": "Odkaz pro Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "disabled": {
     "message": "Zakázáno"
@@ -3116,26 +3189,26 @@
   },
   "deleteSend": {
     "message": "Smazat Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "deleteSendConfirmation": {
     "message": "Opravdu chcete smazat tento Send?",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "deleteSendPermanentConfirmation": {
     "message": "Opravdu chcete tento Send trvale smazat?",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "editSend": {
     "message": "Upravit Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "deletionDate": {
     "message": "Datum smazání"
   },
   "deletionDateDescV2": {
     "message": "Tento Send bude trvale smazán v určené datum.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "expirationDate": {
     "message": "Datum vypršení platnosti"
@@ -3157,34 +3230,34 @@
   },
   "createSend": {
     "message": "Nový Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "newPassword": {
     "message": "Nové heslo"
   },
   "sendDisabled": {
     "message": "Send odebrán",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendDisabledWarning": {
     "message": "Z důvodu podnikových zásad můžete smazat pouze existující Send.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "createdSend": {
     "message": "Send vytvořen",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "createdSendSuccessfully": {
     "message": "Send byl úspěšně vytvořen!",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendExpiresInHoursSingle": {
     "message": "Send bude k dispozici na příští 1 hodinu každému, kdo má odkaz.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendExpiresInHours": {
     "message": "Send bude k dispozici na příštích $HOURS$ hodin každému, kdo má odkaz.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated.",
     "placeholders": {
       "hours": {
         "content": "$1",
@@ -3194,11 +3267,11 @@
   },
   "sendExpiresInDaysSingle": {
     "message": "Send bude k dispozici na příští 1 den každému, kdo má odkaz.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendExpiresInDays": {
     "message": "Send bude k dispozici na příštích $DAYS$ dnů každému, kdo má odkaz.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated.",
     "placeholders": {
       "days": {
         "content": "$1",
@@ -3217,7 +3290,7 @@
   },
   "sendCreatedDescriptionV2": {
     "message": "Zkopírujte a sdílejte tento odkaz Send. Send bude k dispozici komukoli s odkazem na dalších $TIME$.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated.",
     "placeholders": {
       "time": {
         "content": "$1",
@@ -3227,7 +3300,7 @@
   },
   "sendCreatedDescriptionPassword": {
     "message": "Zkopírujte a sdílejte tento odkaz Send. Send bude k dispozici komukoli s odkazem a heslem na dalších $TIME$.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated.",
     "placeholders": {
       "time": {
         "content": "$1",
@@ -3237,7 +3310,7 @@
   },
   "sendCreatedDescriptionEmail": {
     "message": "Zkopírujte a sdílejte tento Send pro odesílání. Můžou jej zobrazit osoby, které jste zadali, a to po dobu $TIME$.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated.",
     "placeholders": {
       "time": {
         "content": "$1",
@@ -3247,11 +3320,11 @@
   },
   "sendLinkCopied": {
     "message": "Odkaz Send byl zkopírován",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "editedSend": {
     "message": "Send upraven",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "popOut": {
     "message": "Nové okno"
@@ -3460,33 +3533,18 @@
   "exportingPersonalVaultTitle": {
     "message": "Exportování osobního trezoru"
   },
-  "exportingIndividualVaultDescription": {
-    "message": "Budou exportovány jen osobní položky trezoru spojené s $EMAIL$. Položky trezoru organizace nebudou zahrnuty. Budou exportovány jen informace o položkách trezoru a nebudou zahrnuty související přílohy.",
-    "placeholders": {
-      "email": {
-        "content": "$1",
-        "example": "name@example.com"
-      }
-    }
-  },
-  "exportingIndividualVaultWithAttachmentsDescription": {
-    "message": "Budou exportovány jen osobní položky trezoru včetně příloh spojené s účtem $EMAIL$. Nebudou zahrnuty položky trezoru v organizaci.",
-    "placeholders": {
-      "email": {
-        "content": "$1",
-        "example": "name@example.com"
-      }
-    }
-  },
   "exportingOrganizationVaultTitle": {
     "message": "Exportování trezoru organizace"
   },
-  "exportingOrganizationVaultDesc": {
-    "message": "Exportován bude jen trezor organizace přidružený k položce $ORGANIZATION$. Osobní položky trezoru a položky z jiných organizací nebudou zahrnuty.",
+  "exportingIndividualVaultScopeDescription": {
+    "message": "Exportovat se budou jen položky ve vašem individuálním trezoru."
+  },
+  "exportingOrganizationVaultScopeDescription": {
+    "message": "Exportovat se budou jen položky spojené s trezorem $ORGANIZATION$. Položky v jednotlivých trezorech ne.",
     "placeholders": {
       "organization": {
         "content": "$1",
-        "example": "ACME Moving Co."
+        "example": "My Org Name"
       }
     }
   },
@@ -4183,11 +4241,11 @@
   },
   "sendsTitleNoItems": {
     "message": "Posílejte citlivé informace bezpečně",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "sendsBodyNoItems": {
     "message": "Sdílejte bezpečně soubory a data s kýmkoli na libovolné platformě. Vaše informace zůstanou šifrovány a zároveň omezují expozici.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "inputRequired": {
     "message": "Je vyžadován vstup."
@@ -4577,6 +4635,18 @@
   "exportError": {
     "message": "Při exportu dat Vašeho trezoru se vyskytla chyba"
   },
+  "exportSuccessSkippedAttachment": {
+    "message": "1 poškozená příloha byla při exportu přeskočena. Všechna ostatní data trezoru a přílohy byly úspěšně exportovány."
+  },
+  "exportSuccessSkippedAttachments": {
+    "message": "$COUNT$ poškozených příloh bylo při exportu přeskočeno. Všechna ostatní data trezoru a přílohy byly úspěšně exportovány.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
   "typePasskey": {
     "message": "Přístupový klíč"
   },
@@ -4773,7 +4843,7 @@
   },
   "uriMatchDefaultStrategyHint": {
     "message": "Detekce shody URI je způsob, jakým Saigon Safe identifikuje návrhy automatického vyplňování.",
-    "description": "Explains to the user that URI match detection determines how Bitwarden suggests autofill options, and clarifies that this default strategy applies when no specific match detection is set for a login item."
+    "description": "Explains to the user that URI match detection determines how Saigon Safe suggests autofill options, and clarifies that this default strategy applies when no specific match detection is set for a login item."
   },
   "regExAdvancedOptionWarning": {
     "message": "\"Regulární výraz\" je pokročilá volba se zvýšeným rizikem odhalení přihlašovacích údajů.",
@@ -5695,7 +5765,7 @@
   },
   "saveToBitwarden": {
     "message": "Uložit do Saigon Safeu",
-    "description": "Confirmation message for saving a login to Bitwarden"
+    "description": "Confirmation message for saving a login to Saigon Safe"
   },
   "spaceCharacterDescriptor": {
     "message": "Mezera",
@@ -5989,7 +6059,7 @@
     "placeholders": {
       "product": {
         "content": "$1",
-        "example": "Bitwarden Phishing Blocker"
+        "example": "Saigon Safe Phishing Blocker"
       }
     }
   },
@@ -6348,10 +6418,28 @@
   },
   "sendPasswordHelperText": {
     "message": "Pro zobrazení tohoto Send budou muset jednotlivci zadat heslo",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "userVerificationFailed": {
     "message": "Ověření uživatele se nezdařilo."
+  },
+  "enterMonth": {
+    "message": "Zadejte měsíc."
+  },
+  "enterDay": {
+    "message": "Zadejte den."
+  },
+  "enterYear": {
+    "message": "Zadejte rok."
+  },
+  "invalidDay": {
+    "message": "Zadejte platný den."
+  },
+  "invalidYear": {
+    "message": "Zadejte platný rok."
+  },
+  "searchDriversLicense": {
+    "message": "Hledat řidičské průkazy"
   },
   "bankName": {
     "message": "Názov banky"
@@ -6423,14 +6511,31 @@
   "bankAccountTypeOther": {
     "message": "Ostatní"
   },
-  "newBankAccountNudgeTitle": {
-    "message": "Bezpečně uložte Vaše bankovní údaje"
-  },
-  "newBankAccountNudgeBody": {
-    "message": "Uložte informace o Vašem bankovním účtu pro snadný a bezpečný přístup ve všech Vašich zařízeních."
-  },
   "downloadFailed": {
     "message": "Stažení se nezdařilo."
+  },
+  "maxAccessCount": {
+    "message": "Maximální počet přístupů",
+    "description": "This text will be displayed after a Send has been accessed the maximum amount of times."
+  },
+  "hideMyEmail": {
+    "message": "Skrýt moji e-mailovou adresu před příjemci"
+  },
+  "viewTextSendHeader": {
+    "message": "Zobrazit text"
+  },
+  "viewFileSendHeader": {
+    "message": "Zobrazit soubor"
+  },
+  "sendCreated": {
+    "message": "Send byl vytvořen",
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
+  },
+  "numericInputError": {
+    "message": "Vstup musí být číselný"
+  },
+  "integerInputError": {
+    "message": "Vstup musí být celé číslo"
   },
   "sideNavigation": {
     "message": "Boční navigace"
@@ -6448,7 +6553,7 @@
   },
   "saveSendEditsFailed": {
     "message": "Ukládání úprav Send selhalo",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Saigon Safe Send'. It should not be translated."
   },
   "hideEmailPolicyInEffect": {
     "message": "Vaše organizace vyžaduje viditelnost e-mailu. Zrušte zaškrtnutí \"Skrýt Vaši e-mailovou adresu\" pro uložení."

@@ -1,6 +1,7 @@
 import { EncString } from "@bitwarden/common/key-management/crypto/models/enc-string";
 import {
   Collection as SdkCollection,
+  CollectionType as SdkCollectionType,
   CollectionView as SdkCollectionView,
   EncString as SdkEncString,
 } from "@bitwarden/sdk-internal";
@@ -32,7 +33,7 @@ function makeSdkCollection(overrides: Partial<SdkCollection> = {}): SdkCollectio
     readOnly: false,
     manage: true,
     defaultUserCollectionEmail: undefined,
-    type: "SharedCollection",
+    type: "SharedCollection" as SdkCollectionType,
     ...overrides,
   };
 }
@@ -46,7 +47,7 @@ function makeSdkCollectionView(overrides: Partial<SdkCollectionView> = {}): SdkC
     hidePasswords: false,
     readOnly: false,
     manage: true,
-    type: "SharedCollection",
+    type: "SharedCollection" as SdkCollectionType,
     ...overrides,
   };
 }
@@ -114,13 +115,13 @@ describe("Collection SDK mapping", () => {
       expect(result.readOnly).toBe(true);
       expect(result.manage).toBe(false);
       expect(result.defaultUserCollectionEmail).toBe("user@example.com");
-      expect(result.type).toBe("DefaultUserCollection");
+      expect(result.type).toBe(CollectionTypes.DefaultUserCollection);
     });
 
     it("maps SharedCollection type correctly", () => {
       const collection = makeCollection({ type: CollectionTypes.SharedCollection });
       const result = collection.toSdkCollection();
-      expect(result.type).toBe("SharedCollection");
+      expect(result.type).toBe(CollectionTypes.SharedCollection);
     });
 
     it("sets id to undefined when collection has no id", () => {
@@ -218,7 +219,7 @@ describe("CollectionView SDK mapping", () => {
         result.manage = true;
 
         // canEditName should be false because defaultUserCollectionEmail is set
-        const mockOrg: any = { canManageAllCollections: true };
+        const mockOrg: any = { id: orgId, canManageAllCollections: true };
         expect(result.canEditName(mockOrg)).toBe(false);
       });
 
@@ -236,7 +237,7 @@ describe("CollectionView SDK mapping", () => {
         sdkPathResult.manage = true;
 
         expect(sdkPathResult.defaultUserCollectionEmail).toBe(email);
-        const mockOrg: any = { canManageAllCollections: true };
+        const mockOrg: any = { id: orgId, canManageAllCollections: true };
         expect(sdkPathResult.canEditName(mockOrg)).toBe(false);
       });
     });
@@ -262,14 +263,14 @@ describe("CollectionView SDK mapping", () => {
       expect(result.hidePasswords).toBe(true);
       expect(result.readOnly).toBe(false);
       expect(result.manage).toBe(true);
-      expect(result.type).toBe("DefaultUserCollection");
+      expect(result.type).toBe(CollectionTypes.DefaultUserCollection);
     });
 
     it("maps SharedCollection type correctly", () => {
       const view = new CollectionView({ id: collectionId, organizationId: orgId, name: "Test" });
       view.type = CollectionTypes.SharedCollection;
       const result = view.toSdkCollectionView();
-      expect(result.type).toBe("SharedCollection");
+      expect(result.type).toBe(CollectionTypes.SharedCollection);
     });
 
     it("sets id to undefined when view has no id", () => {

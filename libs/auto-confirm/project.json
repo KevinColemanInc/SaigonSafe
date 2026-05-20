@@ -6,14 +6,10 @@
   "tags": [],
   "targets": {
     "build": {
-      "executor": "@nx/js:tsc",
-      "outputs": ["{options.outputPath}"],
+      "executor": "nx:run-script",
+      "dependsOn": [],
       "options": {
-        "outputPath": "dist/libs/auto-confirm",
-        "main": "libs/auto-confirm/src/index.ts",
-        "tsConfig": "libs/auto-confirm/tsconfig.lib.json",
-        "assets": ["libs/auto-confirm/*.md"],
-        "rootDir": "libs/auto-confirm/src"
+        "script": "build"
       }
     },
     "lint": {

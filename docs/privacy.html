@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Saigon Safe Browser Extension Privacy Policy</title>
+    <meta
+      name="description"
+      content="Privacy policy for the Saigon Safe browser extension for Chrome and Firefox."
+    />
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f5efe6;
+        --surface: rgba(255, 252, 247, 0.92);
+        --surface-strong: #fffdf9;
+        --text: #1f2933;
+        --muted: #5f6c7b;
+        --line: rgba(31, 41, 51, 0.12);
+        --accent: #0f766e;
+        --accent-strong: #115e59;
+        --shadow: 0 24px 70px rgba(27, 42, 58, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        margin: 0;
+        background:
+          radial-gradient(circle at top left, rgba(15, 118, 110, 0.12), transparent 34%),
+          radial-gradient(circle at top right, rgba(180, 83, 9, 0.1), transparent 28%),
+          linear-gradient(180deg, #faf4ea 0%, var(--bg) 100%);
+      }
+
+      body {
+        margin: 0;
+        color: var(--text);
+        font:
+          16px/1.65 "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia,
+          serif;
+      }
+
+      a {
+        color: var(--accent-strong);
+      }
+
+      a:hover {
+        color: var(--accent);
+      }
+
+      .shell {
+        width: min(980px, calc(100% - 32px));
+        margin: 32px auto 56px;
+      }
+
+      .hero,
+      .panel {
+        backdrop-filter: blur(8px);
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        box-shadow: var(--shadow);
+      }
+
+      .hero {
+        overflow: hidden;
+      }
+
+      .hero-band {
+        padding: 16px 24px;
+        background:
+          linear-gradient(90deg, rgba(15, 118, 110, 0.12), rgba(180, 83, 9, 0.08)),
+          var(--surface-strong);
+        border-bottom: 1px solid var(--line);
+        color: var(--muted);
+        font:
+          600 12px/1.2 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .hero-body {
+        padding: 28px 24px 30px;
+      }
+
+      h1,
+      h2,
+      h3 {
+        margin: 0;
+        line-height: 1.15;
+        letter-spacing: -0.02em;
+      }
+
+      h1 {
+        font-size: clamp(2rem, 4vw, 3.4rem);
+      }
+
+      h2 {
+        font-size: clamp(1.35rem, 2.2vw, 1.7rem);
+        margin-bottom: 14px;
+      }
+
+      h3 {
+        font-size: 1rem;
+        margin-bottom: 10px;
+        font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        color: var(--accent-strong);
+      }
+
+      .lede {
+        max-width: 70ch;
+        margin: 16px 0 0;
+        color: var(--muted);
+        font-size: 1.05rem;
+      }
+
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 20px;
+      }
+
+      .tag {
+        padding: 8px 12px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.72);
+        font:
+          600 13px/1.2 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--muted);
+      }
+
+      .grid {
+        display: grid;
+        gap: 18px;
+        margin-top: 18px;
+      }
+
+      .panel {
+        padding: 22px 22px 24px;
+      }
+
+      .two-up {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      }
+
+      p {
+        margin: 0;
+      }
+
+      p + p,
+      ul + p,
+      p + ul,
+      ul + ul {
+        margin-top: 12px;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+
+      li + li {
+        margin-top: 8px;
+      }
+
+      .callout {
+        border-left: 4px solid var(--accent);
+        padding: 14px 16px;
+        border-radius: 14px;
+        background: rgba(15, 118, 110, 0.08);
+        color: var(--text);
+      }
+
+      .footer {
+        margin-top: 18px;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      @media (max-width: 640px) {
+        .shell {
+          width: min(100% - 20px, 980px);
+          margin-top: 20px;
+          margin-bottom: 28px;
+        }
+
+        .hero-band,
+        .hero-body,
+        .panel {
+          padding-left: 18px;
+          padding-right: 18px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div class="hero-band">Saigon Safe Legal</div>
+        <div class="hero-body">
+          <h1>Privacy Policy for the Saigon Safe Browser Extension</h1>
+          <p class="lede">
+            This policy applies to the Saigon Safe browser extension distributed for Chromium-based
+            browsers and Firefox. It describes what the extension can access, what data it may
+            process, what network activity it performs, and what controls the user has.
+          </p>
+          <div class="meta">
+            <div class="tag">Last updated: May 20, 2026</div>
+            <div class="tag">Product: Saigon Safe Browser Extension</div>
+            <div class="tag">Scope: Chrome and Firefox extension builds</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid two-up">
+        <article class="panel">
+          <h3>Summary</h3>
+          <p>
+            The extension exists to help users store, sync, and autofill credentials and other
+            vault items on websites they choose to use. To do that, it needs broad website access,
+            local encrypted storage, clipboard integration, and limited background browser APIs.
+          </p>
+        </article>
+        <article class="panel">
+          <h3>Policy intent</h3>
+          <p>
+            This page is intended to be the public privacy policy URL for store listings and user
+            review. It should be kept aligned with the current extension behavior and permissions.
+          </p>
+        </article>
+      </section>
+
+      <section class="grid">
+        <article class="panel">
+          <h2>1. What the extension can access</h2>
+          <ul>
+            <li>
+              The extension can run on HTTP and HTTPS pages so it can detect login forms, support
+              autofill, save new logins, and assist with passkey flows across websites.
+            </li>
+            <li>
+              The extension reads page structure, URLs, and form-related context needed for vault
+              matching, autofill decisions, phishing checks, and related security behavior.
+            </li>
+            <li>
+              The extension does not request access to local <code>file://</code> pages.
+            </li>
+          </ul>
+        </article>
+
+        <article class="panel">
+          <h2>2. Local data handling</h2>
+          <ul>
+            <li>
+              Vault data, encryption keys, autofill decisions, and most page analysis are intended
+              to be handled locally inside the extension or against the user’s configured Saigon
+              Safe service.
+            </li>
+            <li>
+              The extension uses browser storage and related extension storage APIs to preserve user
+              state and security settings.
+            </li>
+            <li>
+              Clipboard read and write features are used only to support user-facing copy and paste
+              actions such as copying usernames, passwords, TOTP values, or generated content.
+            </li>
+          </ul>
+        </article>
+
+        <article class="panel">
+          <h2>3. Network activity</h2>
+          <ul>
+            <li>
+              The extension connects to the user’s configured Saigon Safe server or web vault for
+              account authentication, sync, vault operations, and related product functionality.
+            </li>
+            <li>
+              The extension may download phishing blocklist data used to identify known phishing
+              sites. These downloads are separate from ordinary vault sync traffic.
+            </li>
+            <li>
+              The current browser phishing-protection flow does not upload phishing warning,
+              bypass, or exit events.
+            </li>
+          </ul>
+        </article>
+
+        <article class="panel">
+          <h2>4. Optional and user-controlled features</h2>
+          <ul>
+            <li>
+              Privacy-settings integration is requested only when the user chooses a feature that
+              needs it.
+            </li>
+            <li>
+              Biometric unlock uses native messaging to communicate with a local desktop app only
+              after the user enables biometrics and grants that permission.
+            </li>
+            <li>
+              Users can disable or avoid specific features such as phishing protection, browser
+              privacy integration, or biometric unlock through extension settings.
+            </li>
+          </ul>
+        </article>
+
+        <article class="panel">
+          <h2>5. Browser permissions in use</h2>
+          <p>
+            Depending on browser target and manifest version, the extension may request permissions
+            needed for autofill, clipboard operations, browser action behavior, notifications,
+            idle-based lock handling, web navigation checks, authentication challenge handling, and
+            optional biometric/native-messaging flows.
+          </p>
+          <p>
+            Permission prompts are expected to reflect the extension’s current feature set. The
+            project aims to keep optional features behind optional permissions where practical.
+          </p>
+        </article>
+
+        <article class="panel">
+          <h2>6. User controls</h2>
+          <ul>
+            <li>Users can review and change settings inside the extension at any time.</li>
+            <li>
+              Users can block or exclude sites from extension operation where supported by the
+              product.
+            </li>
+            <li>
+              Users can remove the extension at any time through the browser’s extension manager.
+            </li>
+          </ul>
+        </article>
+
+        <article class="panel">
+          <h2>7. Scope and third parties</h2>
+          <p>
+            This policy covers the Saigon Safe browser extension itself. It does not replace any
+            separate privacy terms that may apply to a user’s configured server, web vault, or
+            related self-hosted infrastructure.
+          </p>
+          <p>
+            If the extension is pointed at a self-hosted or third-party service, the operator of
+            that service may control server-side logging, retention, and account handling outside
+            the extension code.
+          </p>
+        </article>
+
+        <article class="panel">
+          <h2>8. Contact and source</h2>
+          <div class="callout">
+            Questions, issue reports, and source review can be directed to the public repository:
+            <a href="https://github.com/kevincolemaninc/saigonsafe"
+              >github.com/kevincolemaninc/saigonsafe</a
+            >.
+          </div>
+          <p class="footer">
+            If the extension behavior changes in a way that materially affects permissions, network
+            traffic, or personal data handling, this page should be updated before release.
+          </p>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

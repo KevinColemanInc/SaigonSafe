@@ -2,6 +2,7 @@ import { EncryptedString } from "@bitwarden/common/key-management/crypto/models/
 import {
   KeyDefinition,
   BIOMETRIC_SETTINGS_DISK,
+  BIOMETRIC_SETTINGS_MEMORY,
   UserKeyDefinition,
 } from "@bitwarden/common/platform/state";
 import { UserId } from "@bitwarden/common/types/guid";
@@ -12,6 +13,20 @@ import { UserId } from "@bitwarden/common/types/guid";
 export const BIOMETRIC_UNLOCK_ENABLED = new UserKeyDefinition<boolean>(
   BIOMETRIC_SETTINGS_DISK,
   "biometricUnlockEnabled",
+  {
+    deserializer: (obj: any) => obj,
+    clearOn: [],
+  },
+);
+
+/**
+ * Stores whether the user allows biometric unlock before they have unlocked once in the current
+ * client session. When true, biometrics can be used immediately after restart. When false, the
+ * user must first unlock with another method before biometric unlock becomes available.
+ */
+export const REQUIRE_PASSWORD_ON_START = new UserKeyDefinition<boolean>(
+  BIOMETRIC_SETTINGS_DISK,
+  "requirePasswordOnStart",
   {
     deserializer: (obj: any) => obj,
     clearOn: [],
@@ -59,6 +74,19 @@ export const PROMPT_AUTOMATICALLY = new UserKeyDefinition<boolean>(
 );
 
 /**
+ * Stores whether the user has already unlocked once in the current client session, allowing
+ * biometric unlock when restart-time biometric unlock is disabled.
+ */
+export const BIOMETRIC_UNLOCK_SESSION_READY = new UserKeyDefinition<boolean>(
+  BIOMETRIC_SETTINGS_MEMORY,
+  "biometricUnlockSessionReady",
+  {
+    deserializer: (obj: any) => obj,
+    clearOn: ["logout"],
+  },
+);
+
+/**
  * Stores whether or not IPC handshake has been validated this session.
  */
 export const FINGERPRINT_VALIDATED = new KeyDefinition<boolean>(
@@ -66,6 +94,19 @@ export const FINGERPRINT_VALIDATED = new KeyDefinition<boolean>(
   "fingerprintValidated",
   {
     deserializer: (obj) => obj,
+  },
+);
+
+/**
+ * Stores the key ID of the user key that was last enrolled in the biometric system.
+ * Used to detect when the user key has changed and biometric keys need re-enrollment.
+ */
+export const BIOMETRIC_ENROLLED_KEY_ID = new UserKeyDefinition<string | null>(
+  BIOMETRIC_SETTINGS_DISK,
+  "biometricEnrolledKeyId",
+  {
+    deserializer: (obj) => obj,
+    clearOn: [],
   },
 );
 
