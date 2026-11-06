@@ -7,8 +7,7 @@ import { RouterTestingModule } from "@angular/router/testing";
 import { mock } from "jest-mock-extended";
 import { BehaviorSubject, Observable, Subject, of } from "rxjs";
 
-import { PremiumUpgradeDialogComponent } from "@bitwarden/angular/billing/components";
-import { NudgeType, NudgesService, PremiumUpsellService } from "@bitwarden/angular/vault";
+import { NudgeType, NudgesService } from "@bitwarden/angular/vault";
 import {
   AutoConfirmExtensionSetupDialogComponent,
   AutomaticUserConfirmationService,
@@ -146,10 +145,6 @@ const mockDialogRef = {
 } as unknown as import("@bitwarden/components").DialogRef<any, any>;
 
 jest
-  .spyOn(PremiumUpgradeDialogComponent, "open")
-  .mockImplementation((_: DialogService) => mockDialogRef as any);
-
-jest
   .spyOn(DecryptionFailureDialogComponent, "open")
   .mockImplementation((_: DialogService, _params: any) => mockDialogRef as any);
 
@@ -235,10 +230,6 @@ describe("VaultComponent", () => {
     getFeatureFlag$: jest.fn().mockImplementation((_flag: string) => of(false)),
   };
 
-  const premiumUpsellSvc = {
-    showUpsell: jest.fn().mockReturnValue(false),
-  };
-
   const autoConfirmSvc = {
     configuration$: jest.fn().mockReturnValue(of({})),
     canManageAutoConfirm$: jest.fn().mockReturnValue(of(false)),
@@ -248,7 +239,6 @@ describe("VaultComponent", () => {
 
   beforeEach(async () => {
     jest.clearAllMocks();
-    premiumUpsellSvc.showUpsell.mockReturnValue(false);
     await TestBed.configureTestingModule({
       imports: [VaultComponent, RouterTestingModule],
       providers: [
@@ -307,7 +297,6 @@ describe("VaultComponent", () => {
           provide: InternalOrganizationServiceAbstraction,
           useValue: { organizations$: jest.fn().mockReturnValue(of([])) },
         },
-        { provide: PremiumUpsellService, useValue: premiumUpsellSvc },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -430,11 +419,6 @@ describe("VaultComponent", () => {
     expect(scrollSvc.start).toHaveBeenCalledWith(scrollRegion);
   }));
 
-  it("showPremiumDialog opens PremiumUpgradeDialogComponent", () => {
-    component["showPremiumDialog"]();
-    expect(PremiumUpgradeDialogComponent.open).toHaveBeenCalledTimes(1);
-  });
-
   it("navigateToImport navigates to import route", fakeAsync(async () => {
     const ngRouter = TestBed.inject(Router);
     jest.spyOn(ngRouter, "navigate").mockResolvedValue(true as any);
@@ -479,7 +463,7 @@ describe("VaultComponent", () => {
     expect(spy).toHaveBeenCalledWith(NudgeType.HasVaultItems, "user-xyz");
   }));
 
-  it("renders Premium spotlight when eligible and opens dialog on click", fakeAsync(() => {
+  it("does not render the Premium promotion even when the upgrade nudge is enabled", fakeAsync(() => {
     activeAccount$.next({
       id: "user-1",
       creationDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
@@ -488,7 +472,6 @@ describe("VaultComponent", () => {
     itemsSvc.cipherCount$.next(10);
 
     hasPremiumFromAnySource$.next(false);
-    premiumUpsellSvc.showUpsell.mockReturnValue(true);
 
     configSvc.getFeatureFlag$.mockImplementation((_flag: string) => of(true));
 
@@ -506,20 +489,9 @@ describe("VaultComponent", () => {
 
     fixture.detectChanges();
 
-    const spotlights = Array.from(
-      fixture.nativeElement.querySelectorAll("bit-callout"),
-    ) as HTMLElement[];
-    expect(spotlights.length).toBe(1);
-
-    const spotDe = fixture.debugElement.query(By.css("bit-callout"));
-    expect(spotDe).toBeTruthy();
-
-    const button = spotDe.query(By.css("[slot='end']"));
-    button.nativeElement.click();
-
-    fixture.detectChanges();
-
-    expect(PremiumUpgradeDialogComponent.open).toHaveBeenCalledTimes(1);
+    expect(queryAllSpotlights(fixture)).toHaveLength(0);
+    expect(fixture.nativeElement.textContent).not.toContain("unlockAdvancedSecurity");
+    expect(fixture.nativeElement.textContent).not.toContain("explorePremium");
   }));
 
   it("renders Empty-Vault spotlight when vaultState is Empty and nudge is on", fakeAsync(() => {

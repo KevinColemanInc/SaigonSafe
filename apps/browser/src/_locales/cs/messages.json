@@ -1,16 +1,16 @@
 {
   "appName": {
-    "message": "Bitwarden"
+    "message": "SaigonSafe"
   },
   "appLogoLabel": {
-    "message": "Logo Bitwarden"
+    "message": "Logo SaigonSafe"
   },
   "extName": {
-    "message": "Bitwarden - Správce hesel",
+    "message": "SaigonSafe",
     "description": "Extension name, MUST be less than 40 characters (Safari restriction)"
   },
   "extDesc": {
-    "message": "Bitwarden zabezpečí všechna Vaše hesla, přístupové klíče a citlivé informace doma, v práci nebo na cestách",
+    "message": "SaigonSafe zabezpečí všechna Vaše hesla, přístupové klíče a citlivé informace doma, v práci nebo na cestách",
     "description": "Extension description, MUST be less than 112 characters (Safari restriction)"
   },
   "loginOrCreateNewAccount": {
@@ -23,7 +23,7 @@
     "message": "Vytvořit účet"
   },
   "newToBitwarden": {
-    "message": "Jste noví na Bitwardenu?"
+    "message": "Jste noví na SaigonSafeu?"
   },
   "logInWithPasskey": {
     "message": "Přihlásit se pomocí přístupového klíče"
@@ -300,22 +300,22 @@
     "message": "Pokračovat do webové aplikace?"
   },
   "continueToWebAppDesc": {
-    "message": "Prozkoumejte další funkce Vašeho účtu Bitwarden ve webové aplikaci."
+    "message": "Prozkoumejte další funkce Vašeho účtu SaigonSafe ve webové aplikaci."
   },
   "continueToHelpCenter": {
     "message": "Pokračovat do Centra nápovědy?"
   },
   "continueToHelpCenterDesc": {
-    "message": "Přečtěte si více o tom, jak používat Bitwarden v Centru nápovědy."
+    "message": "Přečtěte si více o tom, jak používat SaigonSafe v Centru nápovědy."
   },
   "continueToBrowserExtensionStore": {
     "message": "Pokračovat do obchodu s rozšířeními pro prohlížeč?"
   },
   "continueToBrowserExtensionStoreDesc": {
-    "message": "Pomozte ostatním zjistit, zda je Bitwarden pro ně správný. Navštivte obchod s rozšířeními pro prohlížeč a zanechte hodnocení."
+    "message": "Pomozte ostatním zjistit, zda je SaigonSafe pro ně správný. Navštivte obchod s rozšířeními pro prohlížeč a zanechte hodnocení."
   },
   "changeMasterPasswordOnWebConfirmation": {
-    "message": "Hlavní heslo můžete změnit ve webové aplikaci Bitwardenu."
+    "message": "Hlavní heslo můžete změnit ve webové aplikaci SaigonSafeu."
   },
   "fingerprintPhrase": {
     "message": "Fráze otisku prstu",
@@ -332,31 +332,31 @@
     "message": "Odhlásit se"
   },
   "aboutBitwarden": {
-    "message": "O Bitwardenu"
+    "message": "O SaigonSafeu"
   },
   "about": {
     "message": "O rozšíření"
   },
   "moreFromBitwarden": {
-    "message": "Více od Bitwardenu"
+    "message": "Více od SaigonSafeu"
   },
   "continueToBitwardenDotCom": {
     "message": "Pokračovat na bitwarden.com?"
   },
   "bitwardenForBusiness": {
-    "message": "Bitwarden pro podnikání"
+    "message": "SaigonSafe pro podnikání"
   },
   "bitwardenAuthenticator": {
-    "message": "Bitwarden Authenticator"
+    "message": "SaigonSafe Authenticator"
   },
   "continueToAuthenticatorPageDesc": {
-    "message": "Bitwarden Authenticator umožňuje ukládat ověřovací klíče a generovat TOTP kódy pro 2-fázové ověřování. Další informace naleznete na stránkách bitwarden.com"
+    "message": "SaigonSafe Authenticator umožňuje ukládat ověřovací klíče a generovat TOTP kódy pro 2-fázové ověřování. Další informace naleznete na stránkách bitwarden.com"
   },
   "bitwardenSecretsManager": {
-    "message": "Správce tajných klíčů Bitwardenu"
+    "message": "Správce tajných klíčů SaigonSafeu"
   },
   "continueToSecretsManagerPageDesc": {
-    "message": "Bezpečně ukládá, spravuje a sdílí tajné klíče vývojáře se správcem tajných klíčů Bitwardenu. Více informací naleznete na stránkách bitwarden.com."
+    "message": "Bezpečně ukládá, spravuje a sdílí tajné klíče vývojáře se správcem tajných klíčů SaigonSafeu. Více informací naleznete na stránkách bitwarden.com."
   },
   "passwordlessDotDev": {
     "message": "Passwordless.dev"
@@ -365,10 +365,10 @@
     "message": "S heslem Passwordless.dev vytvořte hladký a bezpečný přístup bez tradičních hesel. Další informace naleznete na stránkách bitwarden.com."
   },
   "freeBitwardenFamilies": {
-    "message": "Bitwarden pro rodinu zdarma"
+    "message": "SaigonSafe pro rodinu zdarma"
   },
   "freeBitwardenFamiliesPageDesc": {
-    "message": "Máte nárok na Bitwarden pro rodinu zdarma. Uplatněte tuto nabídku ještě dnes ve webové aplikaci."
+    "message": "Máte nárok na SaigonSafe pro rodinu zdarma. Uplatněte tuto nabídku ještě dnes ve webové aplikaci."
   },
   "version": {
     "message": "Verze"
@@ -428,10 +428,10 @@
     "message": "Nápověda a zpětná vazba"
   },
   "helpCenter": {
-    "message": "Centrum nápovědy Bitwarden"
+    "message": "Centrum nápovědy SaigonSafe"
   },
   "communityForums": {
-    "message": "Prozkoumejte komunitní fóra Bitwarden"
+    "message": "Prozkoumejte komunitní fóra SaigonSafe"
   },
   "contactSupport": {
     "message": "Kontakt na podporu"
@@ -456,7 +456,7 @@
     "message": "Vygenerujte si silné a unikátní heslo pro přihlašovací údaje."
   },
   "bitWebVaultApp": {
-    "message": "Webová aplikace Bitwardenu"
+    "message": "Webová aplikace SaigonSafeu"
   },
   "select": {
     "message": "Vybrat"
@@ -919,10 +919,10 @@
     "message": "Bezproblémové dvoufázové ověřování"
   },
   "totpHelper": {
-    "message": "Bitwarden umí ukládat a vyplňovat dvoufázové ověřovací kódy. Zkopírujte a vložte klíč do tohoto pole."
+    "message": "SaigonSafe umí ukládat a vyplňovat dvoufázové ověřovací kódy. Zkopírujte a vložte klíč do tohoto pole."
   },
   "totpHelperWithCapture": {
-    "message": "Bitwarden umí ukládat a vyplňovat dvoufázové ověřovací kódy. Vyberte ikonu fotoaparátu a pořiďte snímek obrazovky ověřovacího QR kódu této webové stránky nebo klíč zkopírujte a vložte do tohoto pole."
+    "message": "SaigonSafe umí ukládat a vyplňovat dvoufázové ověřovací kódy. Vyberte ikonu fotoaparátu a pořiďte snímek obrazovky ověřovacího QR kódu této webové stránky nebo klíč zkopírujte a vložte do tohoto pole."
   },
   "learnMoreAboutAuthenticators": {
     "message": "Zjistěte více o autentizátorech"
@@ -943,7 +943,7 @@
     "message": "Přihlásit se"
   },
   "logInToBitwarden": {
-    "message": "Přihlásit se do Bitwardenu"
+    "message": "Přihlásit se do SaigonSafeu"
   },
   "enterTheCodeSentToYourEmail": {
     "message": "Zadejte kód odeslaný na Váš e-mail"
@@ -1006,7 +1006,7 @@
     "message": "Dvoufázové přihlášení činí Váš účet mnohem bezpečnějším díky nutnosti po každém úspěšném přihlášení zadat ověřovací kód získaný z bezpečnostního klíče, aplikace, SMS, telefonního hovoru nebo e-mailu. Dvoufázové přihlášení lze aktivovat na webové stránce bitwarden.com. Chcete tuto stránku nyní otevřít?"
   },
   "twoStepLoginConfirmationContent": {
-    "message": "Vytvořte svůj účet bezpečnějším nastavením dvoufázového přihlášení ve webové aplikaci Bitwarden."
+    "message": "Vytvořte svůj účet bezpečnějším nastavením dvoufázového přihlášení ve webové aplikaci SaigonSafe."
   },
   "twoStepLoginConfirmationTitle": {
     "message": "Pokračovat do webové aplikace?"
@@ -1158,7 +1158,7 @@
     "message": "Přejít na nastavení"
   },
   "notificationAddDesc": {
-    "message": "Má si Bitwarden toto heslo pamatovat?"
+    "message": "Má si SaigonSafe toto heslo pamatovat?"
   },
   "notificationAddSave": {
     "message": "Uložit"
@@ -1194,11 +1194,11 @@
     }
   },
   "notificationLoginSaveConfirmation": {
-    "message": "uloženo do Bitwardenu.",
+    "message": "uloženo do SaigonSafeu.",
     "description": "Shown to user after item is saved."
   },
   "notificationLoginUpdatedConfirmation": {
-    "message": "aktualizováno v Bitwardenu.",
+    "message": "aktualizováno v SaigonSafeu.",
     "description": "Shown to user after item is updated."
   },
   "selectItemAriaLabel": {
@@ -1296,13 +1296,13 @@
     "message": "Zeptá se na uložení nového hesla nebo se přihlásí pomocí přístupových hesel uložených ve Vašem trezoru. Platí pro všechny přihlášené účty."
   },
   "notificationChangeDesc": {
-    "message": "Chcete aktualizovat toto heslo v Bitwardenu?"
+    "message": "Chcete aktualizovat toto heslo v SaigonSafeu?"
   },
   "notificationChangeSave": {
     "message": "Aktualizovat"
   },
   "notificationUnlockDesc": {
-    "message": "Pro dokončení požadavku na automatické vyplnění odemkněte Váš trezor na Bitwardenu."
+    "message": "Pro dokončení požadavku na automatické vyplnění odemkněte Váš trezor na SaigonSafeu."
   },
   "notificationUnlock": {
     "message": "Odemknout"
@@ -1378,10 +1378,10 @@
     "message": "Toto heslo bude použito pro export a import tohoto souboru."
   },
   "accountRestrictedOptionDescription": {
-    "message": "Pro zašifrování exportu a omezení importu jen na aktuální účet Bitwardenu se použije šifrovací klíč Vašeho účtu odvozený z uživatelského jména a hlavního hesla."
+    "message": "Pro zašifrování exportu a omezení importu jen na aktuální účet SaigonSafeu se použije šifrovací klíč Vašeho účtu odvozený z uživatelského jména a hlavního hesla."
   },
   "passwordProtectedOptionDescription": {
-    "message": "Nastavte heslo pro šifrování exportu a importujte ho do libovolného účtu Bitwardenu pomocí hesla pro dešifrování."
+    "message": "Nastavte heslo pro šifrování exportu a importujte ho do libovolného účtu SaigonSafeu pomocí hesla pro dešifrování."
   },
   "exportTypeHeading": {
     "message": "Typ exportu"
@@ -1410,7 +1410,7 @@
     "message": "Tento export zašifruje Vaše data pomocí šifrovacího klíče Vašeho účtu. Pokud někdy změníte šifrovací klíč Vašeho účtu, měli byste vyexportovat data znovu, protože tento exportovaný soubor nebudete moci dešifrovat."
   },
   "encExportAccountWarningDesc": {
-    "message": "Šifrovací klíče účtu jsou pro každý uživatelský účet Bitwardenu jedinečné, takže nelze importovat šifrovaný export do jiného účtu."
+    "message": "Šifrovací klíče účtu jsou pro každý uživatelský účet SaigonSafeu jedinečné, takže nelze importovat šifrovaný export do jiného účtu."
   },
   "exportMasterPassword": {
     "message": "Pro exportování dat zadejte své hlavní heslo."
@@ -1419,7 +1419,7 @@
     "message": "Sdílené"
   },
   "bitwardenForBusinessPageDesc": {
-    "message": "Bitwarden pro podnikání Vám umožňuje sdílet položky v trezoru s ostatními prostřednictvím organizace. Více informací naleznete na bitwarden.com."
+    "message": "SaigonSafe pro podnikání Vám umožňuje sdílet položky v trezoru s ostatními prostřednictvím organizace. Více informací naleznete na bitwarden.com."
   },
   "moveToOrganization": {
     "message": "Přesunout do organizace"
@@ -1585,13 +1585,13 @@
     "message": "Zakoupit členství Premium"
   },
   "premiumPurchaseAlertV2": {
-    "message": "Premium si můžete zakoupit v nastavení účtu ve webové aplikaci Bitwarden."
+    "message": "Premium si můžete zakoupit v nastavení účtu ve webové aplikaci SaigonSafe."
   },
   "premiumCurrentMember": {
     "message": "Jste prémiovým členem!"
   },
   "premiumCurrentMemberThanks": {
-    "message": "Děkujeme za podporu Bitwardenu."
+    "message": "Děkujeme za podporu SaigonSafeu."
   },
   "premiumFeatures": {
     "message": "Přejděte na Premium a získáte:"
@@ -1697,8 +1697,8 @@
     "message": "Ověřovací aplikace"
   },
   "authenticatorAppDescV2": {
-    "message": "Zadejte kód vygenerovaný ověřovací aplikací, jako je Bitwarden Authenticator.",
-    "description": "'Bitwarden Authenticator' is a product name and should not be translated."
+    "message": "Zadejte kód vygenerovaný ověřovací aplikací, jako je SaigonSafe Authenticator.",
+    "description": "'SaigonSafe Authenticator' is a product name and should not be translated."
   },
   "yubiKeyTitleV2": {
     "message": "Bezpečnostní klíč YubiKey OTP"
@@ -1730,7 +1730,7 @@
     "message": "Prostředí vlastního serveru"
   },
   "selfHostedBaseUrlHint": {
-    "message": "Zadejte základní URL adresu Vaší vlastní hostované aplikace Bitwarden. Příklad: https://bitwarden.spolecnost.cz"
+    "message": "Zadejte základní URL adresu Vaší vlastní hostované aplikace SaigonSafe. Příklad: https://bitwarden.spolecnost.cz"
   },
   "selfHostedCustomEnvHeader": {
     "message": "Pro rozšířená nastavení můžete zadat základní URL adresu každé služby zvlášť."
@@ -1780,7 +1780,7 @@
     "message": "Snadné hledání návrhů automatického vyplňování"
   },
   "autofillSpotlightDesc": {
-    "message": "Vypněte nastavení automatického vyplňování prohlížeče, takže nebude v rozporu s Bitwardenem."
+    "message": "Vypněte nastavení automatického vyplňování prohlížeče, takže nebude v rozporu s SaigonSafeem."
   },
   "turnOffBrowserAutofill": {
     "message": "Vypnout automatické vyplňování $BROWSER$",
@@ -1825,7 +1825,7 @@
     "message": "Zobrazit návrhy automatického vyplňování v polích formuláře"
   },
   "howDoesBitwardenProtectFromPhishing": {
-    "message": "Jak Bitwarden chrání Vaše data před phishingem?"
+    "message": "Jak SaigonSafe chrání Vaše data před phishingem?"
   },
   "currentWebsite": {
     "message": "Aktuální webová stránka"
@@ -2421,7 +2421,7 @@
     "message": "Slabé hlavní heslo"
   },
   "weakMasterPasswordDesc": {
-    "message": "Zvolené hlavní heslo je slabé. Pro správnou ochranu účtu Bitwardenu byste měli použít silné hlavní heslo (nebo heslovou frázi). Opravdu chcete toto heslo použít?"
+    "message": "Zvolené hlavní heslo je slabé. Pro správnou ochranu účtu SaigonSafeu byste měli použít silné hlavní heslo (nebo heslovou frázi). Opravdu chcete toto heslo použít?"
   },
   "rotateAccountEncKey": {
     "message": "Měnit také šifrovací klíč k mému účtu"
@@ -2433,7 +2433,7 @@
     "message": "Opravdu chcete měnit šifrovací klíč k Vašemu účtu?"
   },
   "updateEncryptionKeyWarning": {
-    "message": "Po aktualizace šifrovacího klíče dojde k odhlášení a budete se muset opětovně přihlásit do všech aplikací Bitwardenu, které aktuálně používáte (např. mobilní aplikace či rozšíření pro prohlížeč). Nezdaří-li se odhlášení a opětovné přihlášení (během něhož bude stažen nový šifrovací klíč), může dojít k poškození dat. Pokusíme se Vás automaticky odhlásit, nicméně, může to chvíli trvat."
+    "message": "Po aktualizace šifrovacího klíče dojde k odhlášení a budete se muset opětovně přihlásit do všech aplikací SaigonSafeu, které aktuálně používáte (např. mobilní aplikace či rozšíření pro prohlížeč). Nezdaří-li se odhlášení a opětovné přihlášení (během něhož bude stažen nový šifrovací klíč), může dojít k poškození dat. Pokusíme se Vás automaticky odhlásit, nicméně, může to chvíli trvat."
   },
   "updateEncryptionKeyAccountExportWarning": {
     "message": "Všechny uložené exporty s omezením účtu se stanou neplatnými."
@@ -2464,7 +2464,7 @@
     "message": "Nastavte svůj PIN kód pro odemknutí trezoru. Pokud se zcela odhlásíte z aplikace bude Váš aktuální PIN resetován."
   },
   "setPinCode": {
-    "message": "Tento PIN můžete použít k odemknutí Bitwardenu. Váš PIN bude resetován, pokud se někdy úplně odhlásíte z aplikace."
+    "message": "Tento PIN můžete použít k odemknutí SaigonSafeu. Váš PIN bude resetován, pokud se někdy úplně odhlásíte z aplikace."
   },
   "pinRequired": {
     "message": "Je vyžadován PIN kód."
@@ -2485,7 +2485,7 @@
     "message": "Čeká se na potvrzení z aplikace v počítači"
   },
   "awaitDesktopDesc": {
-    "message": "Pro povolení biometrie v prohlížeči potvrďte její použití v desktopové aplikaci Bitwarden."
+    "message": "Pro povolení biometrie v prohlížeči potvrďte její použití v desktopové aplikaci SaigonSafe."
   },
   "lockWithMasterPassOnRestart": {
     "message": "Zamknout trezor při restartu prohlížeče pomocí hlavního hesla"
@@ -2600,7 +2600,7 @@
     "message": "Formulář je hostován jinou doménou než URI uloženého přihlášení. Zvolte OK pro automatické vyplnění nebo Zrušit pro zrušení."
   },
   "autofillIframeWarningTip": {
-    "message": "Aby se zabránilo tomuto varování v budoucnu, uložte tuto URI: $HOSTNAME$ do vaší přihlašovací položky Bitwarden pro tuto stránku.",
+    "message": "Aby se zabránilo tomuto varování v budoucnu, uložte tuto URI: $HOSTNAME$ do vaší přihlašovací položky SaigonSafe pro tuto stránku.",
     "placeholders": {
       "hostname": {
         "content": "$1",
@@ -2609,7 +2609,7 @@
     }
   },
   "topLayerHijackWarning": {
-    "message": "Tato stránka narušuje zážitek z Bitwardenu. Vložené menu Bitwarden bylo dočasně vypnuto jako bezpečnostní opatření."
+    "message": "Tato stránka narušuje zážitek z SaigonSafeu. Vložené menu SaigonSafe bylo dočasně vypnuto jako bezpečnostní opatření."
   },
   "setMasterPassword": {
     "message": "Nastavit hlavní heslo"
@@ -2666,7 +2666,7 @@
     "message": "Vaše nové hlavní heslo nesplňuje požadavky zásad organizace."
   },
   "receiveMarketingEmailsV2": {
-    "message": "Přihlásit se pro příjem rad, oznámení a příležitostí k výzkumu od Bitwardenu."
+    "message": "Přihlásit se pro příjem rad, oznámení a příležitostí k výzkumu od SaigonSafeu."
   },
   "unsubscribe": {
     "message": "Odhlásit odběr"
@@ -2717,13 +2717,13 @@
     "message": "Integrace prohlížeče není nastavena"
   },
   "desktopIntegrationDisabledDesc": {
-    "message": "Integrace prohlížeče není v aplikaci Bitwarden nastavena. Nastavte ji v aplikaci pro počítač."
+    "message": "Integrace prohlížeče není v aplikaci SaigonSafe nastavena. Nastavte ji v aplikaci pro počítač."
   },
   "startDesktopTitle": {
-    "message": "Spustit aplikaci Bitwarden pro počítač"
+    "message": "Spustit aplikaci SaigonSafe pro počítač"
   },
   "startDesktopDesc": {
-    "message": "Před použitím této funkce musí být spuštěna aplikace Bitwarden pro počítač."
+    "message": "Před použitím této funkce musí být spuštěna aplikace SaigonSafe pro počítač."
   },
   "errorEnableBiometricTitle": {
     "message": "Nelze nastavit biometrii"
@@ -2777,13 +2777,13 @@
     "message": "Biometrika selhala"
   },
   "biometricsFailedDesc": {
-    "message": "Biometriku nelze dokončit, zvažte použití hlavního hesla nebo odhlášení. Pokud to přetrvává, kontaktujte podporu Bitwardenu."
+    "message": "Biometriku nelze dokončit, zvažte použití hlavního hesla nebo odhlášení. Pokud to přetrvává, kontaktujte podporu SaigonSafeu."
   },
   "nativeMessaginPermissionErrorTitle": {
     "message": "Oprávnění nebylo uděleno"
   },
   "nativeMessaginPermissionErrorDesc": {
-    "message": "Bez oprávnění ke komunikaci s aplikací Bitwarden pro počítač nelze v rozšíření prohlížeče používat biometrické údaje. Zkuste to znovu."
+    "message": "Bez oprávnění ke komunikaci s aplikací SaigonSafe pro počítač nelze v rozšíření prohlížeče používat biometrické údaje. Zkuste to znovu."
   },
   "nativeMessaginPermissionSidebarTitle": {
     "message": "Žádost o oprávnění selhala"
@@ -2820,7 +2820,7 @@
     "message": "Vyloučené domény"
   },
   "excludedDomainsDesc": {
-    "message": "Bitwarden nebude žádat o uložení přihlašovacích údajů pro tyto domény. Aby se změny projevily, musíte stránku obnovit."
+    "message": "SaigonSafe nebude žádat o uložení přihlašovacích údajů pro tyto domény. Aby se změny projevily, musíte stránku obnovit."
   },
   "blockedDomainsDesc": {
     "message": "Automatické vyplňování a další související funkce nebudou pro tyto webové stránky nabízeny. Aby se změny projevily, musíte stránku aktualizovat."
@@ -2936,24 +2936,24 @@
     "message": "Ilustrace seznamu přihlášení, která jsou zranitelná."
   },
   "welcomeDialogGraphicAlt": {
-    "message": "Ilustrace rozložení stránky trezoru Bitwarden."
+    "message": "Ilustrace rozložení stránky trezoru SaigonSafe."
   },
   "generatePasswordSlideDesc": {
-    "message": "Rychle vygeneruje silné, unikátní heslo s nabídkou automatického vyplňování Bitwarden na zranitelných stránkách.",
+    "message": "Rychle vygeneruje silné, unikátní heslo s nabídkou automatického vyplňování SaigonSafe na zranitelných stránkách.",
     "description": "Description of the generate password slide on the at-risk password page carousel"
   },
   "generatePasswordSlideImgAltPeriod": {
-    "message": "Ilustrace nabídky automatického vyplňování Bitwarden zobrazující vygenerované heslo."
+    "message": "Ilustrace nabídky automatického vyplňování SaigonSafe zobrazující vygenerované heslo."
   },
   "updateInBitwarden": {
-    "message": "Aktualizovat v Bitwardenu"
+    "message": "Aktualizovat v SaigonSafeu"
   },
   "updateInBitwardenSlideDesc": {
-    "message": "Bitwarden Vás poté požádá o aktualizaci hesla ve správci hesel.",
-    "description": "Description of the update in Bitwarden slide on the at-risk password page carousel"
+    "message": "SaigonSafe Vás poté požádá o aktualizaci hesla ve správci hesel.",
+    "description": "Description of the update in SaigonSafe slide on the at-risk password page carousel"
   },
   "updateInBitwardenSlideImgAltPeriod": {
-    "message": "Ilustrace oznámení v Bitwardenu, která uživatele vyzývá k aktualizaci přihlášení."
+    "message": "Ilustrace oznámení v SaigonSafeu, která uživatele vyzývá k aktualizaci přihlášení."
   },
   "turnOnAutofill": {
     "message": "Zapnout automatické vyplňování"
@@ -3007,11 +3007,11 @@
   },
   "send": {
     "message": "Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "sendDetails": {
     "message": "Podrobnosti Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "sendTypeText": {
     "message": "Text"
@@ -3024,7 +3024,7 @@
   },
   "allSends": {
     "message": "Všechny Sends",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "maxAccessCountReached": {
     "message": "Dosažen maximální počet přístupů",
@@ -3044,7 +3044,7 @@
   },
   "copySendLink": {
     "message": "Zkopírovat odkaz Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "removePassword": {
     "message": "Odebrat heslo"
@@ -3057,11 +3057,11 @@
   },
   "deletedSend": {
     "message": "Send smazán",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "sendLink": {
     "message": "Odkaz pro Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "disabled": {
     "message": "Zakázáno"
@@ -3071,26 +3071,26 @@
   },
   "deleteSend": {
     "message": "Smazat Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "deleteSendConfirmation": {
     "message": "Opravdu chcete smazat tento Send?",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "deleteSendPermanentConfirmation": {
     "message": "Opravdu chcete tento Send trvale smazat?",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "editSend": {
     "message": "Upravit Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "deletionDate": {
     "message": "Datum smazání"
   },
   "deletionDateDescV2": {
     "message": "Tento Send bude trvale smazán v určené datum.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "expirationDate": {
     "message": "Datum vypršení platnosti"
@@ -3112,34 +3112,34 @@
   },
   "createSend": {
     "message": "Nový Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "newPassword": {
     "message": "Nové heslo"
   },
   "sendDisabled": {
     "message": "Send odebrán",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "sendDisabledWarning": {
     "message": "Z důvodu podnikových zásad můžete smazat pouze existující Send.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "createdSend": {
     "message": "Send vytvořen",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "createdSendSuccessfully": {
     "message": "Send byl úspěšně vytvořen!",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "sendExpiresInHoursSingle": {
     "message": "Send bude k dispozici na příští 1 hodinu každému, kdo má odkaz.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "sendExpiresInHours": {
     "message": "Send bude k dispozici na příštích $HOURS$ hodin každému, kdo má odkaz.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated.",
     "placeholders": {
       "hours": {
         "content": "$1",
@@ -3149,11 +3149,11 @@
   },
   "sendExpiresInDaysSingle": {
     "message": "Send bude k dispozici na příští 1 den každému, kdo má odkaz.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "sendExpiresInDays": {
     "message": "Send bude k dispozici na příštích $DAYS$ dnů každému, kdo má odkaz.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated.",
     "placeholders": {
       "days": {
         "content": "$1",
@@ -3172,7 +3172,7 @@
   },
   "sendCreatedDescriptionV2": {
     "message": "Zkopírujte a sdílejte tento odkaz Send. Send bude k dispozici komukoli s odkazem na dalších $TIME$.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated.",
     "placeholders": {
       "time": {
         "content": "$1",
@@ -3182,7 +3182,7 @@
   },
   "sendCreatedDescriptionPassword": {
     "message": "Zkopírujte a sdílejte tento odkaz Send. Send bude k dispozici komukoli s odkazem a heslem na dalších $TIME$.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated.",
     "placeholders": {
       "time": {
         "content": "$1",
@@ -3192,7 +3192,7 @@
   },
   "sendCreatedDescriptionEmail": {
     "message": "Zkopírujte a sdílejte tento Send pro odesílání. Můžou jej zobrazit osoby, které jste zadali, a to po dobu $TIME$.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated.",
     "placeholders": {
       "time": {
         "content": "$1",
@@ -3202,11 +3202,11 @@
   },
   "sendLinkCopied": {
     "message": "Odkaz Send byl zkopírován",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "editedSend": {
     "message": "Send upraven",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "popOut": {
     "message": "Nové okno"
@@ -3479,7 +3479,7 @@
     "message": "Chyba při načítání dat automatického vyplňování"
   },
   "couldNotDecryptVaultItemsBelow": {
-    "message": "Bitwarden nemohl dešifrovat níže uvedené položky v trezoru."
+    "message": "SaigonSafe nemohl dešifrovat níže uvedené položky v trezoru."
   },
   "contactCSToAvoidDataLossPart1": {
     "message": "Kontaktujte zákaznickou podporu,",
@@ -3583,11 +3583,11 @@
     }
   },
   "forwarderGeneratedBy": {
-    "message": "Vygenerováno Bitwardenem.",
+    "message": "Vygenerováno SaigonSafeem.",
     "description": "Displayed with the address on the forwarding service's configuration screen."
   },
   "forwarderGeneratedByWithWebsite": {
-    "message": "Webová stránka: $WEBSITE$. Vygenerováno Bitwardenem.",
+    "message": "Webová stránka: $WEBSITE$. Vygenerováno SaigonSafeem.",
     "description": "Displayed with the address on the forwarding service's configuration screen.",
     "placeholders": {
       "WEBSITE": {
@@ -3780,7 +3780,7 @@
     "message": "Na Vaše zařízení bylo odesláno oznámení."
   },
   "notificationSentDevicePart1": {
-    "message": "Odemknout Bitwarden na Vašem zařízení nebo na"
+    "message": "Odemknout SaigonSafe na Vašem zařízení nebo na"
   },
   "notificationSentDeviceAnchor": {
     "message": "webová aplikace"
@@ -4138,11 +4138,11 @@
   },
   "sendsTitleNoItems": {
     "message": "Posílejte citlivé informace bezpečně",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "sendsBodyNoItems": {
     "message": "Sdílejte bezpečně soubory a data s kýmkoli na libovolné platformě. Vaše informace zůstanou šifrovány a zároveň omezují expozici.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "inputRequired": {
     "message": "Je vyžadován vstup."
@@ -4283,15 +4283,15 @@
     "message": "Přeskočit na obsah"
   },
   "bitwardenOverlayButton": {
-    "message": "Tlačítko nabídky automatického vyplňování Bitwardenu",
+    "message": "Tlačítko nabídky automatického vyplňování SaigonSafeu",
     "description": "Page title for the iframe containing the overlay button"
   },
   "toggleBitwardenVaultOverlay": {
-    "message": "Přepnout nabídku automatického vyplňování Bitwardenu",
+    "message": "Přepnout nabídku automatického vyplňování SaigonSafeu",
     "description": "Screen reader and tool tip label for the overlay button"
   },
   "bitwardenVault": {
-    "message": "Nabídka automatického vyplňování Bitwardenu",
+    "message": "Nabídka automatického vyplňování SaigonSafeu",
     "description": "Page title in overlay"
   },
   "unlockYourAccountToViewMatchingLogins": {
@@ -4363,7 +4363,7 @@
     "description": "Screen reader text (aria-label) for new identity button within inline menu"
   },
   "bitwardenOverlayMenuAvailable": {
-    "message": "Nabídka automatického vyplňování Bitwardenu. Pro výběr stiskněte šipku dolů.",
+    "message": "Nabídka automatického vyplňování SaigonSafeu. Pro výběr stiskněte šipku dolů.",
     "description": "Screen reader text for announcing when the overlay opens on the page"
   },
   "turnOn": {
@@ -4678,7 +4678,7 @@
     "message": "Aktivní účet"
   },
   "bitwardenAccount": {
-    "message": "Účet Bitwarden"
+    "message": "Účet SaigonSafe"
   },
   "availableAccounts": {
     "message": "Dostupné účty"
@@ -4724,8 +4724,8 @@
     "description": "Label indicating the most common import formats"
   },
   "uriMatchDefaultStrategyHint": {
-    "message": "Detekce shody URI je způsob, jakým Bitwarden identifikuje návrhy automatického vyplňování.",
-    "description": "Explains to the user that URI match detection determines how Bitwarden suggests autofill options, and clarifies that this default strategy applies when no specific match detection is set for a login item."
+    "message": "Detekce shody URI je způsob, jakým SaigonSafe identifikuje návrhy automatického vyplňování.",
+    "description": "Explains to the user that URI match detection determines how SaigonSafe suggests autofill options, and clarifies that this default strategy applies when no specific match detection is set for a login item."
   },
   "regExAdvancedOptionWarning": {
     "message": "\"Regulární výraz\" je pokročilá volba se zvýšeným rizikem odhalení přihlašovacích údajů.",
@@ -4768,23 +4768,23 @@
     "description": "Body content for dialog which asks if the user wants to proceed to the browser's keyboard shortcut settings page"
   },
   "overrideDefaultBrowserAutofillTitle": {
-    "message": "Nastavit Bitwarden jako výchozí správce hesel?",
+    "message": "Nastavit SaigonSafe jako výchozí správce hesel?",
     "description": "Dialog title facilitating the ability to override a chrome browser's default autofill behavior"
   },
   "overrideDefaultBrowserAutofillDescription": {
-    "message": "Ignorování této volby může způsobit konflikty mezi nabídkou automatického vyplňování Bitwardenu a Vaším prohlížečem.",
+    "message": "Ignorování této volby může způsobit konflikty mezi nabídkou automatického vyplňování SaigonSafeu a Vaším prohlížečem.",
     "description": "Dialog message facilitating the ability to override a chrome browser's default autofill behavior"
   },
   "overrideDefaultBrowserAutoFillSettings": {
-    "message": "Nastavit Bitwarden jako výchozí správce hesel",
+    "message": "Nastavit SaigonSafe jako výchozí správce hesel",
     "description": "Label for the setting that allows overriding the default browser autofill settings"
   },
   "privacyPermissionAdditionNotGrantedTitle": {
-    "message": "Bitwarden nelze nastavit jako výchozí správce hesel",
+    "message": "SaigonSafe nelze nastavit jako výchozí správce hesel",
     "description": "Title for the dialog that appears when the user has not granted the extension permission to set privacy settings"
   },
   "privacyPermissionAdditionNotGrantedDescription": {
-    "message": "Pro nastavení jako výchozí správce hesel musíte Bitwardenu udělit oprávnění zabezpečení v prohlížeči.",
+    "message": "Pro nastavení jako výchozí správce hesel musíte SaigonSafeu udělit oprávnění zabezpečení v prohlížeči.",
     "description": "Description for the dialog that appears when the user has not granted the extension permission to set privacy settings"
   },
   "makeDefault": {
@@ -5125,16 +5125,16 @@
     "message": "Stáhnout přílohu"
   },
   "downloadBitwarden": {
-    "message": "Stáhnout Bitwarden"
+    "message": "Stáhnout SaigonSafe"
   },
   "downloadBitwardenOnAllDevices": {
-    "message": "Stáhnout Bitwarden na všech zařízeních"
+    "message": "Stáhnout SaigonSafe na všech zařízeních"
   },
   "getTheMobileApp": {
     "message": "Získejte mobilní aplikaci"
   },
   "getTheMobileAppDesc": {
-    "message": "Přistupujte k Vašim heslům pomocí mobilní aplikace Bitwarden."
+    "message": "Přistupujte k Vašim heslům pomocí mobilní aplikace SaigonSafe."
   },
   "getTheDesktopApp": {
     "message": "Získejte desktopovou aplikaci"
@@ -5608,10 +5608,10 @@
     "message": "Biometrické odemknutí není dostupné kvůli chybnému nastavení systémových souborů."
   },
   "biometricsStatusHelptextDesktopDisconnected": {
-    "message": "Biometrické odemknutí není dostupné, protože je aplikace Bitwarden zavřena."
+    "message": "Biometrické odemknutí není dostupné, protože je aplikace SaigonSafe zavřena."
   },
   "biometricsStatusHelptextNotEnabledInDesktop": {
-    "message": "Biometrické odemknutí není dostupné, protože není povoleno pro $EMAIL$ v desktopové aplikaci Bitwarden.",
+    "message": "Biometrické odemknutí není dostupné, protože není povoleno pro $EMAIL$ v desktopové aplikaci SaigonSafe.",
     "placeholders": {
       "email": {
         "content": "$1",
@@ -5646,8 +5646,8 @@
     "description": "Notification message for when a password has been regenerated"
   },
   "saveToBitwarden": {
-    "message": "Uložit do Bitwardenu",
-    "description": "Confirmation message for saving a login to Bitwarden"
+    "message": "Uložit do SaigonSafeu",
+    "description": "Confirmation message for saving a login to SaigonSafe"
   },
   "spaceCharacterDescriptor": {
     "message": "Mezera",
@@ -5872,13 +5872,13 @@
     "message": "Trezor chrání více než jen Vaše hesla. Bezpečně zde uložte zabezpečená přihlášení, ID, karty a poznámky."
   },
   "introCarouselLabel": {
-    "message": "Vítejte v Bitwardenu"
+    "message": "Vítejte v SaigonSafeu"
   },
   "securityPrioritized": {
     "message": "Bezpečnost, priorita"
   },
   "securityPrioritizedBody": {
-    "message": "Uložte si přihlašovací údaje, karty a identity do zabezpečeného trezoru. Bitwarden používá šifrování end-to-end s nulovou znalostí, aby ochránil to, co je pro Vás důležité."
+    "message": "Uložte si přihlašovací údaje, karty a identity do zabezpečeného trezoru. SaigonSafe používá šifrování end-to-end s nulovou znalostí, aby ochránil to, co je pro Vás důležité."
   },
   "quickLogin": {
     "message": "Rychlé a snadné přihlášení"
@@ -5896,7 +5896,7 @@
     "message": "Vaše data, kdy a kde je potřebujete"
   },
   "secureDevicesBody": {
-    "message": "Uložte neomezená hesla na neomezených zařízeních s Bitwardenem na mobilu, prohlížeči a desktopové aplikaci."
+    "message": "Uložte neomezená hesla na neomezených zařízeních s SaigonSafeem na mobilu, prohlížeči a desktopové aplikaci."
   },
   "nudgeBadgeAria": {
     "message": "1 oznámení"
@@ -5905,7 +5905,7 @@
     "message": "Importovat existující hesla"
   },
   "emptyVaultNudgeBody": {
-    "message": "Pomocí importu rychle přenesete přihlašovací údaje do Bitwardenu a to bez jejich ručního přidání."
+    "message": "Pomocí importu rychle přenesete přihlašovací údaje do SaigonSafeu a to bez jejich ručního přidání."
   },
   "emptyVaultNudgeButton": {
     "message": "Importovat nyní"
@@ -5941,7 +5941,7 @@
     "placeholders": {
       "product": {
         "content": "$1",
-        "example": "Bitwarden Phishing Blocker"
+        "example": "SaigonSafe Phishing Blocker"
       }
     }
   },
@@ -6024,13 +6024,13 @@
     "message": "O tomto nastavení"
   },
   "permitCipherDetailsDescription": {
-    "message": "Bitwarden bude používat uložené přihlašovací URI k identifikaci, která ikona nebo změna adresy URL by měla být použita pro zlepšení Vašeho zážitku. Při používání této služby nejsou shromažďovány ani ukládány žádné informace."
+    "message": "SaigonSafe bude používat uložené přihlašovací URI k identifikaci, která ikona nebo změna adresy URL by měla být použita pro zlepšení Vašeho zážitku. Při používání této služby nejsou shromažďovány ani ukládány žádné informace."
   },
   "noPermissionsViewPage": {
     "message": "Nemáte oprávnění k zobrazení této stránky. Zkuste se přihlásit jiným účtem."
   },
   "wasmNotSupported": {
-    "message": "WebAssembly není ve Vašem prohlížeči podporováno nebo není povoleno. WebAssembly je vyžadováno pro použití aplikace Bitwarden.",
+    "message": "WebAssembly není ve Vašem prohlížeči podporováno nebo není povoleno. WebAssembly je vyžadováno pro použití aplikace SaigonSafe.",
     "description": "'WebAssembly' is a technical term and should not be translated."
   },
   "showMore": {
@@ -6105,7 +6105,7 @@
     "message": "Chyba: Nelze dešifrovat"
   },
   "removeMasterPasswordForOrgUserKeyConnector": {
-    "message": "Vaše organizace již k přihlášení do Bitwardenu nepoužívá hlavní hesla. Chcete-li pokračovat, ověřte organizaci a doménu."
+    "message": "Vaše organizace již k přihlášení do SaigonSafeu nepoužívá hlavní hesla. Chcete-li pokračovat, ověřte organizaci a doménu."
   },
   "continueWithLogIn": {
     "message": "Pokračovat s přihlášením"
@@ -6191,7 +6191,7 @@
     "message": "Nastavte metodu odemknutí, abyste změnili akci při vypršení časového limitu"
   },
   "sessionTimeoutSuppressedByConnectedDevice": {
-    "message": "Spravováno desktopovou aplikací Bitwarden. Pro úpravu otevřete desktopovou aplikaci."
+    "message": "Spravováno desktopovou aplikací SaigonSafe. Pro úpravu otevřete desktopovou aplikaci."
   },
   "percentageCompleted": {
     "message": "$PERCENT$ % dokončeno",
@@ -6293,14 +6293,14 @@
     "message": "user@bitwarden.com, user@acme.com"
   },
   "downloadBitwardenApps": {
-    "message": "Stáhnout aplikace Bitwarden"
+    "message": "Stáhnout aplikace SaigonSafe"
   },
   "emailProtected": {
     "message": "E-mail je chráněný"
   },
   "sendPasswordHelperText": {
     "message": "Pro zobrazení tohoto Send budou muset jednotlivci zadat heslo",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "userVerificationFailed": {
     "message": "Ověření uživatele se nezdařilo."

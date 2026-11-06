@@ -7,6 +7,9 @@ export abstract class CipherFormGenerationService {
    */
   abstract generatePassword(): Promise<string | null>;
 
+  /** Generates using saved settings without opening a generator screen, when supported. */
+  abstract generatePasswordInPlace?(): Promise<string | null>;
+
   /**
    * Generates a random username. Called when the user clicks the "Generate Username" button in the UI.
    * @param uri The URI associated with the username generation request.

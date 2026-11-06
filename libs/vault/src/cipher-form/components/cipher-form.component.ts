@@ -2,6 +2,7 @@
 // @ts-strict-ignore
 import { NgIf } from "@angular/common";
 import {
+  AfterViewChecked,
   AfterViewInit,
   ChangeDetectorRef,
   Component,
@@ -16,8 +17,21 @@ import {
   ViewChild,
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { FormBuilder, FormGroup, ReactiveFormsModule } from "@angular/forms";
-import { BehaviorSubject, firstValueFrom, Subject, switchMap } from "rxjs";
+import {
+  AbstractControl,
+  FormArray,
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+} from "@angular/forms";
+import {
+  BehaviorSubject,
+  debounceTime,
+  firstValueFrom,
+  Subject,
+  Subscription,
+  switchMap,
+} from "rxjs";
 
 import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
 import { getUserId } from "@bitwarden/common/auth/services/account.service";
@@ -82,13 +96,28 @@ import { SshKeySectionComponent } from "./sshkey-section/sshkey-section.componen
     NewItemNudgeComponent,
   ],
 })
-export class CipherFormComponent implements AfterViewInit, OnInit, OnChanges, CipherFormContainer {
+export class CipherFormComponent
+  implements AfterViewChecked, AfterViewInit, OnInit, OnChanges, CipherFormContainer
+{
   // FIXME(https://bitwarden.atlassian.net/browse/CL-903): Migrate to Signals
   // eslint-disable-next-line @angular-eslint/prefer-signals
   @ViewChild(BitSubmitDirective)
   private bitSubmit: BitSubmitDirective;
   private destroyRef = inject(DestroyRef);
   private _firstInitialized = false;
+  private autoSaveChanges = new Subject<void>();
+  private formChangesSubscription?: Subscription;
+  private saveInFlight?: Promise<void>;
+  private readyForAutoSave = false;
+  private editRevision = 0;
+  private savedRevision = 0;
+
+  // FIXME(https://bitwarden.atlassian.net/browse/CL-903): Migrate to Signals
+  // eslint-disable-next-line @angular-eslint/prefer-signals
+  @Input() autoSaveEnabled = false;
+
+  autoSaveStatus: "" | "autoSavePending" | "autoSaveSaving" | "autoSaveSaved" | "autoSaveFailed" =
+    "";
 
   /**
    * The form ID to use for the form. Used to connect it to a submit button.
@@ -166,6 +195,11 @@ export class CipherFormComponent implements AfterViewInit, OnInit, OnChanges, Ci
   protected loading: boolean = true;
 
   CipherType = CipherType;
+
+  ngAfterViewChecked(): void {
+    // Child forms have finished their initial prefill by the end of this view check.
+    this.readyForAutoSave = !this.loading;
+  }
 
   ngAfterViewInit(): void {
     if (this.submitBtn) {
@@ -254,6 +288,10 @@ export class CipherFormComponent implements AfterViewInit, OnInit, OnChanges, Ci
   }
 
   async init() {
+    this.formChangesSubscription?.unsubscribe();
+    this.readyForAutoSave = false;
+    this.autoSaveStatus = "";
+    this.editRevision = this.savedRevision = 0;
     this.loading = true;
 
     // Force change detection so that all child components are destroyed and re-created
@@ -302,6 +340,17 @@ export class CipherFormComponent implements AfterViewInit, OnInit, OnChanges, Ci
 
     this.setInitialCipherFromCache();
 
+    this.formChangesSubscription = this.cipherForm.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        // Ignore initial prefill, but include edits from generators and custom-field dialogs.
+        if (!this.autoSaveEnabled || this.config.mode !== "edit" || !this.readyForAutoSave) {
+          return;
+        }
+        this.editRevision++;
+        this.autoSaveStatus = "autoSavePending";
+        this.autoSaveChanges.next();
+      });
     this.loading = false;
     this.formReadySubject.next();
   }
@@ -347,7 +396,70 @@ export class CipherFormComponent implements AfterViewInit, OnInit, OnChanges, Ci
     private cipherFormCacheService: CipherFormCacheService,
     private cipherArchiveService: CipherArchiveService,
     private accountService: AccountService,
-  ) {}
+  ) {
+    this.autoSaveChanges.pipe(debounceTime(3000), takeUntilDestroyed()).subscribe(() => {
+      void this.autoSave();
+    });
+    this.destroyRef.onDestroy(() => this.formChangesSubscription?.unsubscribe());
+  }
+
+  private async autoSave(flush = false): Promise<void> {
+    if (
+      !this.autoSaveEnabled ||
+      this.config?.mode !== "edit" ||
+      this.loading ||
+      this.cipherForm.invalid ||
+      this.cipherForm.pending ||
+      this.editRevision === this.savedRevision
+    ) {
+      return;
+    }
+    try {
+      await this.save(false, flush ? undefined : this.editRevision);
+    } catch {
+      // Keep the cached edits and show a persistent failure state. Manual Save or
+      // the next edit can retry without discarding the user's input.
+      this.autoSaveStatus = "autoSaveFailed";
+    }
+  }
+
+  async flushAutoSave(): Promise<boolean> {
+    if (!this.autoSaveEnabled) {
+      return true;
+    }
+    await this.autoSave(true);
+    if (this.cipherForm.invalid || this.cipherForm.pending) {
+      this.cipherForm.markAllAsTouched();
+      return false;
+    }
+    return this.editRevision === this.savedRevision;
+  }
+
+  private async save(manual: boolean, expectedRevision?: number): Promise<void> {
+    // Manual Save waits for an in-flight auto-save rather than racing it.
+    while (this.saveInFlight !== undefined) {
+      try {
+        await this.saveInFlight;
+      } catch (error) {
+        if (!manual) {
+          throw error;
+        }
+      }
+    }
+    if (
+      !manual &&
+      (this.editRevision === this.savedRevision ||
+        (expectedRevision !== undefined && expectedRevision !== this.editRevision))
+    ) {
+      return;
+    }
+    this.saveInFlight = this.persist(manual);
+    try {
+      await this.saveInFlight;
+    } finally {
+      this.saveInFlight = undefined;
+    }
+  }
 
   /**
    * Counts the number of invalid fields in a form group.
@@ -363,7 +475,9 @@ export class CipherFormComponent implements AfterViewInit, OnInit, OnChanges, Ci
     }, 0);
   }
 
-  submit = async () => {
+  submit = async () => this.save(true);
+
+  private async persist(manual: boolean): Promise<void> {
     let successToast: string = "editedItem";
     if (this.cipherForm.invalid) {
       this.cipherForm.markAllAsTouched();
@@ -382,44 +496,102 @@ export class CipherFormComponent implements AfterViewInit, OnInit, OnChanges, Ci
       return;
     }
 
-    if (this.beforeSubmit) {
+    if (manual && this.beforeSubmit) {
       const shouldSubmit = await this.beforeSubmit();
       if (!shouldSubmit) {
         return;
       }
     }
 
-    const userCanArchive = await firstValueFrom(
-      this.accountService.activeAccount$.pipe(
-        getUserId,
-        switchMap((userId) => this.cipherArchiveService.userCanArchive$(userId)),
-      ),
-    );
-
-    // If the item is archived but user has lost archive permissions, unarchive the item.
-    if (!userCanArchive && this.updatedCipherView.archivedDate) {
-      this.updatedCipherView.archivedDate = null;
-      successToast = "itemRestored";
+    const revision = this.editRevision;
+    // Some save endpoints mutate their input before a request finishes. Save a
+    // separate view so a failed request cannot damage the edits used for retry.
+    const cipherToSave = CipherView.fromJSON(JSON.parse(JSON.stringify(this.updatedCipherView)));
+    // Remember policy-disabled controls before temporarily blocking edits during a write.
+    const disabledControls: AbstractControl[] = [];
+    const collectDisabled = (control: AbstractControl) => {
+      if (control.disabled) {
+        disabledControls.push(control);
+      } else if (control instanceof FormGroup || control instanceof FormArray) {
+        Object.values(control.controls).forEach(collectDisabled);
+      }
+    };
+    if (manual) {
+      collectDisabled(this.cipherForm);
+      this.disableFormFields();
     }
+    if (this.autoSaveEnabled) {
+      this.autoSaveStatus = "autoSaveSaving";
+    }
+    try {
+      const userCanArchive = await firstValueFrom(
+        this.accountService.activeAccount$.pipe(
+          getUserId,
+          switchMap((userId) => this.cipherArchiveService.userCanArchive$(userId)),
+        ),
+      );
 
-    const savedCipher = await this.addEditFormService.saveCipher(
-      this.updatedCipherView,
-      this.config,
-    );
+      // If the item is archived but user has lost archive permissions, unarchive the item.
+      if (!userCanArchive && cipherToSave.archivedDate) {
+        cipherToSave.archivedDate = null;
+        successToast = "itemRestored";
+      }
 
-    // Clear the cache after successful save
-    this.cipherFormCacheService.clearCache();
+      const savedCipher = await this.addEditFormService.saveCipher(cipherToSave, this.config);
 
-    this.toastService.showToast({
-      variant: "success",
-      title: null,
-      message: this.i18nService.t(
-        this.config.mode === "edit" || this.config.mode === "partial-edit"
-          ? successToast
-          : "addedItem",
-      ),
-    });
+      // A null result means collection changes removed access to the item.
+      // Return to the vault through the existing manual-save handler in that case.
+      if (!manual && savedCipher == null) {
+        this.cipherFormCacheService.clearCache();
+        this.cipherSaved.emit(savedCipher);
+        return;
+      }
+      const hasNewerEdits = this.editRevision !== revision;
+      if (savedCipher) {
+        if (hasNewerEdits) {
+          // Keep input typed during the request, with the latest server metadata.
+          this.updatedCipherView.revisionDate = savedCipher.revisionDate;
+          this.updatedCipherView.key = savedCipher.key;
+          this.updatedCipherView.passwordHistory = savedCipher.passwordHistory;
+        } else {
+          this.updatedCipherView = savedCipher;
+        }
+      }
+      this.savedRevision = revision;
+      if (hasNewerEdits) {
+        this.cipherFormCacheService.cacheCipherView(this.updatedCipherView);
+      } else {
+        this.cipherFormCacheService.clearCache();
+        this.cipherForm.markAsPristine();
+      }
+      if (this.autoSaveEnabled) {
+        this.autoSaveStatus = hasNewerEdits ? "autoSavePending" : "autoSaveSaved";
+      }
+      if (!manual) {
+        return;
+      }
 
-    this.cipherSaved.emit(savedCipher);
-  };
+      this.toastService.showToast({
+        variant: "success",
+        title: null,
+        message: this.i18nService.t(
+          this.config.mode === "edit" || this.config.mode === "partial-edit"
+            ? successToast
+            : "addedItem",
+        ),
+      });
+
+      this.cipherSaved.emit(savedCipher);
+    } catch (error) {
+      if (this.autoSaveEnabled) {
+        this.autoSaveStatus = "autoSaveFailed";
+      }
+      throw error;
+    } finally {
+      if (manual) {
+        this.enableFormFields();
+        disabledControls.forEach((control) => control.disable({ emitEvent: false }));
+      }
+    }
+  }
 }

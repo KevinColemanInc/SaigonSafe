@@ -5,7 +5,7 @@ import { Component, OnDestroy, OnInit } from "@angular/core";
 import { ActivatedRoute, Data, NavigationEnd, Router, RouterModule } from "@angular/router";
 import { Subject, filter, switchMap, takeUntil, tap } from "rxjs";
 
-import { BitwardenLogo, BitSvg } from "@bitwarden/assets/svg";
+import { SaigonSafeLogo, BitSvg } from "@bitwarden/assets/svg";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import {
   SvgModule,
@@ -62,7 +62,7 @@ export class ExtensionAnonLayoutWrapperComponent implements OnInit, OnDestroy {
   protected hideCardWrapper: boolean = false;
 
   protected theme: string;
-  protected logo = BitwardenLogo;
+  protected logo = SaigonSafeLogo;
 
   constructor(
     private router: Router,

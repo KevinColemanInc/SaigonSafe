@@ -39,24 +39,6 @@
 
   <!-- Show search & filters outside of the scroll area of the page -->
   <ng-container slot="above-scroll-area">
-    <ng-container *ngIf="showPremiumSpotlight$ | async">
-      <bit-callout
-        [title]="'unlockAdvancedSecurity' | i18n"
-        [icon]="null"
-        (dismiss)="dismissVaultNudgeSpotlight(NudgeType.PremiumUpgrade)"
-      >
-        {{ "unlockAdvancedSecurityDesc" | i18n }}
-        <button
-          slot="end"
-          bitButton
-          type="button"
-          buttonType="primary"
-          (click)="showPremiumDialog()"
-        >
-          {{ "explorePremium" | i18n }}
-        </button>
-      </bit-callout>
-    </ng-container>
     <ng-container *ngIf="vaultState === VaultStateEnum.Empty && showEmptyVaultSpotlight$ | async">
       <bit-callout
         [title]="'emptyVaultNudgeTitle' | i18n"

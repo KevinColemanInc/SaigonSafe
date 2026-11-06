@@ -61,6 +61,15 @@
       ></button>
       <button
         type="button"
+        bitIconButton="bwi-refresh"
+        bitSuffix
+        *ngIf="loginDetailsForm.controls.password.enabled && canGeneratePasswordInPlace"
+        data-testid="generate-password-in-place-button"
+        [label]="'generatePasswordInPlace' | i18n"
+        [bitAction]="generatePasswordInPlace"
+      ></button>
+      <button
+        type="button"
         bitIconButton="bwi-generate"
         bitSuffix
         *ngIf="loginDetailsForm.controls.password.enabled"

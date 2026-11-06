@@ -112,7 +112,11 @@ export class DefaultCipherFormService implements CipherFormService {
       return null;
     }
 
-    return await this.cipherService.decrypt(savedCipher, activeUserId);
+    const savedCipherView = await this.cipherService.decrypt(savedCipher, activeUserId);
+    // Subsequent auto-saves must compare with the latest persisted revision,
+    // including ownership, collections and password history.
+    config.originalCipher = savedCipher;
+    return savedCipherView;
   }
 
   /**

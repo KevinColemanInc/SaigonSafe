@@ -188,6 +188,14 @@ export class AddEditComponent implements OnInit, OnDestroy {
   canDeleteCipher$: Observable<boolean>;
   routeAfterDeletion: ROUTES_AFTER_EDIT_DELETION = "/tabs/vault";
 
+  get autoSaveEnabled() {
+    return (
+      this.config?.mode === "edit" &&
+      !this.fido2PopoutSessionData?.isFido2Session &&
+      !this.inSingleActionPopout
+    );
+  }
+
   get loading() {
     return this.config == null;
   }
@@ -308,6 +316,11 @@ export class AddEditComponent implements OnInit, OnDestroy {
    * Handle back button
    */
   handleBackButton = async () => {
+    // Closing within the extension flushes the debounce before navigating away.
+    if (this.autoSaveEnabled && !(await this.cipherFormComponent()?.flushAutoSave())) {
+      return;
+    }
+
     if (this.inFido2PopoutWindow) {
       this.popupCloseWarningService.disable();
       BrowserFido2UserInterfaceSession.abortPopout(this.fido2PopoutSessionData.sessionId);

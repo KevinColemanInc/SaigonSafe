@@ -1,0 +1,655 @@
+{
+  "brand": "SaigonSafe",
+  "renderer": "Playwright Chromium / SVG",
+  "sources": [
+    {
+      "path": "scripts/branding/saigonsafe.cjs",
+      "sha256": "35f39d7d385d1f1fd2d796ecfa923cd90510f90b2f50f0ce7e760a4941e3b00f"
+    },
+    {
+      "path": "scripts/branding/generate-browser-assets.cjs",
+      "sha256": "8bb9e1f4e2ce3d39b52aa5b63bb5767896295a500c00f1a45101456ccb0bd837"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "libs/assets/src/svg/svgs/saigonsafe-logo.ts",
+      "sha256": "054d27a941e214666ef467a44f292895c70915313313b85f76b53dc7852da589"
+    },
+    {
+      "path": "libs/assets/src/svg/svgs/saigonsafe-icon.ts",
+      "sha256": "cd399344e1a39000052034835bd2c62ee87233e15390f03028cac7e6cc4a6d9e"
+    },
+    {
+      "path": "libs/assets/src/svg/svgs/bitwarden-logo.icon.ts",
+      "sha256": "ebba26e5153699e0a8fd5ad01490372ead92ba5dc0b845061098a80e6d206a5f"
+    },
+    {
+      "path": "libs/assets/src/svg/svgs/bitwarden-icon.ts",
+      "sha256": "e3421520acbdb8c33e551c36697a6b3ad73b443e94461ef166891d307e2e1478"
+    },
+    {
+      "path": "libs/assets/src/svg/svgs/shield.ts",
+      "sha256": "ecaa666305059537ddbd49dc89f6b78e82d7b3085196b5beddac124bc3dedea9"
+    },
+    {
+      "path": "apps/browser/src/autofill/utils/saigonsafe-icons.ts",
+      "sha256": "915b2b1d2d2a3df0266096885a4bd2468d814955e7045294c65352dd9e69f19b"
+    },
+    {
+      "path": "libs/assets/saigonsafe/logo.svg",
+      "sha256": "e057774dfcab215e57168b312493fa7458e5ff43c94bf7e527e2b3dbd869e05d"
+    },
+    {
+      "path": "libs/assets/saigonsafe/wordmark.svg",
+      "sha256": "7ee5bbf1937a9430c606c5a5aa8de31d93861fd7ab3c99751bdb83068f87df11"
+    },
+    {
+      "path": "apps/browser/src/autofill/content/components/icons/shield.ts",
+      "sha256": "74e57a7879304c19c7ea84da8344ded853d9e88647f7bd11f64325cd0a4cfc81"
+    },
+    {
+      "path": "apps/browser/src/autofill/content/components/illustrations/keyhole.ts",
+      "sha256": "65432988447f1df85ed0f84f6b9d37614b5432ce869ec739e7dc2c2be2daa536"
+    },
+    {
+      "path": "apps/browser/src/autofill/content/components/illustrations/celebrate.ts",
+      "sha256": "6ab1ba3355c6ee8aa8b429dc6d61867ce363cae80bc2e57f4a1e25bd79738910"
+    },
+    {
+      "path": "apps/browser/src/popup/images/search-desktop-light.svg",
+      "sha256": "6a8ab7411f2436f5a45680a33aafdaddbb523078e0385066a6f06b0f3686792c"
+    },
+    {
+      "path": "apps/browser/src/popup/images/search-desktop-dark.svg",
+      "sha256": "b763c04e1b3303b692951929f7d8167e7f5a411c36e6775fd9bf7cfc331c5606"
+    },
+    {
+      "path": "apps/browser/src/popup/images/search-desktop-solarized.svg",
+      "sha256": "33b38f4e4a630d21d413d2294174a3d748355ef787f26361970b5aaf2a0bec59"
+    },
+    {
+      "path": "apps/browser/src/popup/images/close-button-white.svg",
+      "sha256": "17d7f3454ad74fdb298d874929a570c14a029de7547d8dbebc32ec229111518e"
+    },
+    {
+      "path": "apps/browser/src/images/close.svg",
+      "sha256": "a549229bbed243342d74bc4b4af2ed33768c5faeb0cfd1f0f7e40a00eabd1f5d"
+    },
+    {
+      "path": "apps/browser/src/popup/images/loading.svg",
+      "sha256": "de8d9a3e7aa613b58d9614ac9a7656b4118850b8503b3d80d1249ca82803ca8f"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/icon16.svg",
+      "sha256": "e057774dfcab215e57168b312493fa7458e5ff43c94bf7e527e2b3dbd869e05d"
+    },
+    {
+      "path": "apps/browser/src/images/icon16.png",
+      "sha256": "0e2ad275e5a8c5acc02887bbe28addd4c03190fa7b4ee07c8dd495d105e3fbd6",
+      "width": 16,
+      "height": 16,
+      "source": "libs/assets/saigonsafe/browser/icon16.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/icon16_gray.svg",
+      "sha256": "c9260b88552af111e5cd003baca1af7aba29ea2bf36268021c13705d25608826"
+    },
+    {
+      "path": "apps/browser/src/images/icon16_gray.png",
+      "sha256": "3d38c91234174474ffb95873939f6fd95aa548e721cd5c1cdc6909f1c3f85e83",
+      "width": 16,
+      "height": 16,
+      "source": "libs/assets/saigonsafe/browser/icon16_gray.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/local-build/icon16.svg",
+      "sha256": "cea923c5cf2a99dd24c5a7c9375c40561dd7e17d99acb51673caf79da1a4db83"
+    },
+    {
+      "path": "libs/assets/saigonsafe/local-build/icon16.png",
+      "sha256": "5f334bff381f9b327917a13990ad52d2a9733c7cf95e2e7f909a992f3d7a5368",
+      "width": 16,
+      "height": 16,
+      "source": "libs/assets/saigonsafe/browser/local-build/icon16.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/local-build/icon16_gray.svg",
+      "sha256": "b7d5b36f3308b3bd6c1b8e0ffdcb21c4df115627a39d0df39a8bb6958a8c08dd"
+    },
+    {
+      "path": "libs/assets/saigonsafe/local-build/icon16_gray.png",
+      "sha256": "b72fc4e96c6784dc17afb53584db5eb083540ad934fb790207bbd31eaa630304",
+      "width": 16,
+      "height": 16,
+      "source": "libs/assets/saigonsafe/browser/local-build/icon16_gray.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/icon19.svg",
+      "sha256": "e057774dfcab215e57168b312493fa7458e5ff43c94bf7e527e2b3dbd869e05d"
+    },
+    {
+      "path": "apps/browser/src/images/icon19.png",
+      "sha256": "b75c1a32db5a7c44253d0f724776ec6533acb983d68d71c67adaed24da2c35d7",
+      "width": 19,
+      "height": 19,
+      "source": "libs/assets/saigonsafe/browser/icon19.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/icon19_gray.svg",
+      "sha256": "c9260b88552af111e5cd003baca1af7aba29ea2bf36268021c13705d25608826"
+    },
+    {
+      "path": "apps/browser/src/images/icon19_gray.png",
+      "sha256": "c9b9c73eca4d46879644c2f862db2480947e74259130b2aeae1a2b1b70cad39f",
+      "width": 19,
+      "height": 19,
+      "source": "libs/assets/saigonsafe/browser/icon19_gray.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/local-build/icon19.svg",
+      "sha256": "cea923c5cf2a99dd24c5a7c9375c40561dd7e17d99acb51673caf79da1a4db83"
+    },
+    {
+      "path": "libs/assets/saigonsafe/local-build/icon19.png",
+      "sha256": "62acc2053202011988cff6d331a6e9d4b341ec2de11683fdcdacc760ca0cf96a",
+      "width": 19,
+      "height": 19,
+      "source": "libs/assets/saigonsafe/browser/local-build/icon19.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/local-build/icon19_gray.svg",
+      "sha256": "b7d5b36f3308b3bd6c1b8e0ffdcb21c4df115627a39d0df39a8bb6958a8c08dd"
+    },
+    {
+      "path": "libs/assets/saigonsafe/local-build/icon19_gray.png",
+      "sha256": "b31fc14f4893ce1322ee10bdb28467295030a8c420da052303f2daed4fe7afb3",
+      "width": 19,
+      "height": 19,
+      "source": "libs/assets/saigonsafe/browser/local-build/icon19_gray.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/icon32.svg",
+      "sha256": "e057774dfcab215e57168b312493fa7458e5ff43c94bf7e527e2b3dbd869e05d"
+    },
+    {
+      "path": "apps/browser/src/images/icon32.png",
+      "sha256": "1397c7ed8d170074f9d6e33eaa07352a38ee9181807829e9d8e072be0a90dde5",
+      "width": 32,
+      "height": 32,
+      "source": "libs/assets/saigonsafe/browser/icon32.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/icon32_gray.svg",
+      "sha256": "c9260b88552af111e5cd003baca1af7aba29ea2bf36268021c13705d25608826"
+    },
+    {
+      "path": "apps/browser/src/images/icon32_gray.png",
+      "sha256": "ad6fdf5d4625c31b0eb3adfa4cf52bd9839d4ade87fc6d8fa94b530422c398e1",
+      "width": 32,
+      "height": 32,
+      "source": "libs/assets/saigonsafe/browser/icon32_gray.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/local-build/icon32.svg",
+      "sha256": "cea923c5cf2a99dd24c5a7c9375c40561dd7e17d99acb51673caf79da1a4db83"
+    },
+    {
+      "path": "libs/assets/saigonsafe/local-build/icon32.png",
+      "sha256": "d574684afaec098c7fe51f0f1722ab8def95658a79f1d312662272cc4c5d1e8f",
+      "width": 32,
+      "height": 32,
+      "source": "libs/assets/saigonsafe/browser/local-build/icon32.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/local-build/icon32_gray.svg",
+      "sha256": "b7d5b36f3308b3bd6c1b8e0ffdcb21c4df115627a39d0df39a8bb6958a8c08dd"
+    },
+    {
+      "path": "libs/assets/saigonsafe/local-build/icon32_gray.png",
+      "sha256": "610a3b1200555610fa401b982af60030d8208c9f91bd5dbf54eafba7e2136ccf",
+      "width": 32,
+      "height": 32,
+      "source": "libs/assets/saigonsafe/browser/local-build/icon32_gray.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/icon38.svg",
+      "sha256": "e057774dfcab215e57168b312493fa7458e5ff43c94bf7e527e2b3dbd869e05d"
+    },
+    {
+      "path": "apps/browser/src/images/icon38.png",
+      "sha256": "3bf131854af7b3eda63c4d847ca78eb5b26cb4d99deb215bb99f3bcedb054396",
+      "width": 38,
+      "height": 38,
+      "source": "libs/assets/saigonsafe/browser/icon38.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/icon38_gray.svg",
+      "sha256": "c9260b88552af111e5cd003baca1af7aba29ea2bf36268021c13705d25608826"
+    },
+    {
+      "path": "apps/browser/src/images/icon38_gray.png",
+      "sha256": "ce038402376162a4b682b55c9d8a8ecd713d2c2ecbcd4faac9fc3d1c8013a73e",
+      "width": 38,
+      "height": 38,
+      "source": "libs/assets/saigonsafe/browser/icon38_gray.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/local-build/icon38.svg",
+      "sha256": "cea923c5cf2a99dd24c5a7c9375c40561dd7e17d99acb51673caf79da1a4db83"
+    },
+    {
+      "path": "libs/assets/saigonsafe/local-build/icon38.png",
+      "sha256": "b2c7676d4ee8d69ee4313abdfb3c8fdaa22349113eff33ed8226f556b45ea8ac",
+      "width": 38,
+      "height": 38,
+      "source": "libs/assets/saigonsafe/browser/local-build/icon38.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/local-build/icon38_gray.svg",
+      "sha256": "b7d5b36f3308b3bd6c1b8e0ffdcb21c4df115627a39d0df39a8bb6958a8c08dd"
+    },
+    {
+      "path": "libs/assets/saigonsafe/local-build/icon38_gray.png",
+      "sha256": "c18088aaaf1227db0141a296743d8f07ee85bef385ea8a2da4f6a88c364f2850",
+      "width": 38,
+      "height": 38,
+      "source": "libs/assets/saigonsafe/browser/local-build/icon38_gray.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/icon48.svg",
+      "sha256": "e057774dfcab215e57168b312493fa7458e5ff43c94bf7e527e2b3dbd869e05d"
+    },
+    {
+      "path": "apps/browser/src/images/icon48.png",
+      "sha256": "7111fbb3097a25108ac58651ff311e9e5396d5b910da2f0e06717e0f45f0d542",
+      "width": 48,
+      "height": 48,
+      "source": "libs/assets/saigonsafe/browser/icon48.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/icon48_gray.svg",
+      "sha256": "c9260b88552af111e5cd003baca1af7aba29ea2bf36268021c13705d25608826"
+    },
+    {
+      "path": "apps/browser/src/images/icon48_gray.png",
+      "sha256": "b4d58e0ad0b25e7f06cd4c81dda75ab8314c9ad72dca107113bc67955deb9fb5",
+      "width": 48,
+      "height": 48,
+      "source": "libs/assets/saigonsafe/browser/icon48_gray.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/local-build/icon48.svg",
+      "sha256": "cea923c5cf2a99dd24c5a7c9375c40561dd7e17d99acb51673caf79da1a4db83"
+    },
+    {
+      "path": "libs/assets/saigonsafe/local-build/icon48.png",
+      "sha256": "af7788fdd70fd186b33cc144696c6d3ffa054b4232b205d785b0427d4ecf90be",
+      "width": 48,
+      "height": 48,
+      "source": "libs/assets/saigonsafe/browser/local-build/icon48.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/local-build/icon48_gray.svg",
+      "sha256": "b7d5b36f3308b3bd6c1b8e0ffdcb21c4df115627a39d0df39a8bb6958a8c08dd"
+    },
+    {
+      "path": "libs/assets/saigonsafe/local-build/icon48_gray.png",
+      "sha256": "b1e25a8e75e1e4d8fa7d0634c624806f0d6e04b7a891a9d83ea463805b76ac5a",
+      "width": 48,
+      "height": 48,
+      "source": "libs/assets/saigonsafe/browser/local-build/icon48_gray.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/icon96.svg",
+      "sha256": "e057774dfcab215e57168b312493fa7458e5ff43c94bf7e527e2b3dbd869e05d"
+    },
+    {
+      "path": "apps/browser/src/images/icon96.png",
+      "sha256": "d34965cddd52664bd84d87f9804a4848e5b925253e36157611afe2664a095631",
+      "width": 96,
+      "height": 96,
+      "source": "libs/assets/saigonsafe/browser/icon96.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/icon96_gray.svg",
+      "sha256": "c9260b88552af111e5cd003baca1af7aba29ea2bf36268021c13705d25608826"
+    },
+    {
+      "path": "apps/browser/src/images/icon96_gray.png",
+      "sha256": "da3ee742124e8b599e7f7271f3073bcaa3ce85408eb971f7827f632551f2faf6",
+      "width": 96,
+      "height": 96,
+      "source": "libs/assets/saigonsafe/browser/icon96_gray.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/local-build/icon96.svg",
+      "sha256": "cea923c5cf2a99dd24c5a7c9375c40561dd7e17d99acb51673caf79da1a4db83"
+    },
+    {
+      "path": "libs/assets/saigonsafe/local-build/icon96.png",
+      "sha256": "e89cfa56af51957f0966de8130988d2fe445482840e08c16d119353c223433eb",
+      "width": 96,
+      "height": 96,
+      "source": "libs/assets/saigonsafe/browser/local-build/icon96.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/local-build/icon96_gray.svg",
+      "sha256": "b7d5b36f3308b3bd6c1b8e0ffdcb21c4df115627a39d0df39a8bb6958a8c08dd"
+    },
+    {
+      "path": "libs/assets/saigonsafe/local-build/icon96_gray.png",
+      "sha256": "855d9fc8b0c65f124f19a87cfe6f99cc9a646190ae02ee8f76e7ddae92767a1f",
+      "width": 96,
+      "height": 96,
+      "source": "libs/assets/saigonsafe/browser/local-build/icon96_gray.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/icon128.svg",
+      "sha256": "e057774dfcab215e57168b312493fa7458e5ff43c94bf7e527e2b3dbd869e05d"
+    },
+    {
+      "path": "apps/browser/src/images/icon128.png",
+      "sha256": "17930be70d253e00b7d92eab7357221dc87be7f9ccf7fb1727b5adb77bddf5e7",
+      "width": 128,
+      "height": 128,
+      "source": "libs/assets/saigonsafe/browser/icon128.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/icon128_gray.svg",
+      "sha256": "c9260b88552af111e5cd003baca1af7aba29ea2bf36268021c13705d25608826"
+    },
+    {
+      "path": "apps/browser/src/images/icon128_gray.png",
+      "sha256": "c9a664b6e8baf122cb630b5accf8cce2767241591aad0cad0054bd2e68dd0110",
+      "width": 128,
+      "height": 128,
+      "source": "libs/assets/saigonsafe/browser/icon128_gray.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/local-build/icon128.svg",
+      "sha256": "cea923c5cf2a99dd24c5a7c9375c40561dd7e17d99acb51673caf79da1a4db83"
+    },
+    {
+      "path": "libs/assets/saigonsafe/local-build/icon128.png",
+      "sha256": "001cad080bae884a64abf3884d9fd994d6e322c70964ec08a389d85c141d3223",
+      "width": 128,
+      "height": 128,
+      "source": "libs/assets/saigonsafe/browser/local-build/icon128.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/local-build/icon128_gray.svg",
+      "sha256": "b7d5b36f3308b3bd6c1b8e0ffdcb21c4df115627a39d0df39a8bb6958a8c08dd"
+    },
+    {
+      "path": "libs/assets/saigonsafe/local-build/icon128_gray.png",
+      "sha256": "59d4096024dfdbe2da9753afda86e987cc0a674ba8a46d3817993c93ca4733cc",
+      "width": 128,
+      "height": 128,
+      "source": "libs/assets/saigonsafe/browser/local-build/icon128_gray.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/icon19_locked.svg",
+      "sha256": "1b22dc8243038be6d5f1562ce8bb5679fbf897ad62003ad632f1ee77d5487249"
+    },
+    {
+      "path": "apps/browser/src/images/icon19_locked.png",
+      "sha256": "00636fcb0584db0fd3cc538e3390d9e8008c318e5f14368e146228018b7ed7a4",
+      "width": 19,
+      "height": 19,
+      "source": "libs/assets/saigonsafe/browser/icon19_locked.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/berry19.svg",
+      "sha256": "8cdd7c3fcb6997e04e38dbcbdb7aedb818c8f6f288945f7da5b0900b479e7c43"
+    },
+    {
+      "path": "apps/browser/src/images/berry19.png",
+      "sha256": "89ad694bc08c169441d8de0846033a10022fa352543d09bf9a9c706bcb9100ca",
+      "width": 19,
+      "height": 19,
+      "source": "libs/assets/saigonsafe/browser/berry19.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/local-build/icon19_locked.svg",
+      "sha256": "f590afedd0a9491d6e55b0e5bae873f296f9bb5e30f4568b71c36343f92fea9a"
+    },
+    {
+      "path": "libs/assets/saigonsafe/local-build/icon19_locked.png",
+      "sha256": "77812821854f24949ccff50ea6f4517e9da94dd633768c66cfdc8fc5a4d514dd",
+      "width": 19,
+      "height": 19,
+      "source": "libs/assets/saigonsafe/browser/local-build/icon19_locked.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/local-build/berry19.svg",
+      "sha256": "576df3eb9a421a7d8de3048c786d569740b450056505683fed672612bcb06334"
+    },
+    {
+      "path": "libs/assets/saigonsafe/local-build/berry19.png",
+      "sha256": "88eec593070c08cf32bcbac0793ed1a25285c0553531c2050cb2bab6e444053d",
+      "width": 19,
+      "height": 19,
+      "source": "libs/assets/saigonsafe/browser/local-build/berry19.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/icon38_locked.svg",
+      "sha256": "1b22dc8243038be6d5f1562ce8bb5679fbf897ad62003ad632f1ee77d5487249"
+    },
+    {
+      "path": "apps/browser/src/images/icon38_locked.png",
+      "sha256": "aa1a409228ea8c8bbb6d5d1994858f4b2cdc0b9df84c282f783ed6fc293ba8ea",
+      "width": 38,
+      "height": 38,
+      "source": "libs/assets/saigonsafe/browser/icon38_locked.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/berry38.svg",
+      "sha256": "8cdd7c3fcb6997e04e38dbcbdb7aedb818c8f6f288945f7da5b0900b479e7c43"
+    },
+    {
+      "path": "apps/browser/src/images/berry38.png",
+      "sha256": "6d78d42495696d92a624adc27f77f65800aa8ce00563687f0bd25c8fcf56ef48",
+      "width": 38,
+      "height": 38,
+      "source": "libs/assets/saigonsafe/browser/berry38.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/local-build/icon38_locked.svg",
+      "sha256": "f590afedd0a9491d6e55b0e5bae873f296f9bb5e30f4568b71c36343f92fea9a"
+    },
+    {
+      "path": "libs/assets/saigonsafe/local-build/icon38_locked.png",
+      "sha256": "101db1a0d777e9212b07cffc3d21fe8ed1a32ba73df35ff47f63088f52818111",
+      "width": 38,
+      "height": 38,
+      "source": "libs/assets/saigonsafe/browser/local-build/icon38_locked.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/local-build/berry38.svg",
+      "sha256": "576df3eb9a421a7d8de3048c786d569740b450056505683fed672612bcb06334"
+    },
+    {
+      "path": "libs/assets/saigonsafe/local-build/berry38.png",
+      "sha256": "8d4cb0e3be464cd253e35c55af97cb16d30f5a1294a78acd5ddb9b5a9a2b2cc9",
+      "width": 38,
+      "height": 38,
+      "source": "libs/assets/saigonsafe/browser/local-build/berry38.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/icon18_safari.svg",
+      "sha256": "c1e15038d3a90ba1f6183501bd56f19e86540be92fed63d9908c98091aadcde5"
+    },
+    {
+      "path": "apps/browser/src/images/icon18_safari.png",
+      "sha256": "7f9b1d204cd4eadcb56db179c6e1a1027d66c0c62ecdbe08fbef236ab0fb1192",
+      "width": 18,
+      "height": 18,
+      "source": "libs/assets/saigonsafe/browser/icon18_safari.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/icon18_safari@2x.svg",
+      "sha256": "c1e15038d3a90ba1f6183501bd56f19e86540be92fed63d9908c98091aadcde5"
+    },
+    {
+      "path": "apps/browser/src/images/icon18_safari@2x.png",
+      "sha256": "7b37736610e936095fe16fc9994d2b83dd5bf84d7fa2ce4f82de945f68a6fd1a",
+      "width": 36,
+      "height": 36,
+      "source": "libs/assets/saigonsafe/browser/icon18_safari@2x.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/icon18_safari_locked.svg",
+      "sha256": "10ff01255d85ce2a3c8fc483b167669559e09e5929b3382758afcfbdba683181"
+    },
+    {
+      "path": "apps/browser/src/images/icon18_safari_locked.png",
+      "sha256": "097d5256c9fe9ece72f01d6690f889e1f1b5e8933945dd248c3dd8969e9006d5",
+      "width": 18,
+      "height": 18,
+      "source": "libs/assets/saigonsafe/browser/icon18_safari_locked.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/icon18_safari_locked@2x.svg",
+      "sha256": "10ff01255d85ce2a3c8fc483b167669559e09e5929b3382758afcfbdba683181"
+    },
+    {
+      "path": "apps/browser/src/images/icon18_safari_locked@2x.png",
+      "sha256": "d9ccbdf6a046b0486ce3b1f39285189e1dc6e3390da79894178ad7cffde2d175",
+      "width": 36,
+      "height": 36,
+      "source": "libs/assets/saigonsafe/browser/icon18_safari_locked@2x.svg"
+    },
+    {
+      "path": "apps/browser/src/safari/desktop/Assets.xcassets/AppIcon.appiconset/icon16.png",
+      "sha256": "0e2ad275e5a8c5acc02887bbe28addd4c03190fa7b4ee07c8dd495d105e3fbd6",
+      "width": 16,
+      "height": 16,
+      "source": "libs/assets/saigonsafe/browser/icon16.svg"
+    },
+    {
+      "path": "apps/browser/src/safari/desktop/Assets.xcassets/AppIcon.appiconset/icon32.png",
+      "sha256": "1397c7ed8d170074f9d6e33eaa07352a38ee9181807829e9d8e072be0a90dde5",
+      "width": 32,
+      "height": 32,
+      "source": "libs/assets/saigonsafe/browser/icon32.svg"
+    },
+    {
+      "path": "apps/browser/src/safari/desktop/Assets.xcassets/AppIcon.appiconset/icon128.png",
+      "sha256": "17930be70d253e00b7d92eab7357221dc87be7f9ccf7fb1727b5adb77bddf5e7",
+      "width": 128,
+      "height": 128,
+      "source": "libs/assets/saigonsafe/browser/icon128.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/logo-dark@2x.svg",
+      "sha256": "7ee5bbf1937a9430c606c5a5aa8de31d93861fd7ab3c99751bdb83068f87df11"
+    },
+    {
+      "path": "apps/browser/src/popup/images/logo-dark@2x.png",
+      "sha256": "85aa5624791d245d9f8fcdd543d357ddb63272608dc995c5de1481928b1c9eb4",
+      "width": 568,
+      "height": 86,
+      "source": "libs/assets/saigonsafe/browser/logo-dark@2x.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/logo-white@2x.svg",
+      "sha256": "c4e418adbd2a26bed917d9e20f9d8e9560ca0e112eb84a4ed35f26369a363365"
+    },
+    {
+      "path": "apps/browser/src/popup/images/logo-white@2x.png",
+      "sha256": "3b972b2117ea950f6df430e362b81c175d23c3c4d7a240bf45ffefb3291cdf05",
+      "width": 568,
+      "height": 86,
+      "source": "libs/assets/saigonsafe/browser/logo-white@2x.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/bwi-globe.svg",
+      "sha256": "1feedca76efdbd65f6d25916051a19130df99bc149b072775ff1b521a8bdd4ab"
+    },
+    {
+      "path": "apps/browser/src/popup/images/bwi-globe.png",
+      "sha256": "428aee6b3e6f90c585437601ff636c2081ef7ba60b59adf55092ea524f89dfb5",
+      "width": 19,
+      "height": 19,
+      "source": "libs/assets/saigonsafe/browser/bwi-globe.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/bwi-passkey.svg",
+      "sha256": "b3c6b429d491c4cd6e5a5c26a7a767f5a09529c05c48cc1659dddf3c532fb4e5"
+    },
+    {
+      "path": "apps/browser/src/popup/images/bwi-passkey.png",
+      "sha256": "37445625d74293f08306eeaa60e341bdb22ef5eb75024f64426598c9a7e93abe",
+      "width": 38,
+      "height": 38,
+      "source": "libs/assets/saigonsafe/browser/bwi-passkey.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/generate_password.light.svg",
+      "sha256": "67ea5a2de2bc43dc065d76fe60b4300435fcc732d0ec192f7839b7164b9bad63"
+    },
+    {
+      "path": "apps/browser/src/images/at-risk-password-carousel/generate_password.light.png",
+      "sha256": "ccd6ed3474bf0ce08f00bffdb7575feece3cf51ecd2996999787feeb7d3c76af",
+      "width": 864,
+      "height": 573,
+      "source": "libs/assets/saigonsafe/browser/generate_password.light.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/generate_password.dark.svg",
+      "sha256": "7b4b82053f277640474cb2290a7b3b99af23519c6bab3bcad7e2b496637d2c98"
+    },
+    {
+      "path": "apps/browser/src/images/at-risk-password-carousel/generate_password.dark.png",
+      "sha256": "d8612e789598dec170a0e70810bc18ecca65c6f83dd8c6f60d296c7364a64a71",
+      "width": 864,
+      "height": 573,
+      "source": "libs/assets/saigonsafe/browser/generate_password.dark.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/update_login.light.svg",
+      "sha256": "1f7a18771f0e62d839e5923c27602958b9b68e6dee2bafcba20bdda271a72fe5"
+    },
+    {
+      "path": "apps/browser/src/images/at-risk-password-carousel/update_login.light.png",
+      "sha256": "82b052311b062b7f50bc23ce0ac018284ee28d95270d60072fc347dc6d8f73ba",
+      "width": 864,
+      "height": 573,
+      "source": "libs/assets/saigonsafe/browser/update_login.light.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/update_login.dark.svg",
+      "sha256": "5abfa6650add3635334cad9df7471eec5aee5236b3bd5a08254e1baf8840650f"
+    },
+    {
+      "path": "apps/browser/src/images/at-risk-password-carousel/update_login.dark.png",
+      "sha256": "cff1e80b8d7d0eea666afefcf4246463115dd22435b33a0d186338f3ddee480a",
+      "width": 864,
+      "height": 573,
+      "source": "libs/assets/saigonsafe/browser/update_login.dark.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/review_at-risk_logins.light.svg",
+      "sha256": "98c62c7ba072931ecdc1fc2ac1fecd6fc344a32dddb8ee0e3c95d2d79416f53c"
+    },
+    {
+      "path": "apps/browser/src/images/at-risk-password-carousel/review_at-risk_logins.light.png",
+      "sha256": "1941f8b40ea5ffafd2dcc67acacb1574009bd74503ef577ea0128a363d6a7273",
+      "width": 864,
+      "height": 573,
+      "source": "libs/assets/saigonsafe/browser/review_at-risk_logins.light.svg"
+    },
+    {
+      "path": "libs/assets/saigonsafe/browser/review_at-risk_logins.dark.svg",
+      "sha256": "1f4c6634e766e482530504551563bd75960ba2ebed2c40b129b098dd5bb8ee45"
+    },
+    {
+      "path": "apps/browser/src/images/at-risk-password-carousel/review_at-risk_logins.dark.png",
+      "sha256": "173a34a4767f153e9e00e2f8a9f912027928a483c2713b50ab0a28b749494813",
+      "width": 864,
+      "height": 573,
+      "source": "libs/assets/saigonsafe/browser/review_at-risk_logins.dark.svg"
+    }
+  ]
+}

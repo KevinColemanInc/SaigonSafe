@@ -42,9 +42,15 @@ function transformPrefixes(manifest, browser) {
   const prefix = `__${browser}__`;
 
   function transformObject(obj) {
+    if (Array.isArray(obj)) {
+      return obj.map((value) =>
+        typeof value === "object" && value !== null ? transformObject(value) : value,
+      );
+    }
+
     return Object.keys(obj).reduce((acc, key) => {
       // Determine if we need to recurse into the object.
-      const nested = typeof obj[key] === "object" && obj[key] !== null && !Array.isArray(obj[key]);
+      const nested = typeof obj[key] === "object" && obj[key] !== null;
 
       if (key.startsWith(prefix)) {
         const newKey = key.slice(prefix.length);

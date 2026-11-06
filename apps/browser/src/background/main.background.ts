@@ -1866,6 +1866,15 @@ export default class MainBackground {
 
     const userBeingLoggedOut = userId ?? activeUserId;
 
+    // Remembered 2FA tokens are stored by email outside the account's session state.
+    // Clear the token before switching accounts or cleaning account information so
+    // the next login requires two-factor authentication again.
+    const accounts = await firstValueFrom(this.accountService.accounts$);
+    const email = accounts[userBeingLoggedOut]?.email;
+    if (email) {
+      await this.tokenService.clearTwoFactorToken(email);
+    }
+
     await this.eventUploadService.uploadEvents(userBeingLoggedOut);
 
     const newActiveUser =

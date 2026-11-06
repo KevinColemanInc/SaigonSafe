@@ -1,16 +1,16 @@
 {
   "appName": {
-    "message": "Bitwarden"
+    "message": "SaigonSafe"
   },
   "appLogoLabel": {
-    "message": "Bitwarden logo"
+    "message": "SaigonSafe logo"
   },
   "extName": {
-    "message": "Bitwarden 密碼管理工具",
+    "message": "SaigonSafe",
     "description": "Extension name, MUST be less than 40 characters (Safari restriction)"
   },
   "extDesc": {
-    "message": "無論在家、在工作場所或外出時，Bitwarden 都能輕鬆保護您的所有密碼、密碼金鑰及敏感資訊。",
+    "message": "無論在家、在工作場所或外出時，SaigonSafe 都能輕鬆保護您的所有密碼、密碼金鑰及敏感資訊。",
     "description": "Extension description, MUST be less than 112 characters (Safari restriction)"
   },
   "loginOrCreateNewAccount": {
@@ -23,7 +23,7 @@
     "message": "建立帳戶"
   },
   "newToBitwarden": {
-    "message": "第一次使用 Bitwarden？"
+    "message": "第一次使用 SaigonSafe？"
   },
   "logInWithPasskey": {
     "message": "使用通行金鑰登入"
@@ -300,22 +300,22 @@
     "message": "接下來造訪網頁 App 嗎？"
   },
   "continueToWebAppDesc": {
-    "message": "在 Web 應用程式上探索 Bitwarden 帳戶的更多功能。"
+    "message": "在 Web 應用程式上探索 SaigonSafe 帳戶的更多功能。"
   },
   "continueToHelpCenter": {
     "message": "接下來前往說明中心嗎？"
   },
   "continueToHelpCenterDesc": {
-    "message": "在說明中心了解有關如何使用 Bitwarden 的更多資訊。"
+    "message": "在說明中心了解有關如何使用 SaigonSafe 的更多資訊。"
   },
   "continueToBrowserExtensionStore": {
     "message": "接下來到瀏覽器的擴充套件商店？"
   },
   "continueToBrowserExtensionStoreDesc": {
-    "message": "幫助其他人了解 Bitwarden 是否適合他們。立即造訪瀏覽器的擴充套件商店並留下評分。"
+    "message": "幫助其他人了解 SaigonSafe 是否適合他們。立即造訪瀏覽器的擴充套件商店並留下評分。"
   },
   "changeMasterPasswordOnWebConfirmation": {
-    "message": "您可以在 Bitwarden Web 應用程式上變更主密碼。"
+    "message": "您可以在 SaigonSafe Web 應用程式上變更主密碼。"
   },
   "fingerprintPhrase": {
     "message": "指紋短語",
@@ -332,43 +332,43 @@
     "message": "登出"
   },
   "aboutBitwarden": {
-    "message": "關於 Bitwarden"
+    "message": "關於 SaigonSafe"
   },
   "about": {
     "message": "關於"
   },
   "moreFromBitwarden": {
-    "message": "來自 Bitwarden 的更多產品"
+    "message": "來自 SaigonSafe 的更多產品"
   },
   "continueToBitwardenDotCom": {
     "message": "接下來到 bitwarden.com？"
   },
   "bitwardenForBusiness": {
-    "message": "Bitwarden 商業版"
+    "message": "SaigonSafe 商業版"
   },
   "bitwardenAuthenticator": {
-    "message": "Bitwarden 驗證器"
+    "message": "SaigonSafe 驗證器"
   },
   "continueToAuthenticatorPageDesc": {
-    "message": "您可以使用 Bitwarden 驗證器儲存驗證器金鑰，並為兩步驟驗證流程產生 TOTP 代碼。前往 bitwarden.com 網站以了解更多資訊。"
+    "message": "您可以使用 SaigonSafe 驗證器儲存驗證器金鑰，並為兩步驟驗證流程產生 TOTP 代碼。前往 bitwarden.com 網站以了解更多資訊。"
   },
   "bitwardenSecretsManager": {
-    "message": "Bitwarden 機密管理器"
+    "message": "SaigonSafe 機密管理器"
   },
   "continueToSecretsManagerPageDesc": {
-    "message": "透過 Bitwarden 機密管理器安全地儲存、管理並分享開發人員機密。請前往 bitwarden.com 網站了解更多。"
+    "message": "透過 SaigonSafe 機密管理器安全地儲存、管理並分享開發人員機密。請前往 bitwarden.com 網站了解更多。"
   },
   "passwordlessDotDev": {
     "message": "Passwordless.dev"
   },
   "continueToPasswordlessDotDevPageDesc": {
-    "message": "使用 Passwordless.dev 建立流暢且安全的登入體驗，無需使用傳統密碼。在 bitwarden 網站上了解更多。"
+    "message": "使用 Passwordless.dev 建立流暢且安全的登入體驗，無需使用傳統密碼。在 SaigonSafe 網站上了解更多。"
   },
   "freeBitwardenFamilies": {
-    "message": "免費的 Bitwarden 家庭方案"
+    "message": "免費的 SaigonSafe 家庭方案"
   },
   "freeBitwardenFamiliesPageDesc": {
-    "message": "您符合免費 Bitwarden 家庭方案的資格要求。在網頁應用程式中兌換您的優惠。"
+    "message": "您符合免費 SaigonSafe 家庭方案的資格要求。在網頁應用程式中兌換您的優惠。"
   },
   "version": {
     "message": "版本"
@@ -428,13 +428,13 @@
     "message": "說明與意見回饋"
   },
   "helpCenter": {
-    "message": "Bitwarden 說明中心"
+    "message": "SaigonSafe 說明中心"
   },
   "communityForums": {
-    "message": "瀏覽 Bitwarden 社群論壇"
+    "message": "瀏覽 SaigonSafe 社群論壇"
   },
   "contactSupport": {
-    "message": "聯絡 Bitwarden 技術支援"
+    "message": "聯絡 SaigonSafe 技術支援"
   },
   "sync": {
     "message": "同步"
@@ -456,7 +456,7 @@
     "message": "為您的登入項目自動產生高強度且唯一的密碼。"
   },
   "bitWebVaultApp": {
-    "message": "Bitwarden Web 應用程式"
+    "message": "SaigonSafe Web 應用程式"
   },
   "select": {
     "message": "選擇"
@@ -919,10 +919,10 @@
     "message": "無縫兩步驟驗證"
   },
   "totpHelper": {
-    "message": "Bitwarden 可以儲存並填入兩步驟驗證碼。複製金鑰並貼上到此欄位。"
+    "message": "SaigonSafe 可以儲存並填入兩步驟驗證碼。複製金鑰並貼上到此欄位。"
   },
   "totpHelperWithCapture": {
-    "message": "Bitwarden 可以儲存並填入兩步驟驗證碼。選擇相機圖示來截取此網站的驗證器QR code，或手動複製金鑰並貼上到此欄位。"
+    "message": "SaigonSafe 可以儲存並填入兩步驟驗證碼。選擇相機圖示來截取此網站的驗證器QR code，或手動複製金鑰並貼上到此欄位。"
   },
   "learnMoreAboutAuthenticators": {
     "message": "了解更多驗證程式"
@@ -943,7 +943,7 @@
     "message": "登入"
   },
   "logInToBitwarden": {
-    "message": "登入 Bitwarden"
+    "message": "登入 SaigonSafe"
   },
   "enterTheCodeSentToYourEmail": {
     "message": "輸入傳送到您電子郵件信箱的驗證碼"
@@ -1006,7 +1006,7 @@
     "message": "兩步驟登入會要求您透過另一個裝置驗證登入，例如安全金鑰、驗證器應用程式、簡訊、電話或電子郵件，藉此提升帳戶安全性。您可以在 bitwarden.com 的網頁密碼庫中設定此功能。是否要現在前往？"
   },
   "twoStepLoginConfirmationContent": {
-    "message": "在 Bitwarden 網頁應用程式中設定兩步驟登入，讓您的帳號更加安全。"
+    "message": "在 SaigonSafe 網頁應用程式中設定兩步驟登入，讓您的帳號更加安全。"
   },
   "twoStepLoginConfirmationTitle": {
     "message": "前往網頁 App 嗎？"
@@ -1158,7 +1158,7 @@
     "message": "前往設定"
   },
   "notificationAddDesc": {
-    "message": "是否要讓 Bitwarden 記住此密碼？"
+    "message": "是否要讓 SaigonSafe 記住此密碼？"
   },
   "notificationAddSave": {
     "message": "儲存"
@@ -1194,11 +1194,11 @@
     }
   },
   "notificationLoginSaveConfirmation": {
-    "message": "已儲存至 Bitwarden。",
+    "message": "已儲存至 SaigonSafe。",
     "description": "Shown to user after item is saved."
   },
   "notificationLoginUpdatedConfirmation": {
-    "message": "已更新至 Bitwarden。",
+    "message": "已更新至 SaigonSafe。",
     "description": "Shown to user after item is updated."
   },
   "selectItemAriaLabel": {
@@ -1296,13 +1296,13 @@
     "message": "詢問是否儲存新的密碼金鑰或使用儲存在您的密碼庫中的密碼金鑰登入。適用於所有已登入的帳戶。"
   },
   "notificationChangeDesc": {
-    "message": "是否要在 Bitwarden 中更新此密碼？"
+    "message": "是否要在 SaigonSafe 中更新此密碼？"
   },
   "notificationChangeSave": {
     "message": "更新"
   },
   "notificationUnlockDesc": {
-    "message": "解鎖您的 Bitwarden 密碼庫以完成自動填入請求。"
+    "message": "解鎖您的 SaigonSafe 密碼庫以完成自動填入請求。"
   },
   "notificationUnlock": {
     "message": "解鎖"
@@ -1378,10 +1378,10 @@
     "message": "此密碼將用於匯出和匯入此檔案"
   },
   "accountRestrictedOptionDescription": {
-    "message": "使用衍生自您帳戶的使用者名稱與主密碼的加密金鑰，加密此匯出檔案，並限制只能匯入到目前的 Bitwarden 帳戶。"
+    "message": "使用衍生自您帳戶的使用者名稱與主密碼的加密金鑰，加密此匯出檔案，並限制只能匯入到目前的 SaigonSafe 帳戶。"
   },
   "passwordProtectedOptionDescription": {
-    "message": "設定一組檔案密碼來加密匯出的資料，並使用此密碼解密以匯入至任意 Bitwarden 帳戶。"
+    "message": "設定一組檔案密碼來加密匯出的資料，並使用此密碼解密以匯入至任意 SaigonSafe 帳戶。"
   },
   "exportTypeHeading": {
     "message": "匯出類型"
@@ -1410,7 +1410,7 @@
     "message": "此匯出檔會使用您帳戶的加密金鑰進行加密。若您日後更換了帳戶的加密金鑰，請務必重新匯出，否則將無法解密此檔案。"
   },
   "encExportAccountWarningDesc": {
-    "message": "帳戶加密金鑰專屬於每個 Bitwarden 使用者帳戶，因此您無法將加密匯出檔匯入至其他帳戶。"
+    "message": "帳戶加密金鑰專屬於每個 SaigonSafe 使用者帳戶，因此您無法將加密匯出檔匯入至其他帳戶。"
   },
   "exportMasterPassword": {
     "message": "請輸入主密碼以匯出密碼庫資料。"
@@ -1419,7 +1419,7 @@
     "message": "已共用"
   },
   "bitwardenForBusinessPageDesc": {
-    "message": "Bitwarden 可讓您透過組織與其他人共用您的密碼庫項目。請造訪 bitwarden.com 網站以了解更多資訊。"
+    "message": "SaigonSafe 可讓您透過組織與其他人共用您的密碼庫項目。請造訪 bitwarden.com 網站以了解更多資訊。"
   },
   "moveToOrganization": {
     "message": "移動至組織 "
@@ -1585,13 +1585,13 @@
     "message": "升級為進階會員"
   },
   "premiumPurchaseAlertV2": {
-    "message": "您可以在 Bitwarden 網頁 App 的帳號設定中購買進階版。"
+    "message": "您可以在 SaigonSafe 網頁 App 的帳號設定中購買進階版。"
   },
   "premiumCurrentMember": {
     "message": "您目前為進階會員！"
   },
   "premiumCurrentMemberThanks": {
-    "message": "感謝您支持 Bitwarden 。"
+    "message": "感謝您支持 SaigonSafe 。"
   },
   "premiumFeatures": {
     "message": "升級到進階版並接收："
@@ -1697,8 +1697,8 @@
     "message": "驗證器應用程式"
   },
   "authenticatorAppDescV2": {
-    "message": "輸入驗證器應用程式產生的驗證碼，例如 Bitwarden 驗證器。",
-    "description": "'Bitwarden Authenticator' is a product name and should not be translated."
+    "message": "輸入驗證器應用程式產生的驗證碼，例如 SaigonSafe 驗證器。",
+    "description": "'SaigonSafe Authenticator' is a product name and should not be translated."
   },
   "yubiKeyTitleV2": {
     "message": "YubiKey OTP 安全金鑰"
@@ -1730,7 +1730,7 @@
     "message": "自行部署環境"
   },
   "selfHostedBaseUrlHint": {
-    "message": "請指定您自行部署的 Bitwarden 安裝環境的基礎 URL。例如：https://bitwarden.company.com"
+    "message": "請指定您自行部署的 SaigonSafe 安裝環境的基礎 URL。例如：https://bitwarden.company.com"
   },
   "selfHostedCustomEnvHeader": {
     "message": "在進階設定中，您可獨立指定每項服務的基礎 URL。"
@@ -1780,7 +1780,7 @@
     "message": "輕鬆找到自動填入建議"
   },
   "autofillSpotlightDesc": {
-    "message": "請關閉瀏覽器的自動填入設定，以免與 Bitwarden 發生衝突。"
+    "message": "請關閉瀏覽器的自動填入設定，以免與 SaigonSafe 發生衝突。"
   },
   "turnOffBrowserAutofill": {
     "message": "關閉 $BROWSER$ 自動填入",
@@ -1825,7 +1825,7 @@
     "message": "在表單欄位上顯示自動填入選單"
   },
   "howDoesBitwardenProtectFromPhishing": {
-    "message": "Bitwarden 如何保護您的資料免於網路釣魚攻擊？"
+    "message": "SaigonSafe 如何保護您的資料免於網路釣魚攻擊？"
   },
   "currentWebsite": {
     "message": "目前網站"
@@ -2421,7 +2421,7 @@
     "message": "主密碼強度不足"
   },
   "weakMasterPasswordDesc": {
-    "message": "您選擇的主密碼強度過弱。請使用高強度的主密碼（或密碼短語），以妥善保護您的 Bitwarden 帳戶。您確定要使用此主密碼嗎？"
+    "message": "您選擇的主密碼強度過弱。請使用高強度的主密碼（或密碼短語），以妥善保護您的 SaigonSafe 帳戶。您確定要使用此主密碼嗎？"
   },
   "rotateAccountEncKey": {
     "message": "同時輪換帳戶的加密金鑰"
@@ -2433,7 +2433,7 @@
     "message": "確定要輪換帳戶的加密金鑰嗎？"
   },
   "updateEncryptionKeyWarning": {
-    "message": "更新加密金鑰後，您需要登出並重新登入目前使用的所有 Bitwarden 應用程式（如行動應用程式或瀏覽器擴充套件）。登出和重新登入（這會下載新的加密金鑰）失敗可能會導致資料損毀。我們將嘗試自動登出，但可能會有所延遲。"
+    "message": "更新加密金鑰後，您需要登出並重新登入目前使用的所有 SaigonSafe 應用程式（如行動應用程式或瀏覽器擴充套件）。登出和重新登入（這會下載新的加密金鑰）失敗可能會導致資料損毀。我們將嘗試自動登出，但可能會有所延遲。"
   },
   "updateEncryptionKeyAccountExportWarning": {
     "message": "您保存的任何受限制匯出帳號將失效。"
@@ -2461,10 +2461,10 @@
     "message": "設定 PIN 碼"
   },
   "setYourPinCode": {
-    "message": "設定用於解鎖 Bitwarden 的 PIN 碼。若您完全登出應用程式，PIN 碼設定將會重設。"
+    "message": "設定用於解鎖 SaigonSafe 的 PIN 碼。若您完全登出應用程式，PIN 碼設定將會重設。"
   },
   "setPinCode": {
-    "message": "你可以使用此 PIN 來解鎖 Bitwarden。若你完全登出應用程式，PIN 將會被重設。"
+    "message": "你可以使用此 PIN 來解鎖 SaigonSafe。若你完全登出應用程式，PIN 將會被重設。"
   },
   "pinRequired": {
     "message": "必須輸入 PIN 碼。"
@@ -2485,7 +2485,7 @@
     "message": "正在等待桌面應用程式確認"
   },
   "awaitDesktopDesc": {
-    "message": "請在 Bitwarden 桌面應用程式中使用生物辨識進行確認，以設定瀏覽器的生物辨識功能。"
+    "message": "請在 SaigonSafe 桌面應用程式中使用生物辨識進行確認，以設定瀏覽器的生物辨識功能。"
   },
   "lockWithMasterPassOnRestart": {
     "message": "瀏覽器重新啟動時使用主密碼鎖定"
@@ -2600,7 +2600,7 @@
     "message": "這個表單存放在不同的網域，而非儲存您登入資訊的統一資源標識符（URI）。選擇「確認」則依然自動填入，「取消」則停止本動作。"
   },
   "autofillIframeWarningTip": {
-    "message": "若以後不想再跳出這個警告，請將這個網站的統一資源標識符（URI）「$HOSTNAME$」儲存到您的 Bitwarden 登入項目。",
+    "message": "若以後不想再跳出這個警告，請將這個網站的統一資源標識符（URI）「$HOSTNAME$」儲存到您的 SaigonSafe 登入項目。",
     "placeholders": {
       "hostname": {
         "content": "$1",
@@ -2609,7 +2609,7 @@
     }
   },
   "topLayerHijackWarning": {
-    "message": "此頁面正在干擾 Bitwarden 的使用體驗。為了安全起見，已暫時停用 Bitwarden 的內嵌選單。"
+    "message": "此頁面正在干擾 SaigonSafe 的使用體驗。為了安全起見，已暫時停用 SaigonSafe 的內嵌選單。"
   },
   "setMasterPassword": {
     "message": "設定主密碼"
@@ -2666,7 +2666,7 @@
     "message": "您的新主密碼未符合政策要求。"
   },
   "receiveMarketingEmailsV2": {
-    "message": "獲得來自 Bitwarden 的公告、建議及研究資訊電子郵件。"
+    "message": "獲得來自 SaigonSafe 的公告、建議及研究資訊電子郵件。"
   },
   "unsubscribe": {
     "message": "取消訂閱"
@@ -2717,13 +2717,13 @@
     "message": "瀏覽器整合尚未設定"
   },
   "desktopIntegrationDisabledDesc": {
-    "message": "Bitwarden 桌面應用程式尚未設定瀏覽器整合。請在桌面應用程式的設定中完成設定。"
+    "message": "SaigonSafe 桌面應用程式尚未設定瀏覽器整合。請在桌面應用程式的設定中完成設定。"
   },
   "startDesktopTitle": {
-    "message": "啟動 Bitwarden 桌面應用程式"
+    "message": "啟動 SaigonSafe 桌面應用程式"
   },
   "startDesktopDesc": {
-    "message": "在使用生物辨識解鎖前，必須先啟動 Bitwarden 桌面應用程式。"
+    "message": "在使用生物辨識解鎖前，必須先啟動 SaigonSafe 桌面應用程式。"
   },
   "errorEnableBiometricTitle": {
     "message": "無法啟用生物特徵辨識"
@@ -2777,13 +2777,13 @@
     "message": "生物特徵辨識失敗"
   },
   "biometricsFailedDesc": {
-    "message": "生物特徵辨識無法完成，請考慮使用主密碼或登出。若仍無法解決，請聯絡 Bitwarden 客服。"
+    "message": "生物特徵辨識無法完成，請考慮使用主密碼或登出。若仍無法解決，請聯絡 SaigonSafe 客服。"
   },
   "nativeMessaginPermissionErrorTitle": {
     "message": "未提供權限"
   },
   "nativeMessaginPermissionErrorDesc": {
-    "message": "若未取得與 Bitwarden 桌面應用程式通訊的權限，無法在瀏覽器擴充套件中提供生物辨識。請再試一次。"
+    "message": "若未取得與 SaigonSafe 桌面應用程式通訊的權限，無法在瀏覽器擴充套件中提供生物辨識。請再試一次。"
   },
   "nativeMessaginPermissionSidebarTitle": {
     "message": "權限要求錯誤"
@@ -2820,7 +2820,7 @@
     "message": "排除網域"
   },
   "excludedDomainsDesc": {
-    "message": "Bitwarden 不會在這些網域要求儲存登入資料。您必須重新整理頁面，變更才會生效。"
+    "message": "SaigonSafe 不會在這些網域要求儲存登入資料。您必須重新整理頁面，變更才會生效。"
   },
   "blockedDomainsDesc": {
     "message": "自動填入及其它相關的功能無法在這些網站上使用。您必須重新整理頁面來使變更生效。"
@@ -2936,24 +2936,24 @@
     "message": "有風險登入清單的示意圖。"
   },
   "welcomeDialogGraphicAlt": {
-    "message": "Bitwarden 密碼庫頁面版面配置示意圖。"
+    "message": "SaigonSafe 密碼庫頁面版面配置示意圖。"
   },
   "generatePasswordSlideDesc": {
-    "message": "在有風險的網站上，透過 Bitwarden 自動填入選單快速產生強且唯一的密碼。",
+    "message": "在有風險的網站上，透過 SaigonSafe 自動填入選單快速產生強且唯一的密碼。",
     "description": "Description of the generate password slide on the at-risk password page carousel"
   },
   "generatePasswordSlideImgAltPeriod": {
-    "message": "Bitwarden 自動填入選單顯示產生密碼的示意圖。"
+    "message": "SaigonSafe 自動填入選單顯示產生密碼的示意圖。"
   },
   "updateInBitwarden": {
-    "message": "在 Bitwarden 中更新"
+    "message": "在 SaigonSafe 中更新"
   },
   "updateInBitwardenSlideDesc": {
-    "message": "之後 Bitwarden 會提示你在密碼管理器中更新該密碼。",
-    "description": "Description of the update in Bitwarden slide on the at-risk password page carousel"
+    "message": "之後 SaigonSafe 會提示你在密碼管理器中更新該密碼。",
+    "description": "Description of the update in SaigonSafe slide on the at-risk password page carousel"
   },
   "updateInBitwardenSlideImgAltPeriod": {
-    "message": "Bitwarden 通知使用者更新登入資訊的示意圖。"
+    "message": "SaigonSafe 通知使用者更新登入資訊的示意圖。"
   },
   "turnOnAutofill": {
     "message": "啟用自動填入"
@@ -3007,11 +3007,11 @@
   },
   "send": {
     "message": "Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "sendDetails": {
     "message": "Send 詳細資訊",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "sendTypeText": {
     "message": "文字"
@@ -3024,7 +3024,7 @@
   },
   "allSends": {
     "message": "所有 Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "maxAccessCountReached": {
     "message": "已達最大存取次數",
@@ -3044,7 +3044,7 @@
   },
   "copySendLink": {
     "message": "複製 Send 連結",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "removePassword": {
     "message": "移除密碼"
@@ -3057,11 +3057,11 @@
   },
   "deletedSend": {
     "message": "Send 已刪除",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "sendLink": {
     "message": "Send 連結",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "disabled": {
     "message": "已停用"
@@ -3071,26 +3071,26 @@
   },
   "deleteSend": {
     "message": "刪除 Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "deleteSendConfirmation": {
     "message": "您確定要刪除此 Send 嗎？",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "deleteSendPermanentConfirmation": {
     "message": "您確定要永久刪除此 Send 嗎？",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "editSend": {
     "message": "編輯 Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "deletionDate": {
     "message": "刪除日期"
   },
   "deletionDateDescV2": {
     "message": "此 Send 將在指定的日期後被永久刪除。",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "expirationDate": {
     "message": "到期日期"
@@ -3112,34 +3112,34 @@
   },
   "createSend": {
     "message": "建立新 Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "newPassword": {
     "message": "新密碼"
   },
   "sendDisabled": {
     "message": "Send 已停用",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "sendDisabledWarning": {
     "message": "由於企業政策限制，您只能刪除現有的 Send。",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "createdSend": {
     "message": "Send 已建立",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "createdSendSuccessfully": {
     "message": "Send 建立成功！",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "sendExpiresInHoursSingle": {
     "message": "在接下來的 1 小時內，任何人都可以透過連結訪問此 Send。",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "sendExpiresInHours": {
     "message": "在接下來的 $HOURS$ 小時內，任何人都可以透過連結訪問此 Send。",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated.",
     "placeholders": {
       "hours": {
         "content": "$1",
@@ -3149,11 +3149,11 @@
   },
   "sendExpiresInDaysSingle": {
     "message": "在接下來的 1 天內，任何人都可以透過連結訪問此 Send。",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "sendExpiresInDays": {
     "message": "在接下來的 $DAYS$ 天內，任何人都可以透過連結訪問此 Send。",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated.",
     "placeholders": {
       "days": {
         "content": "$1",
@@ -3172,7 +3172,7 @@
   },
   "sendCreatedDescriptionV2": {
     "message": "複製並分享此 Send 連結。任何擁有此連結的人，都可在接下來的 $TIME$ 內存取該 Send。",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated.",
     "placeholders": {
       "time": {
         "content": "$1",
@@ -3182,7 +3182,7 @@
   },
   "sendCreatedDescriptionPassword": {
     "message": "複製並分享此 Send 連結。任何擁有此連結與您所設定密碼的人，都可在接下來的 $TIME$ 內存取該 Send。",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated.",
     "placeholders": {
       "time": {
         "content": "$1",
@@ -3192,7 +3192,7 @@
   },
   "sendCreatedDescriptionEmail": {
     "message": "複製並分享此 Send 連結。在接下來的 $TIME$ 內，只有您指定的人可以檢視。",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated.",
     "placeholders": {
       "time": {
         "content": "$1",
@@ -3202,11 +3202,11 @@
   },
   "sendLinkCopied": {
     "message": "已複製 Send 連結",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "editedSend": {
     "message": "Send 已儲存",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "popOut": {
     "message": "彈出"
@@ -3479,7 +3479,7 @@
     "message": "取得自動填入資料時發生錯誤"
   },
   "couldNotDecryptVaultItemsBelow": {
-    "message": "Bitwarden 無法解密您密碼庫中下面的項目。"
+    "message": "SaigonSafe 無法解密您密碼庫中下面的項目。"
   },
   "contactCSToAvoidDataLossPart1": {
     "message": "聯絡客戶支援部門",
@@ -3583,11 +3583,11 @@
     }
   },
   "forwarderGeneratedBy": {
-    "message": "由 Bitwarden 生成。",
+    "message": "由 SaigonSafe 生成。",
     "description": "Displayed with the address on the forwarding service's configuration screen."
   },
   "forwarderGeneratedByWithWebsite": {
-    "message": "網站：$WEBSITE$。透過 Bitwarden 產生。",
+    "message": "網站：$WEBSITE$。透過 SaigonSafe 產生。",
     "description": "Displayed with the address on the forwarding service's configuration screen.",
     "placeholders": {
       "WEBSITE": {
@@ -3780,7 +3780,7 @@
     "message": "已傳送通知至您的裝置。"
   },
   "notificationSentDevicePart1": {
-    "message": "在你的裝置或其他裝置上解鎖 Bitwarden"
+    "message": "在你的裝置或其他裝置上解鎖 SaigonSafe"
   },
   "notificationSentDeviceAnchor": {
     "message": "網頁應用程式"
@@ -4138,11 +4138,11 @@
   },
   "sendsTitleNoItems": {
     "message": "安全傳送機密的資訊",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "sendsBodyNoItems": {
     "message": "安全的和任何人及任何平臺分享檔案及資料。您的資料會受到端對端加密的保護。",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "inputRequired": {
     "message": "必須輸入內容。"
@@ -4283,15 +4283,15 @@
     "message": "跳至內容"
   },
   "bitwardenOverlayButton": {
-    "message": "Bitwarden 自動填入選單按鈕",
+    "message": "SaigonSafe 自動填入選單按鈕",
     "description": "Page title for the iframe containing the overlay button"
   },
   "toggleBitwardenVaultOverlay": {
-    "message": "切換 Bitwarden 自動填入選單",
+    "message": "切換 SaigonSafe 自動填入選單",
     "description": "Screen reader and tool tip label for the overlay button"
   },
   "bitwardenVault": {
-    "message": "Bitwarden 自動填入選單",
+    "message": "SaigonSafe 自動填入選單",
     "description": "Page title in overlay"
   },
   "unlockYourAccountToViewMatchingLogins": {
@@ -4363,7 +4363,7 @@
     "description": "Screen reader text (aria-label) for new identity button within inline menu"
   },
   "bitwardenOverlayMenuAvailable": {
-    "message": "您可以使用 Bitwarden 自動填入選單。請按向下鍵來選擇。",
+    "message": "您可以使用 SaigonSafe 自動填入選單。請按向下鍵來選擇。",
     "description": "Screen reader text for announcing when the overlay opens on the page"
   },
   "turnOn": {
@@ -4678,7 +4678,7 @@
     "message": "目前帳戶"
   },
   "bitwardenAccount": {
-    "message": "Bitwarden 帳戶"
+    "message": "SaigonSafe 帳戶"
   },
   "availableAccounts": {
     "message": "可用帳戶"
@@ -4724,8 +4724,8 @@
     "description": "Label indicating the most common import formats"
   },
   "uriMatchDefaultStrategyHint": {
-    "message": "URI 匹配偵測是 Bitwarden 用來識別自動填入建議的方式。",
-    "description": "Explains to the user that URI match detection determines how Bitwarden suggests autofill options, and clarifies that this default strategy applies when no specific match detection is set for a login item."
+    "message": "URI 匹配偵測是 SaigonSafe 用來識別自動填入建議的方式。",
+    "description": "Explains to the user that URI match detection determines how SaigonSafe suggests autofill options, and clarifies that this default strategy applies when no specific match detection is set for a login item."
   },
   "regExAdvancedOptionWarning": {
     "message": "「正則表達式」是進階選項，可能會增加憑證外洩的風險。",
@@ -4768,23 +4768,23 @@
     "description": "Body content for dialog which asks if the user wants to proceed to the browser's keyboard shortcut settings page"
   },
   "overrideDefaultBrowserAutofillTitle": {
-    "message": "使用 Bitwarden 作為預設的密碼管理器？",
+    "message": "使用 SaigonSafe 作為預設的密碼管理器？",
     "description": "Dialog title facilitating the ability to override a chrome browser's default autofill behavior"
   },
   "overrideDefaultBrowserAutofillDescription": {
-    "message": "忽略此設定可能會導致 Bitwarden 自動填入選單與您的瀏覽器產生衝突。",
+    "message": "忽略此設定可能會導致 SaigonSafe 自動填入選單與您的瀏覽器產生衝突。",
     "description": "Dialog message facilitating the ability to override a chrome browser's default autofill behavior"
   },
   "overrideDefaultBrowserAutoFillSettings": {
-    "message": "使用 Bitwarden 作為預設的密碼管理器",
+    "message": "使用 SaigonSafe 作為預設的密碼管理器",
     "description": "Label for the setting that allows overriding the default browser autofill settings"
   },
   "privacyPermissionAdditionNotGrantedTitle": {
-    "message": "無法設定 Bitwarden 作為預設的密碼管理器",
+    "message": "無法設定 SaigonSafe 作為預設的密碼管理器",
     "description": "Title for the dialog that appears when the user has not granted the extension permission to set privacy settings"
   },
   "privacyPermissionAdditionNotGrantedDescription": {
-    "message": "您必須同意您瀏覽器的隱私權限設定來設定 Bitwarden 為預設的密碼管理器。",
+    "message": "您必須同意您瀏覽器的隱私權限設定來設定 SaigonSafe 為預設的密碼管理器。",
     "description": "Description for the dialog that appears when the user has not granted the extension permission to set privacy settings"
   },
   "makeDefault": {
@@ -5125,16 +5125,16 @@
     "message": "下載附件"
   },
   "downloadBitwarden": {
-    "message": "下載 Bitwarden"
+    "message": "下載 SaigonSafe"
   },
   "downloadBitwardenOnAllDevices": {
-    "message": "在所有裝置上下載 Bitwarden"
+    "message": "在所有裝置上下載 SaigonSafe"
   },
   "getTheMobileApp": {
     "message": "取得手機應用程式"
   },
   "getTheMobileAppDesc": {
-    "message": "使用 Bitwarden 行動應用程式，隨時隨地存取你的密碼。"
+    "message": "使用 SaigonSafe 行動應用程式，隨時隨地存取你的密碼。"
   },
   "getTheDesktopApp": {
     "message": "取得桌面應用程式"
@@ -5608,10 +5608,10 @@
     "message": "由於系統檔案不正確，生物辨識解鎖無法使用。"
   },
   "biometricsStatusHelptextDesktopDisconnected": {
-    "message": "由於 Bitwarden 桌面應用程式已關閉，生物辨識解鎖無法使用。"
+    "message": "由於 SaigonSafe 桌面應用程式已關閉，生物辨識解鎖無法使用。"
   },
   "biometricsStatusHelptextNotEnabledInDesktop": {
-    "message": "由於未 Bitwarden 桌面應用程式的 $EMAIL$ 帳號上啟動，生物辨識解鎖無法使用。",
+    "message": "由於未 SaigonSafe 桌面應用程式的 $EMAIL$ 帳號上啟動，生物辨識解鎖無法使用。",
     "placeholders": {
       "email": {
         "content": "$1",
@@ -5646,8 +5646,8 @@
     "description": "Notification message for when a password has been regenerated"
   },
   "saveToBitwarden": {
-    "message": "已儲存至 Bitwarden。",
-    "description": "Confirmation message for saving a login to Bitwarden"
+    "message": "已儲存至 SaigonSafe。",
+    "description": "Confirmation message for saving a login to SaigonSafe"
   },
   "spaceCharacterDescriptor": {
     "message": "空格",
@@ -5872,13 +5872,13 @@
     "message": "除了密碼之外，您也可以儲存安全的登入資訊、身分資訊、信用卡及筆記在您的密碼庫。"
   },
   "introCarouselLabel": {
-    "message": "歡迎使用 Bitwarden"
+    "message": "歡迎使用 SaigonSafe"
   },
   "securityPrioritized": {
     "message": "安全，第一優先"
   },
   "securityPrioritizedBody": {
-    "message": "儲存登入資訊、信用卡和數位身分到您的安全密碼庫。Bitwarden 使用零知識、端對端的加密來保護您的重要資訊。"
+    "message": "儲存登入資訊、信用卡和數位身分到您的安全密碼庫。SaigonSafe 使用零知識、端對端的加密來保護您的重要資訊。"
   },
   "quickLogin": {
     "message": "快速方便的登入"
@@ -5896,7 +5896,7 @@
     "message": "您的資料，隨時隨地都垂手可得"
   },
   "secureDevicesBody": {
-    "message": "使用 Bitwarden 行動應用程式、瀏覽器及桌面應用程式在無限制的裝置來儲存無上限的密碼。"
+    "message": "使用 SaigonSafe 行動應用程式、瀏覽器及桌面應用程式在無限制的裝置來儲存無上限的密碼。"
   },
   "nudgeBadgeAria": {
     "message": "1 通知"
@@ -5905,7 +5905,7 @@
     "message": "匯入現有密碼"
   },
   "emptyVaultNudgeBody": {
-    "message": "使用匯入工具可快速將登入資訊轉移到 Bitwarden，而不需手動新增。"
+    "message": "使用匯入工具可快速將登入資訊轉移到 SaigonSafe，而不需手動新增。"
   },
   "emptyVaultNudgeButton": {
     "message": "立即匯入"
@@ -5941,7 +5941,7 @@
     "placeholders": {
       "product": {
         "content": "$1",
-        "example": "Bitwarden Phishing Blocker"
+        "example": "SaigonSafe Phishing Blocker"
       }
     }
   },
@@ -6024,13 +6024,13 @@
     "message": "關於此設定"
   },
   "permitCipherDetailsDescription": {
-    "message": "Bitwarden 會使用已儲存的登入 URI 來判斷應顯示的圖示或變更密碼網址，以改善你的使用體驗。使用此服務時，不會收集或儲存任何資訊。"
+    "message": "SaigonSafe 會使用已儲存的登入 URI 來判斷應顯示的圖示或變更密碼網址，以改善你的使用體驗。使用此服務時，不會收集或儲存任何資訊。"
   },
   "noPermissionsViewPage": {
     "message": "你沒有檢視此頁面的權限。請嘗試使用其他帳號登入。"
   },
   "wasmNotSupported": {
-    "message": "你的瀏覽器不支援或未啟用 WebAssembly。使用 Bitwarden 應用程式需要啟用 WebAssembly。",
+    "message": "你的瀏覽器不支援或未啟用 WebAssembly。使用 SaigonSafe 應用程式需要啟用 WebAssembly。",
     "description": "'WebAssembly' is a technical term and should not be translated."
   },
   "showMore": {
@@ -6105,7 +6105,7 @@
     "message": "錯誤：無法解密"
   },
   "removeMasterPasswordForOrgUserKeyConnector": {
-    "message": "您的組織已不再使用主密碼登入 Bitwarden。若要繼續，請驗證組織與網域。"
+    "message": "您的組織已不再使用主密碼登入 SaigonSafe。若要繼續，請驗證組織與網域。"
   },
   "continueWithLogIn": {
     "message": "繼續登入"
@@ -6191,7 +6191,7 @@
     "message": "設定一個解鎖方式來變更您的密碼庫逾時動作。"
   },
   "sessionTimeoutSuppressedByConnectedDevice": {
-    "message": "由 Bitwarden 桌面應用程式管理。請開啟桌面應用程式進行編輯。"
+    "message": "由 SaigonSafe 桌面應用程式管理。請開啟桌面應用程式進行編輯。"
   },
   "percentageCompleted": {
     "message": "完成 $PERCENT$%",
@@ -6293,14 +6293,14 @@
     "message": "user@bitwarden.com, user@acme.com"
   },
   "downloadBitwardenApps": {
-    "message": "下載 Bitwarden 應用程式"
+    "message": "下載 SaigonSafe 應用程式"
   },
   "emailProtected": {
     "message": "電子郵件已受保護"
   },
   "sendPasswordHelperText": {
     "message": "對方必須輸入密碼才能檢視此 Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "userVerificationFailed": {
     "message": "使用者驗證失敗。"

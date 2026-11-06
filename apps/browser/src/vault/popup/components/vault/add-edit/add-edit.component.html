@@ -21,6 +21,7 @@
     *ngIf="!loading"
     formId="cipherForm"
     [config]="config"
+    [autoSaveEnabled]="autoSaveEnabled"
     (cipherSaved)="onCipherSaved($event)"
     [beforeSubmit]="checkFido2UserVerification"
     [submitBtn]="submitBtn"
@@ -31,13 +32,19 @@
     ></app-open-attachments>
   </vault-cipher-form>
 
+  @if (cipherFormComponent()?.autoSaveStatus; as status) {
+    <p role="status" aria-live="polite" class="tw-text-sm tw-text-muted tw-mt-2">
+      {{ status | i18n }}
+    </p>
+  }
+
   <popup-footer slot="footer">
     <button bitButton type="submit" form="cipherForm" buttonType="primary" #submitBtn>
       {{ (previouslyCouldArchive ? "unarchiveAndSave" : "save") | i18n }}
     </button>
 
     <button (click)="handleBackButton()" bitButton type="button" buttonType="secondary">
-      {{ "cancel" | i18n }}
+      {{ (autoSaveEnabled ? "close" : "cancel") | i18n }}
     </button>
 
     <ng-container slot="end">

@@ -1,16 +1,16 @@
 {
   "appName": {
-    "message": "Bitwarden"
+    "message": "SaigonSafe"
   },
   "appLogoLabel": {
-    "message": "Logo do Bitwarden"
+    "message": "Logo do SaigonSafe"
   },
   "extName": {
-    "message": "Bitwarden Gerenciador de Senhas",
+    "message": "SaigonSafe",
     "description": "Extension name, MUST be less than 40 characters (Safari restriction)"
   },
   "extDesc": {
-    "message": "Onde quer que você esteja, o Bitwarden protege suas senhas, chaves de acesso e informações sensíveis",
+    "message": "Onde quer que você esteja, o SaigonSafe protege suas senhas, chaves de acesso e informações sensíveis",
     "description": "Extension description, MUST be less than 112 characters (Safari restriction)"
   },
   "loginOrCreateNewAccount": {
@@ -23,7 +23,7 @@
     "message": "Criar conta"
   },
   "newToBitwarden": {
-    "message": "Novo no Bitwarden?"
+    "message": "Novo no SaigonSafe?"
   },
   "logInWithPasskey": {
     "message": "Conectar-se com chave de acesso"
@@ -300,22 +300,22 @@
     "message": "Continuar no aplicativo web?"
   },
   "continueToWebAppDesc": {
-    "message": "Explore mais recursos da sua conta do Bitwarden no aplicativo web."
+    "message": "Explore mais recursos da sua conta do SaigonSafe no aplicativo web."
   },
   "continueToHelpCenter": {
     "message": "Continuar na Central de Ajuda?"
   },
   "continueToHelpCenterDesc": {
-    "message": "Saiba mais sobre como usar o Bitwarden na Central de Ajuda."
+    "message": "Saiba mais sobre como usar o SaigonSafe na Central de Ajuda."
   },
   "continueToBrowserExtensionStore": {
     "message": "Continuar na loja de extensões do navegador?"
   },
   "continueToBrowserExtensionStoreDesc": {
-    "message": "Ajude outras pessoas a descobrirem se o Bitwarden é o que elas estão procurando. Visite a loja de extensões do seu navegador e deixe uma avaliação."
+    "message": "Ajude outras pessoas a descobrirem se o SaigonSafe é o que elas estão procurando. Visite a loja de extensões do seu navegador e deixe uma avaliação."
   },
   "changeMasterPasswordOnWebConfirmation": {
-    "message": "Você pode alterar a sua senha principal no aplicativo web do Bitwarden."
+    "message": "Você pode alterar a sua senha principal no aplicativo web do SaigonSafe."
   },
   "fingerprintPhrase": {
     "message": "Frase biométrica",
@@ -332,31 +332,31 @@
     "message": "Sair"
   },
   "aboutBitwarden": {
-    "message": "Sobre o Bitwarden"
+    "message": "Sobre o SaigonSafe"
   },
   "about": {
     "message": "Sobre"
   },
   "moreFromBitwarden": {
-    "message": "Mais do Bitwarden"
+    "message": "Mais do SaigonSafe"
   },
   "continueToBitwardenDotCom": {
     "message": "Continuar em bitwarden.com?"
   },
   "bitwardenForBusiness": {
-    "message": "Bitwarden para Negócios"
+    "message": "SaigonSafe para Negócios"
   },
   "bitwardenAuthenticator": {
-    "message": "Bitwarden Authenticator"
+    "message": "SaigonSafe Authenticator"
   },
   "continueToAuthenticatorPageDesc": {
-    "message": "O Bitwarden Authenticator permite que você armazene as chaves de autenticador e gere códigos TOTP para fluxos de verificação em 2 etapas. Saiba mais no site bitwarden.com"
+    "message": "O SaigonSafe Authenticator permite que você armazene as chaves de autenticador e gere códigos TOTP para fluxos de verificação em 2 etapas. Saiba mais no site bitwarden.com"
   },
   "bitwardenSecretsManager": {
-    "message": "Bitwarden Gerenciador de Segredos"
+    "message": "SaigonSafe Gerenciador de Segredos"
   },
   "continueToSecretsManagerPageDesc": {
-    "message": "Armazene, gerencie e compartilhe segredos de desenvolvedor com o Bitwarden Gerenciador de Segredos. Saiba mais no site bitwarden.com."
+    "message": "Armazene, gerencie e compartilhe segredos de desenvolvedor com o SaigonSafe Gerenciador de Segredos. Saiba mais no site bitwarden.com."
   },
   "passwordlessDotDev": {
     "message": "Passwordless.dev"
@@ -365,10 +365,10 @@
     "message": "Crie experiências de autenticação seguras, simples e livres de senhas tradicionais, com o Passwordless.dev. Saiba mais no site bitwarden.com."
   },
   "freeBitwardenFamilies": {
-    "message": "Bitwarden Famílias grátis"
+    "message": "SaigonSafe Famílias grátis"
   },
   "freeBitwardenFamiliesPageDesc": {
-    "message": "Você é elegível para o plano Bitwarden Famílias grátis. Resgate esta oferta hoje no aplicativo web."
+    "message": "Você é elegível para o plano SaigonSafe Famílias grátis. Resgate esta oferta hoje no aplicativo web."
   },
   "version": {
     "message": "Versão"
@@ -428,13 +428,13 @@
     "message": "Ajuda e feedback"
   },
   "helpCenter": {
-    "message": "Central de ajuda do Bitwarden"
+    "message": "Central de ajuda do SaigonSafe"
   },
   "communityForums": {
-    "message": "Explorar os fóruns da comunidade do Bitwarden"
+    "message": "Explorar os fóruns da comunidade do SaigonSafe"
   },
   "contactSupport": {
-    "message": "Entrar em contato com o suporte do Bitwarden"
+    "message": "Entrar em contato com o suporte do SaigonSafe"
   },
   "sync": {
     "message": "Sincronizar"
@@ -456,7 +456,7 @@
     "message": "Gere automaticamente senhas fortes e únicas para as suas credenciais."
   },
   "bitWebVaultApp": {
-    "message": "Aplicativo web do Bitwarden"
+    "message": "Aplicativo web do SaigonSafe"
   },
   "select": {
     "message": "Selecionar"
@@ -919,10 +919,10 @@
     "message": "Torne a verificação em 2 etapas mais simples"
   },
   "totpHelper": {
-    "message": "O Bitwarden pode armazenar e preencher códigos de verificação de duas etapas. Copie e cole a chave neste campo."
+    "message": "O SaigonSafe pode armazenar e preencher códigos de verificação de duas etapas. Copie e cole a chave neste campo."
   },
   "totpHelperWithCapture": {
-    "message": "O Bitwarden pode armazenar e preencher códigos de verificação de duas etapas. Selecione o ícone de câmera para fazer uma captura de tela do código QR de autenticador deste site, ou copie e cole a chave neste campo."
+    "message": "O SaigonSafe pode armazenar e preencher códigos de verificação de duas etapas. Selecione o ícone de câmera para fazer uma captura de tela do código QR de autenticador deste site, ou copie e cole a chave neste campo."
   },
   "learnMoreAboutAuthenticators": {
     "message": "Saiba mais sobre os autenticadores"
@@ -943,7 +943,7 @@
     "message": "Entrar"
   },
   "logInToBitwarden": {
-    "message": "Conecte-se ao Bitwarden"
+    "message": "Conecte-se ao SaigonSafe"
   },
   "enterTheCodeSentToYourEmail": {
     "message": "Digite o código enviado para o seu e-mail"
@@ -1006,7 +1006,7 @@
     "message": "A autenticação de duas etapas torna a sua conta mais segura ao exigir que digite um código de segurança de um aplicativo autenticador ao se conectar. A autenticação de duas etapas pode ser ativada no cofre web do bitwarden.com. Deseja visitar o site agora?"
   },
   "twoStepLoginConfirmationContent": {
-    "message": "Torne sua conta mais segura configurando a autenticação em duas etapas no aplicativo web do Bitwarden."
+    "message": "Torne sua conta mais segura configurando a autenticação em duas etapas no aplicativo web do SaigonSafe."
   },
   "twoStepLoginConfirmationTitle": {
     "message": "Continuar no aplicativo web?"
@@ -1158,7 +1158,7 @@
     "message": "Jump to setting"
   },
   "notificationAddDesc": {
-    "message": "Deseja que o Bitwarden salve esta senha para você?"
+    "message": "Deseja que o SaigonSafe salve esta senha para você?"
   },
   "notificationAddSave": {
     "message": "Salvar"
@@ -1194,11 +1194,11 @@
     }
   },
   "notificationLoginSaveConfirmation": {
-    "message": "salva no Bitwarden.",
+    "message": "salva no SaigonSafe.",
     "description": "Shown to user after item is saved."
   },
   "notificationLoginUpdatedConfirmation": {
-    "message": "atualizada no Bitwarden.",
+    "message": "atualizada no SaigonSafe.",
     "description": "Shown to user after item is updated."
   },
   "selectItemAriaLabel": {
@@ -1296,13 +1296,13 @@
     "message": "Pedir para salvar novas chaves de acesso ou se conectar com as mesmas armazenadas no seu cofre. Aplica-se a todas as contas conectadas."
   },
   "notificationChangeDesc": {
-    "message": "Deseja atualizar esta senha no Bitwarden?"
+    "message": "Deseja atualizar esta senha no SaigonSafe?"
   },
   "notificationChangeSave": {
     "message": "Atualizar"
   },
   "notificationUnlockDesc": {
-    "message": "Desbloqueie o seu cofre do Bitwarden para concluir a solicitação de preenchimento automático."
+    "message": "Desbloqueie o seu cofre do SaigonSafe para concluir a solicitação de preenchimento automático."
   },
   "notificationUnlock": {
     "message": "Desbloquear"
@@ -1327,7 +1327,7 @@
     "description": "Default URI match detection for autofill."
   },
   "defaultUriMatchDetectionDesc": {
-    "message": "A detecção de correspondência de URI determina como o Bitwarden sugere opções de preenchimento automático."
+    "message": "A detecção de correspondência de URI determina como o SaigonSafe sugere opções de preenchimento automático."
   },
   "theme": {
     "message": "Tema"
@@ -1378,10 +1378,10 @@
     "message": "Esta senha será usada para exportar e importar este arquivo"
   },
   "accountRestrictedOptionDescription": {
-    "message": "Use a chave de criptografia da sua conta, derivada do nome de usuário e senha principal, para criptografar a exportação e restringir a importação para apenas a conta atual do Bitwarden."
+    "message": "Use a chave de criptografia da sua conta, derivada do nome de usuário e senha principal, para criptografar a exportação e restringir a importação para apenas a conta atual do SaigonSafe."
   },
   "passwordProtectedOptionDescription": {
-    "message": "Configure uma senha de arquivo para criptografar a exportação e importá-la para qualquer conta do Bitwarden usando a senha para descriptografá-la."
+    "message": "Configure uma senha de arquivo para criptografar a exportação e importá-la para qualquer conta do SaigonSafe usando a senha para descriptografá-la."
   },
   "exportTypeHeading": {
     "message": "Tipo da exportação"
@@ -1410,7 +1410,7 @@
     "message": "Esta exportação criptografa seus dados usando a chave de criptografia da sua conta. Se você rotacionar a chave de criptografia da sua conta, você deve exportar novamente, já que não será capaz de descriptografar este arquivo de exportação anterior."
   },
   "encExportAccountWarningDesc": {
-    "message": "As chaves de criptografia são únicas para cada conta de usuário do Bitwarden, logo você não pode importar um arquivo de exportação criptografado para uma conta diferente."
+    "message": "As chaves de criptografia são únicas para cada conta de usuário do SaigonSafe, logo você não pode importar um arquivo de exportação criptografado para uma conta diferente."
   },
   "exportMasterPassword": {
     "message": "Digite a sua senha principal para exportar os dados do seu cofre."
@@ -1419,7 +1419,7 @@
     "message": "Compartilhado"
   },
   "bitwardenForBusinessPageDesc": {
-    "message": "O Bitwarden para Empresas permite que você compartilhe os itens do seu cofre com outras pessoas usando uma organização. Saiba mais no site do bitwarden.com."
+    "message": "O SaigonSafe para Empresas permite que você compartilhe os itens do seu cofre com outras pessoas usando uma organização. Saiba mais no site do bitwarden.com."
   },
   "moveToOrganization": {
     "message": "Mover para organização"
@@ -1585,13 +1585,13 @@
     "message": "Comprar Premium"
   },
   "premiumPurchaseAlertV2": {
-    "message": "Você pode comprar o Premium nas configurações de sua conta no aplicativo web do Bitwarden."
+    "message": "Você pode comprar o Premium nas configurações de sua conta no aplicativo web do SaigonSafe."
   },
   "premiumCurrentMember": {
     "message": "Você é um membro Premium!"
   },
   "premiumCurrentMemberThanks": {
-    "message": "Obrigado por apoiar o Bitwarden."
+    "message": "Obrigado por apoiar o SaigonSafe."
   },
   "premiumFeatures": {
     "message": "Faça o upgrade para o Premium e receba:"
@@ -1697,8 +1697,8 @@
     "message": "Aplicativo autenticador"
   },
   "authenticatorAppDescV2": {
-    "message": "Digite um código gerado por um aplicativo autenticador como o Bitwarden Authenticator.",
-    "description": "'Bitwarden Authenticator' is a product name and should not be translated."
+    "message": "Digite um código gerado por um aplicativo autenticador como o SaigonSafe Authenticator.",
+    "description": "'SaigonSafe Authenticator' is a product name and should not be translated."
   },
   "yubiKeyTitleV2": {
     "message": "Chave de segurança Yubico OTP"
@@ -1730,7 +1730,7 @@
     "message": "Ambiente auto-hospedado"
   },
   "selfHostedBaseUrlHint": {
-    "message": "Especifique a URL base da sua instalação local do Bitwarden. Exemplo: https://bitwarden.company.com"
+    "message": "Especifique a URL base da sua instalação local do SaigonSafe. Exemplo: https://bitwarden.company.com"
   },
   "selfHostedCustomEnvHeader": {
     "message": "Para configuração avançada, você pode especificar a URL base de cada serviço independentemente."
@@ -1780,7 +1780,7 @@
     "message": "Encontre sugestões de preenchimento automático com facilidade"
   },
   "autofillSpotlightDesc": {
-    "message": "Desative as configurações de preenchimento automático do seu navegador, para que elas não entrem em conflito com o Bitwarden."
+    "message": "Desative as configurações de preenchimento automático do seu navegador, para que elas não entrem em conflito com o SaigonSafe."
   },
   "turnOffBrowserAutofill": {
     "message": "Desativar o preenchimento automático do $BROWSER$",
@@ -1825,7 +1825,7 @@
     "message": "Mostrar sugestões de preenchimento automático em campos de formulário"
   },
   "howDoesBitwardenProtectFromPhishing": {
-    "message": "Como o Bitwarden protege seus dados contra phishing?"
+    "message": "Como o SaigonSafe protege seus dados contra phishing?"
   },
   "currentWebsite": {
     "message": "Site atual"
@@ -2421,7 +2421,7 @@
     "message": "Senha principal fraca"
   },
   "weakMasterPasswordDesc": {
-    "message": "A senha principal selecionada é fraca. Use uma senha principal forte (ou uma frase secreta) para proteger sua conta do Bitwarden adequadamente. Tem certeza de que deseja usar esta senha principal?"
+    "message": "A senha principal selecionada é fraca. Use uma senha principal forte (ou uma frase secreta) para proteger sua conta do SaigonSafe adequadamente. Tem certeza de que deseja usar esta senha principal?"
   },
   "rotateAccountEncKey": {
     "message": "Rotacionar a chave de criptografia da minha conta"
@@ -2433,7 +2433,7 @@
     "message": "Tem certeza de que deseja rotacionar a chave de criptografia da sua conta?"
   },
   "updateEncryptionKeyWarning": {
-    "message": "Após atualizar a chave de criptografia, é necessário sair e entrar novamente em todos os aplicativos do Bitwarden em uso (como o aplicativo móvel ou as extensões do navegador). Não fazer isso pode resultar em corrupção de dados. Tentaremos desconectá-lo automaticamente, mas isso pode demorar um pouco."
+    "message": "Após atualizar a chave de criptografia, é necessário sair e entrar novamente em todos os aplicativos do SaigonSafe em uso (como o aplicativo móvel ou as extensões do navegador). Não fazer isso pode resultar em corrupção de dados. Tentaremos desconectá-lo automaticamente, mas isso pode demorar um pouco."
   },
   "updateEncryptionKeyAccountExportWarning": {
     "message": "Quaisquer exportações salvas restritas à conta se tornarão inválidas."
@@ -2461,10 +2461,10 @@
     "message": "Configurar PIN"
   },
   "setYourPinCode": {
-    "message": "Configure o seu código PIN para desbloquear o Bitwarden. Suas configurações de PIN serão reconfiguradas se você desconectar a sua conta do aplicativo."
+    "message": "Configure o seu código PIN para desbloquear o SaigonSafe. Suas configurações de PIN serão reconfiguradas se você desconectar a sua conta do aplicativo."
   },
   "setPinCode": {
-    "message": "Você pode usar este PIN para desbloquear o Bitwarden. O seu PIN será reconfigurado se você desconectar a sua conta do aplicativo."
+    "message": "Você pode usar este PIN para desbloquear o SaigonSafe. O seu PIN será reconfigurado se você desconectar a sua conta do aplicativo."
   },
   "pinRequired": {
     "message": "O PIN é obrigatório."
@@ -2485,7 +2485,7 @@
     "message": "Aguardando confirmação do computador"
   },
   "awaitDesktopDesc": {
-    "message": "Confirme o uso de biometria no aplicativo do Bitwarden para computador para ativá-la no navegador."
+    "message": "Confirme o uso de biometria no aplicativo do SaigonSafe para computador para ativá-la no navegador."
   },
   "lockWithMasterPassOnRestart": {
     "message": "Bloquear com senha principal ao reiniciar o navegador"
@@ -2600,7 +2600,7 @@
     "message": "O formulário está hospedado em um domínio diferente do URI da sua credencial salva. Escolha OK para preencher mesmo assim, ou Cancelar para parar."
   },
   "autofillIframeWarningTip": {
-    "message": "Para evitar este aviso no futuro, adicione este URI, $HOSTNAME$, à sua credencial do Bitwarden para este site.",
+    "message": "Para evitar este aviso no futuro, adicione este URI, $HOSTNAME$, à sua credencial do SaigonSafe para este site.",
     "placeholders": {
       "hostname": {
         "content": "$1",
@@ -2609,7 +2609,7 @@
     }
   },
   "topLayerHijackWarning": {
-    "message": "Esta página está interferindo na experiência do Bitwarden. O menu embutido do Bitwarden foi temporariamente desativado como medida de segurança."
+    "message": "Esta página está interferindo na experiência do SaigonSafe. O menu embutido do SaigonSafe foi temporariamente desativado como medida de segurança."
   },
   "setMasterPassword": {
     "message": "Configurar senha principal"
@@ -2666,7 +2666,7 @@
     "message": "A nova senha principal não atende aos requisitos da política."
   },
   "receiveMarketingEmailsV2": {
-    "message": "Receba dicas, novidades e oportunidades de pesquisa do Bitwarden em sua caixa de entrada."
+    "message": "Receba dicas, novidades e oportunidades de pesquisa do SaigonSafe em sua caixa de entrada."
   },
   "unsubscribe": {
     "message": "Desinscreva-se"
@@ -2717,13 +2717,13 @@
     "message": "A integração com o navegador não foi configurada"
   },
   "desktopIntegrationDisabledDesc": {
-    "message": "A integração com o navegador não foi configurada no aplicativo do Bitwarden para computador. Configure-a nas definições do aplicativo."
+    "message": "A integração com o navegador não foi configurada no aplicativo do SaigonSafe para computador. Configure-a nas definições do aplicativo."
   },
   "startDesktopTitle": {
-    "message": "Abrir o aplicativo do Bitwarden para computador"
+    "message": "Abrir o aplicativo do SaigonSafe para computador"
   },
   "startDesktopDesc": {
-    "message": "O aplicativo do Bitwarden para computador precisa estar aberto para utilizar o desbloqueio biométrico."
+    "message": "O aplicativo do SaigonSafe para computador precisa estar aberto para utilizar o desbloqueio biométrico."
   },
   "errorEnableBiometricTitle": {
     "message": "Não é possível ativar a biometria"
@@ -2777,13 +2777,13 @@
     "message": "Biometria falhou"
   },
   "biometricsFailedDesc": {
-    "message": "Não foi possível concluir a biometria. Considere usar a senha principal ou desconectar. Se o problema persistir, entre em contato com o suporte do Bitwarden."
+    "message": "Não foi possível concluir a biometria. Considere usar a senha principal ou desconectar. Se o problema persistir, entre em contato com o suporte do SaigonSafe."
   },
   "nativeMessaginPermissionErrorTitle": {
     "message": "Permissão não concedida"
   },
   "nativeMessaginPermissionErrorDesc": {
-    "message": "Sem a permissão para se comunicar com o aplicativo do Bitwarden para computador, não é possível utilizar a biometria na extensão do navegador. Tente novamente."
+    "message": "Sem a permissão para se comunicar com o aplicativo do SaigonSafe para computador, não é possível utilizar a biometria na extensão do navegador. Tente novamente."
   },
   "nativeMessaginPermissionSidebarTitle": {
     "message": "Erro ao solicitar permissão"
@@ -2820,7 +2820,7 @@
     "message": "Domínios excluídos"
   },
   "excludedDomainsDesc": {
-    "message": "O Bitwarden não pedirá para salvar os detalhes de credenciais para estes domínios. Atualize a página para que as alterações entrem em vigor."
+    "message": "O SaigonSafe não pedirá para salvar os detalhes de credenciais para estes domínios. Atualize a página para que as alterações entrem em vigor."
   },
   "blockedDomainsDesc": {
     "message": "O preenchimento automático e outros recursos relacionados não serão oferecidos para estes sites. Recarregue a página para que as mudanças surtam efeito."
@@ -2936,24 +2936,24 @@
     "message": "Ilustração de uma lista de credenciais em risco."
   },
   "welcomeDialogGraphicAlt": {
-    "message": "Ilustração do layout da página do Cofre do Bitwarden."
+    "message": "Ilustração do layout da página do Cofre do SaigonSafe."
   },
   "generatePasswordSlideDesc": {
     "message": "Gere uma senha forte e única rapidamente pelo menu de preenchimento automático no site em risco.",
     "description": "Description of the generate password slide on the at-risk password page carousel"
   },
   "generatePasswordSlideImgAltPeriod": {
-    "message": "Ilustração do menu de preenchimento automático do Bitwarden exibindo uma senha gerada."
+    "message": "Ilustração do menu de preenchimento automático do SaigonSafe exibindo uma senha gerada."
   },
   "updateInBitwarden": {
-    "message": "Atualizar no Bitwarden"
+    "message": "Atualizar no SaigonSafe"
   },
   "updateInBitwardenSlideDesc": {
-    "message": "O Bitwarden então solicitará que você atualize a senha no gerenciador de senhas.",
-    "description": "Description of the update in Bitwarden slide on the at-risk password page carousel"
+    "message": "O SaigonSafe então solicitará que você atualize a senha no gerenciador de senhas.",
+    "description": "Description of the update in SaigonSafe slide on the at-risk password page carousel"
   },
   "updateInBitwardenSlideImgAltPeriod": {
-    "message": "Ilustração de uma notificação do Bitwarden solicitando que o usuário atualize a credencial."
+    "message": "Ilustração de uma notificação do SaigonSafe solicitando que o usuário atualize a credencial."
   },
   "turnOnAutofill": {
     "message": "Ativar preenchimento automático"
@@ -3007,11 +3007,11 @@
   },
   "send": {
     "message": "Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "sendDetails": {
     "message": "Detalhes do Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "sendTypeText": {
     "message": "Texto"
@@ -3024,7 +3024,7 @@
   },
   "allSends": {
     "message": "Todos os Sends",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "maxAccessCountReached": {
     "message": "Número máximo de acessos atingido",
@@ -3044,7 +3044,7 @@
   },
   "copySendLink": {
     "message": "Copiar link do Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "removePassword": {
     "message": "Remover senha"
@@ -3057,11 +3057,11 @@
   },
   "deletedSend": {
     "message": "Send apagado",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "sendLink": {
     "message": "Link do Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "disabled": {
     "message": "Desativado"
@@ -3071,26 +3071,26 @@
   },
   "deleteSend": {
     "message": "Apagar Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "deleteSendConfirmation": {
     "message": "Tem certeza de que deseja apagar este Send?",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "deleteSendPermanentConfirmation": {
     "message": "Tem certeza de que deseja apagar este Send permanentemente?",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "editSend": {
     "message": "Editar Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "deletionDate": {
     "message": "Data de exclusão"
   },
   "deletionDateDescV2": {
     "message": "O Send será excluído permanentemente nesta data.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "expirationDate": {
     "message": "Data de validade"
@@ -3112,34 +3112,34 @@
   },
   "createSend": {
     "message": "Novo Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "newPassword": {
     "message": "Senha nova"
   },
   "sendDisabled": {
     "message": "Send desativado",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "sendDisabledWarning": {
     "message": "Devido a uma política corporativa, você só pode apagar um Send existente.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "createdSend": {
     "message": "Send criado",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "createdSendSuccessfully": {
     "message": "Send criado com sucesso!",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "sendExpiresInHoursSingle": {
     "message": "O Send estará disponível para qualquer pessoa com o link pela próxima 1 hora.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "sendExpiresInHours": {
     "message": "O Send estará disponível para qualquer pessoa com o link pelas próximas $HOURS$ horas.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated.",
     "placeholders": {
       "hours": {
         "content": "$1",
@@ -3149,11 +3149,11 @@
   },
   "sendExpiresInDaysSingle": {
     "message": "O Send estará disponível para qualquer pessoa com o link pelo próximo 1 dia.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "sendExpiresInDays": {
     "message": "O Send estará disponível para qualquer pessoa com o link pelos próximos $DAYS$ dias.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated.",
     "placeholders": {
       "days": {
         "content": "$1",
@@ -3172,7 +3172,7 @@
   },
   "sendCreatedDescriptionV2": {
     "message": "Copie e compartilhe este link do Send. O Send ficará disponível para qualquer pessoa com o link por $TIME$.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated.",
     "placeholders": {
       "time": {
         "content": "$1",
@@ -3182,7 +3182,7 @@
   },
   "sendCreatedDescriptionPassword": {
     "message": "Copie e compartilhe este link do Send. O Send ficará disponível para qualquer pessoa com o link e a senha por $TIME$.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated.",
     "placeholders": {
       "time": {
         "content": "$1",
@@ -3192,7 +3192,7 @@
   },
   "sendCreatedDescriptionEmail": {
     "message": "Copie e compartilhe este link do Send. Ele pode ser visto pelas pessoas que você especificou por $TIME$.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated.",
     "placeholders": {
       "time": {
         "content": "$1",
@@ -3202,11 +3202,11 @@
   },
   "sendLinkCopied": {
     "message": "Link do Send copiado",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "editedSend": {
     "message": "Send salvo",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "popOut": {
     "message": "Mover para janela"
@@ -3479,7 +3479,7 @@
     "message": "Erro ao obter dados de preenchimento automático"
   },
   "couldNotDecryptVaultItemsBelow": {
-    "message": "O Bitwarden não conseguiu descriptografar o(s) item(ns) do cofre listados abaixo."
+    "message": "O SaigonSafe não conseguiu descriptografar o(s) item(ns) do cofre listados abaixo."
   },
   "contactCSToAvoidDataLossPart1": {
     "message": "Entre em contato com o suporte",
@@ -3583,11 +3583,11 @@
     }
   },
   "forwarderGeneratedBy": {
-    "message": "Gerado pelo Bitwarden.",
+    "message": "Gerado pelo SaigonSafe.",
     "description": "Displayed with the address on the forwarding service's configuration screen."
   },
   "forwarderGeneratedByWithWebsite": {
-    "message": "Site: $WEBSITE$. Gerado pelo Bitwarden.",
+    "message": "Site: $WEBSITE$. Gerado pelo SaigonSafe.",
     "description": "Displayed with the address on the forwarding service's configuration screen.",
     "placeholders": {
       "WEBSITE": {
@@ -3780,7 +3780,7 @@
     "message": "Uma notificação foi enviada para seu dispositivo."
   },
   "notificationSentDevicePart1": {
-    "message": "Desbloqueie o Bitwarden no seu dispositivo ou no "
+    "message": "Desbloqueie o SaigonSafe no seu dispositivo ou no "
   },
   "notificationSentDeviceAnchor": {
     "message": "aplicativo web"
@@ -4138,11 +4138,11 @@
   },
   "sendsTitleNoItems": {
     "message": "Envie informações confidenciais com segurança",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "sendsBodyNoItems": {
     "message": "Compartilhe dados e arquivos com segurança com qualquer pessoa, em qualquer plataforma. Suas informações permanecerão criptografadas de ponta a ponta, limitando a exposição.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "inputRequired": {
     "message": "Campo obrigatório."
@@ -4283,15 +4283,15 @@
     "message": "Ir para o conteúdo"
   },
   "bitwardenOverlayButton": {
-    "message": "Botão de menu de preenchimento automático do Bitwarden",
+    "message": "Botão de menu de preenchimento automático do SaigonSafe",
     "description": "Page title for the iframe containing the overlay button"
   },
   "toggleBitwardenVaultOverlay": {
-    "message": "Alternar menu de preenchimento automático do Bitwarden",
+    "message": "Alternar menu de preenchimento automático do SaigonSafe",
     "description": "Screen reader and tool tip label for the overlay button"
   },
   "bitwardenVault": {
-    "message": "Menu de preenchimento automático do Bitwarden",
+    "message": "Menu de preenchimento automático do SaigonSafe",
     "description": "Page title in overlay"
   },
   "unlockYourAccountToViewMatchingLogins": {
@@ -4363,7 +4363,7 @@
     "description": "Screen reader text (aria-label) for new identity button within inline menu"
   },
   "bitwardenOverlayMenuAvailable": {
-    "message": "Menu de preenchimento automático do Bitwarden disponível. Pressione a tecla de seta para baixo para selecionar.",
+    "message": "Menu de preenchimento automático do SaigonSafe disponível. Pressione a tecla de seta para baixo para selecionar.",
     "description": "Screen reader text for announcing when the overlay opens on the page"
   },
   "turnOn": {
@@ -4678,7 +4678,7 @@
     "message": "Conta ativa"
   },
   "bitwardenAccount": {
-    "message": "Conta do Bitwarden"
+    "message": "Conta do SaigonSafe"
   },
   "availableAccounts": {
     "message": "Contas disponíveis"
@@ -4724,8 +4724,8 @@
     "description": "Label indicating the most common import formats"
   },
   "uriMatchDefaultStrategyHint": {
-    "message": "A detecção de correspondência de URI é como o Bitwarden identifica sugestões de preenchimento automático.",
-    "description": "Explains to the user that URI match detection determines how Bitwarden suggests autofill options, and clarifies that this default strategy applies when no specific match detection is set for a login item."
+    "message": "A detecção de correspondência de URI é como o SaigonSafe identifica sugestões de preenchimento automático.",
+    "description": "Explains to the user that URI match detection determines how SaigonSafe suggests autofill options, and clarifies that this default strategy applies when no specific match detection is set for a login item."
   },
   "regExAdvancedOptionWarning": {
     "message": "\"Expressão regular\" é uma opção avançada com maior risco de exposição das credenciais.",
@@ -4768,23 +4768,23 @@
     "description": "Body content for dialog which asks if the user wants to proceed to the browser's keyboard shortcut settings page"
   },
   "overrideDefaultBrowserAutofillTitle": {
-    "message": "Tornar o Bitwarden seu gerenciador de senhas padrão?",
+    "message": "Tornar o SaigonSafe seu gerenciador de senhas padrão?",
     "description": "Dialog title facilitating the ability to override a chrome browser's default autofill behavior"
   },
   "overrideDefaultBrowserAutofillDescription": {
-    "message": "Ignorar esta opção pode causar conflitos entre o menu de preenchimento automático do Bitwarden e o do seu navegador.",
+    "message": "Ignorar esta opção pode causar conflitos entre o menu de preenchimento automático do SaigonSafe e o do seu navegador.",
     "description": "Dialog message facilitating the ability to override a chrome browser's default autofill behavior"
   },
   "overrideDefaultBrowserAutoFillSettings": {
-    "message": "Tornar o Bitwarden o gerenciador de senhas padrão",
+    "message": "Tornar o SaigonSafe o gerenciador de senhas padrão",
     "description": "Label for the setting that allows overriding the default browser autofill settings"
   },
   "privacyPermissionAdditionNotGrantedTitle": {
-    "message": "Não é possível configurar o Bitwarden como o gerenciador de senhas padrão",
+    "message": "Não é possível configurar o SaigonSafe como o gerenciador de senhas padrão",
     "description": "Title for the dialog that appears when the user has not granted the extension permission to set privacy settings"
   },
   "privacyPermissionAdditionNotGrantedDescription": {
-    "message": "Você deve conceder permissões de privacidade do navegador ao Bitwarden para configurá-lo como o gerenciador de senhas padrão.",
+    "message": "Você deve conceder permissões de privacidade do navegador ao SaigonSafe para configurá-lo como o gerenciador de senhas padrão.",
     "description": "Description for the dialog that appears when the user has not granted the extension permission to set privacy settings"
   },
   "makeDefault": {
@@ -5125,16 +5125,16 @@
     "message": "Baixar anexo"
   },
   "downloadBitwarden": {
-    "message": "Baixar o Bitwarden"
+    "message": "Baixar o SaigonSafe"
   },
   "downloadBitwardenOnAllDevices": {
-    "message": "Baixar o Bitwarden em todos os dispositivos"
+    "message": "Baixar o SaigonSafe em todos os dispositivos"
   },
   "getTheMobileApp": {
     "message": "Baixe o aplicativo para dispositivos móveis"
   },
   "getTheMobileAppDesc": {
-    "message": "Acesse as suas senhas em qualquer lugar com o aplicativo móvel do Bitwarden."
+    "message": "Acesse as suas senhas em qualquer lugar com o aplicativo móvel do SaigonSafe."
   },
   "getTheDesktopApp": {
     "message": "Baixe o aplicativo para computador"
@@ -5646,8 +5646,8 @@
     "description": "Notification message for when a password has been regenerated"
   },
   "saveToBitwarden": {
-    "message": "Salvar no Bitwarden",
-    "description": "Confirmation message for saving a login to Bitwarden"
+    "message": "Salvar no SaigonSafe",
+    "description": "Confirmation message for saving a login to SaigonSafe"
   },
   "spaceCharacterDescriptor": {
     "message": "Espaço",
@@ -5872,13 +5872,13 @@
     "message": "O cofre protege mais do que só suas senhas. Armazene credenciais, identidades, cartões e anotações com segurança aqui."
   },
   "introCarouselLabel": {
-    "message": "Boas-vindas ao Bitwarden"
+    "message": "Boas-vindas ao SaigonSafe"
   },
   "securityPrioritized": {
     "message": "Segurança em primeiro lugar"
   },
   "securityPrioritizedBody": {
-    "message": "Guarde suas senhas, cartões e documentos no seu cofre seguro. O Bitwarden usa criptografia de ponta a ponta de conhecimento zero, protegendo o que é valioso para você."
+    "message": "Guarde suas senhas, cartões e documentos no seu cofre seguro. O SaigonSafe usa criptografia de ponta a ponta de conhecimento zero, protegendo o que é valioso para você."
   },
   "quickLogin": {
     "message": "Autenticação rápida e fácil"
@@ -5896,7 +5896,7 @@
     "message": "Seus dados, quando e onde precisar"
   },
   "secureDevicesBody": {
-    "message": "Guarde quantas senhas quiser e acesse de qualquer lugar com o Bitwarden. No celular, navegador ou computador."
+    "message": "Guarde quantas senhas quiser e acesse de qualquer lugar com o SaigonSafe. No celular, navegador ou computador."
   },
   "nudgeBadgeAria": {
     "message": "1 notificação"
@@ -5905,7 +5905,7 @@
     "message": "Importar senhas existentes"
   },
   "emptyVaultNudgeBody": {
-    "message": "Use o importador para transferir rapidamente as credenciais para o Bitwarden sem adicioná-las manualmente."
+    "message": "Use o importador para transferir rapidamente as credenciais para o SaigonSafe sem adicioná-las manualmente."
   },
   "emptyVaultNudgeButton": {
     "message": "Importar agora"
@@ -5941,7 +5941,7 @@
     "placeholders": {
       "product": {
         "content": "$1",
-        "example": "Bitwarden Phishing Blocker"
+        "example": "SaigonSafe Phishing Blocker"
       }
     }
   },
@@ -6024,13 +6024,13 @@
     "message": "Sobre esta configuração"
   },
   "permitCipherDetailsDescription": {
-    "message": "O Bitwarden usará URIs de credenciais salvas para identificar qual ícone ou URL de alteração de senha deverá ser usado para melhorar sua experiência. Nenhuma informação é coletada ou salva quando você utiliza este serviço."
+    "message": "O SaigonSafe usará URIs de credenciais salvas para identificar qual ícone ou URL de alteração de senha deverá ser usado para melhorar sua experiência. Nenhuma informação é coletada ou salva quando você utiliza este serviço."
   },
   "noPermissionsViewPage": {
     "message": "Você não tem permissão para ver esta página. Tente se conectar com uma conta diferente."
   },
   "wasmNotSupported": {
-    "message": "O WebAssembly não é suportado no seu navegador ou não está ativado. O WebAssembly é necessário para utilizar o aplicativo do Bitwarden.",
+    "message": "O WebAssembly não é suportado no seu navegador ou não está ativado. O WebAssembly é necessário para utilizar o aplicativo do SaigonSafe.",
     "description": "'WebAssembly' is a technical term and should not be translated."
   },
   "showMore": {
@@ -6105,7 +6105,7 @@
     "message": "Erro: Não é possível descriptografar"
   },
   "removeMasterPasswordForOrgUserKeyConnector": {
-    "message": "A sua organização não está mais usando senhas principais para se conectar ao Bitwarden. Para continuar, verifique a organização e o domínio."
+    "message": "A sua organização não está mais usando senhas principais para se conectar ao SaigonSafe. Para continuar, verifique a organização e o domínio."
   },
   "continueWithLogIn": {
     "message": "Continuar acesso"
@@ -6191,7 +6191,7 @@
     "message": "Configure um método de desbloqueio para alterar a ação do limite de tempo"
   },
   "sessionTimeoutSuppressedByConnectedDevice": {
-    "message": "Managed by the Bitwarden desktop app. Open the desktop app to edit."
+    "message": "Managed by the SaigonSafe desktop app. Open the desktop app to edit."
   },
   "percentageCompleted": {
     "message": "$PERCENT$% complete",
@@ -6293,14 +6293,14 @@
     "message": "user@bitwarden.com, user@acme.com"
   },
   "downloadBitwardenApps": {
-    "message": "Baixar aplicativos do Bitwarden"
+    "message": "Baixar aplicativos do SaigonSafe"
   },
   "emailProtected": {
     "message": "Protegido por e-mail"
   },
   "sendPasswordHelperText": {
     "message": "Os destinatários precisarão digitar a senha para visualizar este Send.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'SaigonSafe Send'. It should not be translated."
   },
   "userVerificationFailed": {
     "message": "Falha na verificação do usuário."

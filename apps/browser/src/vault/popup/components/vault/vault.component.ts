@@ -19,9 +19,8 @@ import {
   withLatestFrom,
 } from "rxjs";
 
-import { PremiumUpgradeDialogComponent } from "@bitwarden/angular/billing/components";
 import { JslibModule } from "@bitwarden/angular/jslib.module";
-import { NudgesService, NudgeType, PremiumUpsellService } from "@bitwarden/angular/vault";
+import { NudgesService, NudgeType } from "@bitwarden/angular/vault";
 import { DeactivatedOrg, NoResults, VaultOpen } from "@bitwarden/assets/svg";
 import {
   AutoConfirmExtensionSetupDialogComponent,
@@ -165,24 +164,6 @@ export class VaultComponent implements OnInit, OnDestroy {
   protected allFilters$ = this.vaultPopupListFiltersService.allFilters$;
   protected cipherCount$ = this.vaultPopupItemsService.cipherCount$;
 
-  protected showPremiumSpotlight$ = combineLatest([
-    this.activeUserId$.pipe(
-      switchMap((userId) =>
-        this.nudgesService.showNudgeSpotlight$(NudgeType.PremiumUpgrade, userId),
-      ),
-    ),
-    this.showHasItemsVaultSpotlight$,
-  ]).pipe(
-    map(([showPremiumNudge, showHasItemsNudge]) => {
-      return showPremiumNudge && !showHasItemsNudge && this.premiumUpsellService.showUpsell();
-    }),
-    shareReplay({ bufferSize: 1, refCount: true }),
-  );
-
-  showPremiumDialog() {
-    PremiumUpgradeDialogComponent.open(this.dialogService);
-  }
-
   /** When true, show skeleton loading state with debouncing to prevent flicker */
   protected showSkeletonsLoaders$ = combineLatest([
     this.loading$,
@@ -242,7 +223,6 @@ export class VaultComponent implements OnInit, OnDestroy {
     private vaultItemsTransferService: VaultItemsTransferService,
     private eventCollectionService: EventCollectionService,
     private organizationService: InternalOrganizationServiceAbstraction,
-    private premiumUpsellService: PremiumUpsellService,
   ) {
     combineLatest([
       this.vaultPopupItemsService.emptyVault$,

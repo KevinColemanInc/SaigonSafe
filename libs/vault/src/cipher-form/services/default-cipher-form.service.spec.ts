@@ -46,6 +46,24 @@ describe("DefaultCipherFormService", () => {
     service = testBed.inject(DefaultCipherFormService);
   });
 
+  it("uses the saved server revision as the baseline for subsequent saves", async () => {
+    const original = new Cipher();
+    const persisted = new Cipher();
+    persisted.revisionDate = new Date("2026-11-03T00:00:00Z");
+    const view = new CipherView();
+    view.id = "cipher-1";
+    const config = { originalCipher: original, admin: false } as CipherFormConfig;
+    cipherServiceMock.updateWithServer.mockResolvedValue(view);
+    cipherServiceMock.encrypt.mockResolvedValue({ cipher: persisted } as EncryptionContext);
+    cipherServiceMock.decrypt.mockResolvedValue(view);
+
+    await service.saveCipher(view, config);
+    expect(config.originalCipher).toBe(persisted);
+    cipherServiceMock.decrypt.mockClear();
+    await service.saveCipher(view, config);
+    expect(cipherServiceMock.decrypt).toHaveBeenCalledWith(persisted, "user-1");
+  });
+
   describe("markAssociatedTaskAsComplete", () => {
     it("does not call markAsComplete when the cipher is not a login", async () => {
       pendingTasks$.mockReturnValueOnce(

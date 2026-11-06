@@ -2,6 +2,8 @@
   "name": "@bitwarden/browser",
   "version": "2026.4.0",
   "scripts": {
+    "prebuild:chrome": "node ../../scripts/branding/generate-browser-assets.cjs --check",
+    "prebuild:firefox": "node ../../scripts/branding/generate-browser-assets.cjs --check",
     "build": "npm run build:chrome",
     "build:bit": "npm run build:bit:chrome",
     "build:chrome": "cross-env BROWSER=chrome MANIFEST_VERSION=3 NODE_OPTIONS=\"--max-old-space-size=8192\" webpack",

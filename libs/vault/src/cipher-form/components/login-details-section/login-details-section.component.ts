@@ -240,6 +240,23 @@ export class LoginDetailsSectionComponent implements OnInit {
     });
   };
 
+  get canGeneratePasswordInPlace(): boolean {
+    return typeof this.generationService.generatePasswordInPlace === "function";
+  }
+
+  generatePasswordInPlace = async () => {
+    const passwordControl = this.loginDetailsForm.controls.password;
+    if (passwordControl.disabled || !this.canGeneratePasswordInPlace) {
+      return;
+    }
+    const password = await this.generationService.generatePasswordInPlace();
+    if (password && passwordControl.enabled) {
+      passwordControl.markAsDirty();
+      passwordControl.patchValue(password);
+      this.newPasswordGenerated = true;
+    }
+  };
+
   /**
    * Generate a new password and update the form.
    * TODO: Browser extension needs a means to cache the current form so values are not lost upon navigating to the generator.

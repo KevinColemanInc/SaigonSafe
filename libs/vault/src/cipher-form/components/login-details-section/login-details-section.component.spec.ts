@@ -340,6 +340,58 @@ describe("LoginDetailsSectionComponent", () => {
       }));
     });
 
+    describe("in-place password generation", () => {
+      const inlineButton = () =>
+        fixture.nativeElement.querySelector('[data-testid="generate-password-in-place-button"]');
+
+      it("fills the password directly and preserves the existing generator action", fakeAsync(() => {
+        generationService.generatePasswordInPlace!.mockResolvedValue("inline-password");
+        inlineButton().click();
+        tick();
+        expect(component.loginDetailsForm.controls.password.value).toBe("inline-password");
+        expect(component.loginDetailsForm.controls.password.dirty).toBe(true);
+        expect(component.newPasswordGenerated).toBe(true);
+        expect(generationService.generatePassword).not.toHaveBeenCalled();
+        generationService.generatePassword.mockResolvedValue("dialog-password");
+        getGeneratePasswordBtn().click();
+        tick();
+        expect(generationService.generatePassword).toHaveBeenCalledTimes(1);
+        expect(component.loginDetailsForm.controls.password.value).toBe("dialog-password");
+      }));
+
+      it("hides the inline action when the password cannot be edited", () => {
+        component.loginDetailsForm.controls.password.disable();
+        fixture.detectChanges();
+        expect(inlineButton()).toBeNull();
+      });
+
+      it("retains the password if generation returns no value", async () => {
+        component.loginDetailsForm.controls.password.setValue("existing-password");
+        generationService.generatePasswordInPlace!.mockResolvedValue(null);
+        await component.generatePasswordInPlace();
+        expect(component.loginDetailsForm.controls.password.value).toBe("existing-password");
+      });
+
+      it("retains the password if generation fails", async () => {
+        component.loginDetailsForm.controls.password.setValue("existing-password");
+        generationService.generatePasswordInPlace!.mockRejectedValue(
+          new Error("generation failed"),
+        );
+        await expect(component.generatePasswordInPlace()).rejects.toThrow("generation failed");
+        expect(component.loginDetailsForm.controls.password.value).toBe("existing-password");
+      });
+
+      it("does not replace the field if it becomes disabled during generation", async () => {
+        generationService.generatePasswordInPlace!.mockImplementation(async () => {
+          component.loginDetailsForm.controls.password.disable();
+          return "generated-password";
+        });
+        component.loginDetailsForm.controls.password.setValue("existing-password");
+        await component.generatePasswordInPlace();
+        expect(component.loginDetailsForm.controls.password.value).toBe("existing-password");
+      });
+    });
+
     describe("password checking", () => {
       it("should show the password check button when a password is present and editable", () => {
         component.loginDetailsForm.controls.password.setValue("password");

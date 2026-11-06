@@ -8,6 +8,7 @@ const TerserPlugin = require("terser-webpack-plugin");
 const { TsconfigPathsPlugin } = require("tsconfig-paths-webpack-plugin");
 const configurator = require("./config/config");
 const manifest = require("./webpack/manifest");
+const brandIcons = require("./webpack/brand-icons.cjs");
 const AngularCheckPlugin = require("./webpack/angular-check");
 
 module.exports.getEnv = function getEnv(params) {
@@ -188,7 +189,11 @@ module.exports.buildConfig = function buildConfig(params) {
         },
         { from: path.resolve(__dirname, "src/managed_schema.json"), to: "managed_schema.json" },
         { from: path.resolve(__dirname, "src/_locales"), to: "_locales" },
-        { from: path.resolve(__dirname, "src/images"), to: "images" },
+        {
+          from: path.resolve(__dirname, "src/images"),
+          to: "images",
+          transform: brandIcons.transform({ browser, env: ENV }),
+        },
         { from: path.resolve(__dirname, "src/popup/images"), to: "popup/images" },
         { from: path.resolve(__dirname, "src/autofill/content/autofill.css"), to: "content" },
       ],
