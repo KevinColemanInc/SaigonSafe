@@ -1,6 +1,7 @@
 import { TestBed } from "@angular/core/testing";
 import { Route, Router } from "@angular/router";
 
+import { authGuard } from "@bitwarden/angular/auth/guards";
 import { IMPORT_DESTINATION_ROUTE_PATH } from "@bitwarden/importer-ui";
 
 import { importUpgradeRedirectGuard } from "../tools/popup/guards/import-upgrade-redirect.guard";
@@ -24,6 +25,15 @@ describe("browser import routes", () => {
   beforeEach(() => {
     TestBed.configureTestingModule({ imports: [AppRoutingModule] });
     routes = TestBed.inject(Router).config;
+  });
+
+  it("initializes the router with legacy redirects and a protected local-security destination", () => {
+    const router = TestBed.inject(Router);
+    expect(() => router.resetConfig(routes)).not.toThrow();
+    for (const path of ["premium", "more-from-bitwarden"]) {
+      expect(findRoute(routes, path)[0].redirectTo).toBe("local-security");
+    }
+    expect(findRoute(routes, "local-security")[0].canActivate).toContain(authGuard);
   });
 
   // TODO: remove once pm-35053-import-upgrade is retired

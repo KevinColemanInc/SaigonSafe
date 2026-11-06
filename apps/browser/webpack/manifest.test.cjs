@@ -47,6 +47,19 @@ test("MV3 uses the appropriate background mechanism for each browser", () => {
   });
 });
 
+test("toolbar actions use a full pane without a default popup", () => {
+  for (const filename of ["manifest.json", "manifest.v3.json"]) {
+    const template = fs.readFileSync(path.join(__dirname, "../src", filename));
+    for (const browser of ["chrome", "edge", "firefox", "opera", "safari"]) {
+      const manifest = JSON.parse(transform(browser)(template));
+      assert.equal((manifest.action || manifest.browser_action).default_popup, undefined);
+      if (filename === "manifest.v3.json" && ["chrome", "edge"].includes(browser)) {
+        assert.equal(manifest.side_panel.default_path, "popup/index.html?uilocation=sidepanel");
+      }
+    }
+  }
+});
+
 test("beta manifests retain SaigonSafe identity", () => {
   const previousChannel = process.env.CHANNEL;
   process.env.CHANNEL = "beta";

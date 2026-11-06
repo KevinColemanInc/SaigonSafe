@@ -5,6 +5,7 @@ import { LogService } from "@bitwarden/logging";
 
 import { SafariApp } from "../../browser/safariApp";
 import { BrowserApi } from "../browser/browser-api";
+import BrowserPopupUtils from "../browser/browser-popup-utils";
 
 export class BrowserActionsService implements ActionsService {
   constructor(
@@ -23,7 +24,7 @@ export class BrowserActionsService implements ActionsService {
           const browserAction = BrowserApi.getBrowserAction();
 
           if ("openPopup" in browserAction && typeof browserAction.openPopup === "function") {
-            await browserAction.openPopup();
+            await BrowserPopupUtils.openToolbarPopup();
             return;
           } else {
             this.logService.warning(

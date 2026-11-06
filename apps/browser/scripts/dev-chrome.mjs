@@ -141,7 +141,7 @@ async function waitForExtensionId(browser) {
 
 async function openPopup(browser, extensionId) {
   const manifest = JSON.parse(await readFile(join(BUILD_DIR, "manifest.json"), "utf8"));
-  const popup = manifest.action?.default_popup;
+  const popup = manifest.side_panel?.default_path ?? manifest.action?.default_popup;
 
   if (!popup) {
     return;

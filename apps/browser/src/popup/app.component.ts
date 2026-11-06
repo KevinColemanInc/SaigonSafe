@@ -41,6 +41,7 @@ import { getOptionalUserId } from "@bitwarden/common/auth/services/account.servi
 import { PendingAuthRequestsStateService } from "@bitwarden/common/auth/services/auth-request-answering/pending-auth-requests.state";
 import { PremiumCheckoutPendingService } from "@bitwarden/common/billing/abstractions/account/premium-checkout-pending.service";
 import { AnimationControlService } from "@bitwarden/common/platform/abstractions/animation-control.service";
+import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import { LogService } from "@bitwarden/common/platform/abstractions/log.service";
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
@@ -82,6 +83,7 @@ const ACTIVE_USER_SYNC_TIMEOUT_MS = 1_000;
 export class AppComponent implements OnInit, OnDestroy {
   private compactModeService = inject(PopupCompactModeService);
   private sdkService = inject(SdkService);
+  private configService = inject(ConfigService);
 
   private lastActivity: Date;
   private activeUserId: UserId;
@@ -134,6 +136,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
     initPopupClosedListener();
+    this.refreshConfigInBackground();
 
     this.compactModeService.init();
     await this.popupSizeService.setHeight();
@@ -318,8 +321,16 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   private readonly onWindowFocus = (): void => {
+    this.refreshConfigInBackground();
     void this.syncIfReturningFromCheckout();
   };
+
+  private refreshConfigInBackground(): void {
+    // Keep cached settings on screen while the request finishes, even offline.
+    void this.configService.refreshConfig().catch((error) => {
+      this.logService.error("Failed to refresh server configuration in the background", error);
+    });
+  }
 
   private async syncIfReturningFromCheckout(): Promise<void> {
     try {

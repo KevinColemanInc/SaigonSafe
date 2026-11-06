@@ -135,7 +135,7 @@ export class VaultPopupItemsService {
           debounceTime(0),
           runInsideAngular(this.ngZone),
           tap(() => this._ciphersLoading$.next()),
-          waitUntilSync(this.syncService),
+          waitUntilVaultAvailable(this.syncService, this.cipherService, userId),
           switchMap(() =>
             combineLatest([
               this.cipherService
@@ -451,9 +451,18 @@ const hasAccessibleOrganization = (
 ): boolean => !cipher.organizationId || orgMap[cipher.organizationId as OrganizationId] != null;
 
 /**
- * Operator that waits until the active account has synced at least once before allowing the source to continue emission.
- * @param syncService
+ * Use cached items immediately, even if the first sync has not finished. An
+ * uncached account still waits for its first sync before showing an empty vault.
  */
-const waitUntilSync = <T>(syncService: SyncService): MonoTypeOperatorFunction<T> => {
-  return waitUntil(syncService.activeUserLastSync$().pipe(filter((lastSync) => lastSync != null)));
+const waitUntilVaultAvailable = <T>(
+  syncService: SyncService,
+  cipherService: CipherService,
+  userId: UserId,
+): MonoTypeOperatorFunction<T> => {
+  return waitUntil(
+    merge(
+      syncService.activeUserLastSync$().pipe(filter((lastSync) => lastSync != null)),
+      cipherService.cipherListViews$(userId).pipe(filter((ciphers) => !!ciphers?.length)),
+    ),
+  );
 };

@@ -390,6 +390,7 @@ import { BrowserActionsService } from "../platform/actions/browser-actions.servi
 import { DefaultBadgeBrowserApi } from "../platform/badge/badge-browser-api";
 import { BadgeService } from "../platform/badge/badge.service";
 import { BrowserApi } from "../platform/browser/browser-api";
+import BrowserPopupUtils from "../platform/browser/browser-popup-utils";
 import { devFlagEnabled, devFlagValue, flagEnabled } from "../platform/flags";
 import { IpcBackgroundService } from "../platform/ipc/ipc-background.service";
 import { IpcContentScriptManagerService } from "../platform/ipc/ipc-content-script-manager.service";
@@ -428,6 +429,7 @@ import CommandsBackground from "./commands.background";
 import IdleBackground from "./idle.background";
 import { NativeMessagingBackground } from "./nativeMessaging.background";
 import RuntimeBackground from "./runtime.background";
+import { ToolbarBackground } from "./toolbar.background";
 
 export default class MainBackground {
   messagingService: MessageSender;
@@ -992,6 +994,7 @@ export default class MainBackground {
       this.stateProvider,
       this.authService,
       this.sdkService,
+      { cacheFirst: true },
     );
 
     this.availableRegionsService = new DefaultAvailableRegionsService(
@@ -1860,6 +1863,7 @@ export default class MainBackground {
     );
 
     // Synchronous startup
+    new ToolbarBackground(this.logService).init();
     if (this.webPushConnectionService instanceof WorkerWebPushConnectionService) {
       this.webPushConnectionService.start();
     }
@@ -1914,12 +1918,6 @@ export default class MainBackground {
     this.overlayNotificationsBackground.init();
     this.commandsBackground.init();
     this.contextMenusBackground?.init();
-    // Disable the side panel globally on startup so Bitwarden does not appear in
-    // Chrome's side panel picker. It is enabled per-tab on demand when the user
-    // triggers autofill triage via the context menu.
-    if (BrowserApi.isSidePanelApiSupported) {
-      await BrowserApi.setSidePanelOptions({ enabled: false });
-    }
     this.idleBackground.init();
     this.webRequestBackground?.startListening();
     this.syncServiceListener?.listener$().subscribe();
@@ -1948,7 +1946,9 @@ export default class MainBackground {
 
     return new Promise<void>((resolve) => {
       setTimeout(async () => {
-        await this.fullSync(false);
+        // Local initialization is complete. A slow/offline sync must not hold
+        // startup or the notification listeners behind a network request.
+        void this.fullSync(false).catch((error) => this.logService.error(error));
         this.backgroundSyncService.init();
         this.serverNotificationsService.startListening();
 
@@ -2170,7 +2170,7 @@ export default class MainBackground {
     const browserAction = BrowserApi.getBrowserAction();
 
     if ("openPopup" in browserAction && typeof browserAction.openPopup === "function") {
-      await browserAction.openPopup();
+      await BrowserPopupUtils.openToolbarPopup();
       return;
     }
 
@@ -2191,10 +2191,9 @@ export default class MainBackground {
 
       await this.openPopup();
     } finally {
-      // Reset the popup route to the default route so any subsequent
-      // popup openings will not open to the at-risk-passwords page.
+      // Clear the temporary popup so toolbar clicks keep opening the full pane.
       await browserAction.setPopup({
-        popup: ExtensionPageUrls.Index,
+        popup: "",
       });
     }
   }
@@ -2223,10 +2222,9 @@ export default class MainBackground {
 
       await this.openPopup();
     } finally {
-      // Reset the popup route to the default route so any subsequent
-      // popup openings will not open to the at-risk-passwords page.
+      // Clear the temporary popup so toolbar clicks keep opening the full pane.
       await browserAction.setPopup({
-        popup: ExtensionPageUrls.Index,
+        popup: "",
       });
     }
   }

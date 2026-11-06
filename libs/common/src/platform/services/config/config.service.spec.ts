@@ -4,7 +4,7 @@
  */
 
 import { matches, mock } from "jest-mock-extended";
-import { BehaviorSubject, Subject, bufferCount, firstValueFrom, of } from "rxjs";
+import { BehaviorSubject, Subject, bufferCount, filter, firstValueFrom, of, timeout } from "rxjs";
 
 import {
   FakeGlobalState,
@@ -155,7 +155,7 @@ describe("ConfigService", () => {
             expect(newConfig).not.toEqual(activeUserId ? userStored : globalStored[activeApiUrl]);
           });
 
-          it("fetches config from server when it's older than an hour", async () => {
+          it("fetches config from server when it's older than 48 hours", async () => {
             await firstValueFrom(sut.serverConfig$);
 
             expect(configApiService.get).toHaveBeenCalledTimes(1);
@@ -674,6 +674,162 @@ describe("ConfigService", () => {
       // The gate hangs off the existing pipeline, so a run that never reads config
       // never enables the recorder.
       expect(logService.enableRecorder).not.toHaveBeenCalled();
+    });
+  });
+
+  describe.each([null, userId])("cache-first configuration for %s", (activeUserId) => {
+    let sut: DefaultConfigService;
+    let resolveRefresh: (response: ServerConfigResponse) => void;
+    let rejectRefresh: (error: Error) => void;
+    const cached = serverConfigFactory("cached", tooOld);
+
+    beforeEach(async () => {
+      await accountService.switchAccount(activeUserId);
+      const environment = of(environmentFactory(activeApiUrl));
+      environmentService.globalEnvironment$ = environment;
+      Matrix.autoMockMethod(environmentService.getEnvironment$, () => environment);
+      globalState.stateSubject.next({ [activeApiUrl]: cached });
+      userState.nextState(cached);
+      configApiService.get.mockReturnValue(
+        new Promise((resolve, reject) => {
+          resolveRefresh = resolve;
+          rejectRefresh = reject;
+        }),
+      );
+      sut = new DefaultConfigService(
+        configApiService,
+        environmentService,
+        logService,
+        stateProvider,
+        authService,
+        sdkService,
+        { cacheFirst: true },
+      );
+    });
+
+    it("exposes stale cached settings while the network request is still pending", async () => {
+      await expect(firstValueFrom(sut.serverConfig$.pipe(timeout(100)))).resolves.toEqual(cached);
+      expect(configApiService.get).toHaveBeenCalledTimes(1);
+    });
+
+    it.each([2, 47])(
+      "keeps a %s-hour-old configuration without an automatic request",
+      async (hours) => {
+        const withinCacheLifetime = serverConfigFactory(
+          "cached",
+          new Date(Date.now() - hours * 60 * 60 * 1000),
+        );
+        globalState.stateSubject.next({ [activeApiUrl]: withinCacheLifetime });
+        userState.nextState(withinCacheLifetime);
+
+        await expect(firstValueFrom(sut.serverConfig$)).resolves.toEqual(withinCacheLifetime);
+        expect(configApiService.get).not.toHaveBeenCalled();
+      },
+    );
+
+    it("explicitly refreshes a fresh cache while continuing to expose it to observers", async () => {
+      const fresh = serverConfigFactory("fresh");
+      globalState.stateSubject.next({ [activeApiUrl]: fresh });
+      userState.nextState(fresh);
+      const configs: (ServerConfig | null)[] = [];
+      const sub = sut.serverConfig$.subscribe((config) => configs.push(config));
+
+      const refresh = sut.refreshConfig();
+      await Promise.resolve();
+      expect(configApiService.get).toHaveBeenCalledTimes(1);
+      expect(configs).toEqual([fresh]);
+      resolveRefresh(serverConfigResponseFactory("refreshed"));
+      await refresh;
+
+      expect(configs.at(-1)?.gitHash).toBe("refreshed");
+      sub.unsubscribe();
+    });
+
+    it("shares a pending refresh between cache expiry and pane refresh requests", async () => {
+      const sub = sut.serverConfig$.subscribe();
+      const first = sut.refreshConfig();
+      const second = sut.refreshConfig();
+      await Promise.resolve();
+
+      expect(configApiService.get).toHaveBeenCalledTimes(1);
+      resolveRefresh(serverConfigResponseFactory("refreshed"));
+      await Promise.all([first, second]);
+      sub.unsubscribe();
+    });
+
+    it("can retry a failed explicit refresh without clearing the cached settings", async () => {
+      const fresh = serverConfigFactory("fresh");
+      globalState.stateSubject.next({ [activeApiUrl]: fresh });
+      userState.nextState(fresh);
+      const configs: (ServerConfig | null)[] = [];
+      const sub = sut.serverConfig$.subscribe((config) => configs.push(config));
+      const refresh = sut.refreshConfig();
+      await Promise.resolve();
+      rejectRefresh(new Error("offline"));
+      await refresh;
+      expect(configs).toEqual([fresh]);
+
+      configApiService.get.mockResolvedValue(serverConfigResponseFactory("retried"));
+      await sut.refreshConfig();
+      expect(configApiService.get).toHaveBeenCalledTimes(2);
+      expect(configs.at(-1)?.gitHash).toBe("retried");
+      sub.unsubscribe();
+    });
+
+    it("uses defaults immediately when there is no stored configuration", async () => {
+      globalState.stateSubject.next({});
+      userState.nextState(null);
+
+      await expect(firstValueFrom(sut.serverConfig$.pipe(timeout(100)))).resolves.toBeNull();
+      expect(configApiService.get).toHaveBeenCalledTimes(1);
+    });
+
+    it("updates observers when the background request finishes", async () => {
+      const configs: (ServerConfig | null)[] = [];
+      const sub = sut.serverConfig$.subscribe((config) => configs.push(config));
+      const updated = firstValueFrom(
+        sut.serverConfig$.pipe(
+          filter((config) => config?.gitHash === "refreshed"),
+          timeout(100),
+        ),
+      );
+      expect(configs).toEqual([cached]);
+      resolveRefresh(serverConfigResponseFactory("refreshed"));
+
+      await updated;
+      expect(configs.at(-1)?.gitHash).toBe("refreshed");
+      expect(configApiService.get).toHaveBeenCalledTimes(1);
+      if (activeUserId) {
+        expect(sdkService.setFlags).toHaveBeenCalled();
+      }
+      sub.unsubscribe();
+    });
+
+    it("retains cached settings when the background request fails", async () => {
+      const configs: (ServerConfig | null)[] = [];
+      const sub = sut.serverConfig$.subscribe((config) => configs.push(config));
+      rejectRefresh(new Error("offline"));
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(configs).toEqual([cached]);
+      expect(logService.error).toHaveBeenCalled();
+      sub.unsubscribe();
+    });
+
+    it("does not re-emit a previous account's settings when its request fails", async () => {
+      const configs: (ServerConfig | null)[] = [];
+      const sub = sut.serverConfig$.subscribe((config) => configs.push(config));
+      const nextUserId = "next-user" as UserId;
+      const nextConfig = serverConfigFactory("next-account");
+      stateProvider.singleUser.getFake(nextUserId, USER_SERVER_CONFIG).nextState(nextConfig);
+      await accountService.switchAccount(nextUserId);
+      rejectRefresh(new Error("old request failed"));
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(configs).toEqual([cached, nextConfig]);
+      sub.unsubscribe();
     });
   });
 

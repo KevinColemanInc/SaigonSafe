@@ -12,7 +12,60 @@ describe("BrowserPopupUtils", () => {
     localStorage.clear();
   });
 
+  describe("openToolbarPopup", () => {
+    let action: {
+      getPopup: jest.Mock;
+      setPopup: jest.Mock;
+      openPopup: jest.Mock;
+    };
+
+    beforeEach(() => {
+      action = {
+        getPopup: jest.fn((_details, callback) => callback("")),
+        setPopup: jest.fn().mockResolvedValue(undefined),
+        openPopup: jest.fn().mockResolvedValue(undefined),
+      };
+      jest
+        .spyOn(BrowserApi, "getBrowserAction")
+        .mockReturnValue(action as unknown as typeof chrome.action);
+    });
+
+    afterEach(() => jest.restoreAllMocks());
+
+    it("temporarily configures a popup for programmatic actions and then clears it", async () => {
+      await BrowserPopupUtils.openToolbarPopup();
+
+      expect(action.openPopup).toHaveBeenCalledTimes(1);
+      expect(action.setPopup.mock.calls).toEqual([
+        [{ popup: "popup/index.html" }],
+        [{ popup: "" }],
+      ]);
+    });
+
+    it("preserves a caller's temporary route", async () => {
+      action.getPopup.mockImplementation((_details, callback) =>
+        callback("popup/index.html#/at-risk-passwords"),
+      );
+      await BrowserPopupUtils.openToolbarPopup();
+
+      expect(action.openPopup).toHaveBeenCalledTimes(1);
+      expect(action.setPopup).not.toHaveBeenCalled();
+    });
+
+    it("clears the popup even if the browser rejects the open request", async () => {
+      action.openPopup.mockRejectedValue(new Error("cannot open"));
+
+      await expect(BrowserPopupUtils.openToolbarPopup()).rejects.toThrow("cannot open");
+      expect(action.setPopup).toHaveBeenLastCalledWith({ popup: "" });
+    });
+  });
+
   describe("inSidebar", () => {
+    it("treats the Chrome side panel as a sidebar for persistent UI behavior", () => {
+      const win = { location: { href: "https://jest-testing.com?uilocation=sidepanel" } } as Window;
+
+      expect(BrowserPopupUtils.inSidebar(win)).toBe(true);
+    });
     it("should return true if the window contains the sidebar query param", () => {
       const win = { location: { href: "https://jest-testing.com?uilocation=sidebar" } } as Window;
 

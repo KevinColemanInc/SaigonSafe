@@ -43,8 +43,7 @@
       "19": "images/icon19.png",
       "38": "images/icon38.png"
     },
-    "default_title": "SaigonSafe",
-    "default_popup": "popup/index.html"
+    "default_title": "SaigonSafe"
   },
   "permissions": [
     "activeTab",
@@ -110,7 +109,10 @@
   },
   "__firefox__sandbox": null,
   "__chrome__side_panel": {
-    "default_path": "sidepanel-disabled.html"
+    "default_path": "popup/index.html?uilocation=sidepanel"
+  },
+  "__edge__side_panel": {
+    "default_path": "popup/index.html?uilocation=sidepanel"
   },
   "commands": {
     "_execute_action": {

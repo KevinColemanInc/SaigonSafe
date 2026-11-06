@@ -1714,10 +1714,9 @@ export default class NotificationBackground {
           }),
         ]);
       } finally {
-        // Reset the popup route to the default route so any subsequent
-        // popup openings will not open to the at-risk-passwords page.
+        // Clear the temporary popup so toolbar clicks keep opening the full pane.
         await browserAction.setPopup({
-          popup: "popup/index.html#/",
+          popup: "",
         });
       }
     });

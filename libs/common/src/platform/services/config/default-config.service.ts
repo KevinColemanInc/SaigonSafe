@@ -41,7 +41,7 @@ import { CONFIG_DISK, KeyDefinition, StateProvider, UserKeyDefinition } from "..
 
 export const RETRIEVAL_INTERVAL = devFlagEnabled("configRetrievalIntervalMs")
   ? (devFlagValue("configRetrievalIntervalMs") as number)
-  : 3_600_000; // 1 hour
+  : 48 * 60 * 60 * 1000; // 48 hours
 
 export const SLOW_EMISSION_GUARD = 800;
 
@@ -80,10 +80,19 @@ const environmentComparer = (previous: Environment, current: Environment) => {
   return previous.getApiUrl() === current.getApiUrl();
 };
 
+type ConfigContext = readonly [
+  existingConfig: ServerConfig | null,
+  userId: UserId | null,
+  environment: Environment,
+  fallbackConfig: ServerConfig | null,
+];
+
 // FIXME: currently we are limited to api requests for active users. Update to accept a UserId and APIUrl once ApiService supports it.
 export class DefaultConfigService implements ConfigService {
   private failedFetchFallbackSubject = new Subject<ServerConfig | null>();
   private serverCommunicationConfigSubject = new ReplaySubject<ServerCommunicationConfig>(1);
+  private configContext$: Observable<ConfigContext>;
+  private configRefreshes = new Map<string, Promise<void>>();
 
   serverConfig$: Observable<ServerConfig | null>;
   serverCommunicationConfig$ = this.serverCommunicationConfigSubject.asObservable();
@@ -103,6 +112,7 @@ export class DefaultConfigService implements ConfigService {
     private stateProvider: StateProvider,
     private authService: AuthService,
     private sdkService: SdkService,
+    private options: { cacheFirst?: boolean } = {},
   ) {
     const globalConfig$ = this.environmentService.globalEnvironment$.pipe(
       distinctUntilChanged(environmentComparer),
@@ -115,7 +125,7 @@ export class DefaultConfigService implements ConfigService {
       ),
     );
 
-    this.serverConfig$ = this.stateProvider.activeUserId$.pipe(
+    this.configContext$ = this.stateProvider.activeUserId$.pipe(
       distinctUntilChanged(),
       switchMap((userId) => {
         if (userId == null) {
@@ -154,6 +164,9 @@ export class DefaultConfigService implements ConfigService {
           }),
         );
       }),
+    );
+
+    this.serverConfig$ = this.configContext$.pipe(
       tap(async (rec) => {
         const [existingConfig, userId, environment, fallbackConfig] = rec;
         // Grab new config if older retrieval interval
@@ -161,7 +174,12 @@ export class DefaultConfigService implements ConfigService {
           await this.renewConfig(existingConfig, userId, environment, fallbackConfig);
         }
       }),
-      switchMap(([existingConfig]) => {
+      switchMap(([existingConfig, , , fallbackConfig]) => {
+        // Browser startup can use stored settings while the refresh runs,
+        // including when the server is unreachable.
+        if (this.options.cacheFirst) {
+          return of(fallbackConfig);
+        }
         // If we needed to fetch, stop this emit, we'll get a new one after update
         // This is split up with the above tap because we need to return an observable from a failed promise,
         // which isn't very doable since promises are converted to observables in switchMap
@@ -230,8 +248,16 @@ export class DefaultConfigService implements ConfigService {
   }
 
   async ensureConfigFetched() {
-    // Triggering a retrieval for the given user ensures that the config is less than RETRIEVAL_INTERVAL old
+    // Trigger retrieval if needed. Cache-first clients can continue using stored
+    // settings while that retrieval completes in the background.
     await firstValueFrom(this.serverConfig$);
+  }
+
+  async refreshConfig(): Promise<void> {
+    const [existingConfig, userId, environment, fallbackConfig] = await firstValueFrom(
+      this.configContext$,
+    );
+    await this.renewConfig(existingConfig, userId, environment, fallbackConfig);
   }
 
   private olderThanRetrievalInterval(date: Date) {
@@ -254,21 +280,51 @@ export class DefaultConfigService implements ConfigService {
     }
   }
 
-  // Updates the on-disk configuration with a newly retrieved configuration
-  private async renewConfig(
+  private renewConfig(
     existingConfig: ServerConfig | null,
     userId: UserId | null,
     environment: Environment,
     fallbackConfig: ServerConfig | null,
   ): Promise<void> {
+    // Pane open/focus and an expired cache can request the same refresh together.
+    // Keep those callers on one request, scoped to the account and server.
+    const key = JSON.stringify([userId, environment.getApiUrl()]);
+    const pending = this.configRefreshes.get(key);
+    if (pending != null) {
+      return pending;
+    }
+    const request = this.fetchConfig(existingConfig, userId, environment, fallbackConfig).finally(
+      () => this.configRefreshes.delete(key),
+    );
+    this.configRefreshes.set(key, request);
+    return request;
+  }
+
+  // Updates the on-disk configuration with a newly retrieved configuration.
+  private async fetchConfig(
+    existingConfig: ServerConfig | null,
+    userId: UserId | null,
+    environment: Environment,
+    fallbackConfig: ServerConfig | null,
+  ): Promise<void> {
+    // Cache-first consumers already received this value. Do not emit it again
+    // after a failure: the active account/environment may have changed meanwhile.
+    const emitFallback = () => {
+      if (!this.options.cacheFirst) {
+        this.failedFetchFallbackSubject.next(fallbackConfig);
+      }
+    };
+    let handle: ReturnType<typeof setTimeout> | undefined;
     try {
       // Feature flags often have a big impact on user experience, lets ensure we return some value
       // somewhat quickly even though it may not be accurate, we won't cancel the HTTP request
       // though so that hopefully it can have finished and hydrated a more accurate value.
-      const handle = setTimeout(() => {
-        this.logService.info("Environment did not respond in time, emitting previous config.");
-        this.failedFetchFallbackSubject.next(fallbackConfig);
-      }, SLOW_EMISSION_GUARD);
+      if (!this.options.cacheFirst) {
+        handle = setTimeout(() => {
+          this.logService.info("Environment did not respond in time, emitting previous config.");
+          emitFallback();
+        }, SLOW_EMISSION_GUARD);
+      }
       const response = await this.configApiService.get(userId);
       clearTimeout(handle);
       const newConfig = new ServerConfig(new ServerConfigData(response));
@@ -299,7 +355,9 @@ export class DefaultConfigService implements ConfigService {
       // mutate error to be handled by catchError
       this.logService.error(`Unable to fetch ServerConfig from ${environment.getApiUrl()}`, e);
       // Emit the existing config
-      this.failedFetchFallbackSubject.next(fallbackConfig);
+      emitFallback();
+    } finally {
+      clearTimeout(handle);
     }
   }
 

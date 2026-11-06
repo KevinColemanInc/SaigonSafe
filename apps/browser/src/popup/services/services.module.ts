@@ -107,6 +107,7 @@ import {
   AnimationControlService,
   DefaultAnimationControlService,
 } from "@bitwarden/common/platform/abstractions/animation-control.service";
+import { ConfigApiServiceAbstraction } from "@bitwarden/common/platform/abstractions/config/config-api.service.abstraction";
 import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { EnvironmentService } from "@bitwarden/common/platform/abstractions/environment.service";
 import { FileDownloadService } from "@bitwarden/common/platform/abstractions/file-download/file-download.service";
@@ -134,6 +135,7 @@ import { SubjectMessageSender } from "@bitwarden/common/platform/messaging/inter
 import { flagEnabled } from "@bitwarden/common/platform/misc/flags";
 import { TaskSchedulerService } from "@bitwarden/common/platform/scheduling";
 import { ServerNotificationsService } from "@bitwarden/common/platform/server-notifications";
+import { DefaultConfigService } from "@bitwarden/common/platform/services/config/default-config.service";
 import { ConsoleLogService } from "@bitwarden/common/platform/services/console-log.service";
 import { ContainerService } from "@bitwarden/common/platform/services/container.service";
 import { DefaultSdkClientFactory } from "@bitwarden/common/platform/services/sdk/default-sdk-client-factory";
@@ -281,6 +283,25 @@ const DISK_BACKUP_LOCAL_STORAGE = new SafeInjectionToken<
  * If you need help please ask for it, do NOT change the type of this array.
  */
 const safeProviders: SafeProvider[] = [
+  safeProvider({
+    provide: DefaultConfigService,
+    useFactory: (
+      api: ConfigApiServiceAbstraction,
+      environment: EnvironmentService,
+      log: LogService,
+      state: StateProvider,
+      auth: AuthService,
+      sdk: SdkService,
+    ) => new DefaultConfigService(api, environment, log, state, auth, sdk, { cacheFirst: true }),
+    deps: [
+      ConfigApiServiceAbstraction,
+      EnvironmentService,
+      LogService,
+      StateProvider,
+      AuthService,
+      SdkService,
+    ],
+  }),
   safeProvider(InitService),
   safeProvider(DebounceNavigationService),
   safeProvider(DialogService),

@@ -17,6 +17,7 @@ import { TokenService } from "@bitwarden/common/auth/abstractions/token.service"
 import { PendingAuthRequestsStateService } from "@bitwarden/common/auth/services/auth-request-answering/pending-auth-requests.state";
 import { PremiumCheckoutPendingService } from "@bitwarden/common/billing/abstractions/account/premium-checkout-pending.service";
 import { AnimationControlService } from "@bitwarden/common/platform/abstractions/animation-control.service";
+import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import { LogService } from "@bitwarden/common/platform/abstractions/log.service";
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
@@ -48,6 +49,7 @@ describe("AppComponent (browser popup)", () => {
   let router: MockProxy<Router>;
   let ngZone: MockProxy<NgZone>;
   let logService: MockProxy<LogService>;
+  let configService: MockProxy<ConfigService>;
 
   const userId = "user-1" as UserId;
 
@@ -56,6 +58,8 @@ describe("AppComponent (browser popup)", () => {
     syncService = mock<SyncService>();
     premiumCheckoutPendingService = mock<PremiumCheckoutPendingService>();
     logService = mock<LogService>();
+    configService = mock<ConfigService>();
+    configService.refreshConfig.mockResolvedValue(undefined);
     compactModeService = mock<PopupCompactModeService>();
     popupSizeService = mock<PopupSizeService>();
     authService = mock<AuthService>();
@@ -85,6 +89,7 @@ describe("AppComponent (browser popup)", () => {
       providers: [
         { provide: PopupCompactModeService, useValue: compactModeService },
         { provide: SdkService, useValue: sdkService },
+        { provide: ConfigService, useValue: configService },
       ],
     });
 
@@ -133,6 +138,38 @@ describe("AppComponent (browser popup)", () => {
   afterEach(() => {
     component.ngOnDestroy();
     jest.clearAllMocks();
+  });
+
+  it("finishes initializing the pane while a configuration request is still pending", async () => {
+    configService.refreshConfig.mockReturnValue(new Promise(() => {}));
+
+    await component.ngOnInit();
+
+    expect(configService.refreshConfig).toHaveBeenCalledTimes(1);
+    expect(window.onmousedown).toEqual(expect.any(Function));
+  });
+
+  it("keeps initializing the pane if its background configuration refresh fails", async () => {
+    const error = new Error("offline");
+    configService.refreshConfig.mockRejectedValue(error);
+
+    await expect(component.ngOnInit()).resolves.toBeUndefined();
+
+    expect(logService.error).toHaveBeenCalledWith(
+      "Failed to refresh server configuration in the background",
+      error,
+    );
+    expect(window.onmousedown).toEqual(expect.any(Function));
+  });
+
+  it("refreshes configuration again when the persistent pane regains focus", async () => {
+    await component.ngOnInit();
+    window.dispatchEvent(new Event("focus"));
+
+    expect(configService.refreshConfig).toHaveBeenCalledTimes(2);
+    component.ngOnDestroy();
+    window.dispatchEvent(new Event("focus"));
+    expect(configService.refreshConfig).toHaveBeenCalledTimes(2);
   });
 
   it("syncs once when a premium checkout was pending on popup open", async () => {

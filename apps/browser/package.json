@@ -13,6 +13,8 @@
     "build:edge": "cross-env BROWSER=edge MANIFEST_VERSION=3 NODE_OPTIONS=\"--max-old-space-size=8192\" webpack",
     "build:bit:edge": "cross-env BROWSER=edge MANIFEST_VERSION=3 NODE_OPTIONS=\"--max-old-space-size=8192\" webpack -c ../../bitwarden_license/bit-browser/webpack.config.js",
     "build:firefox": "cross-env BROWSER=firefox NODE_OPTIONS=\"--max-old-space-size=8192\" webpack",
+    "build:unpacked:chrome": "npm run build:chrome -- --output-path dist/chrome",
+    "build:unpacked:firefox": "cross-env MANIFEST_VERSION=3 npm run build:firefox -- --output-path dist/firefox",
     "build:bit:firefox": "cross-env BROWSER=firefox NODE_OPTIONS=\"--max-old-space-size=8192\" webpack -c ../../bitwarden_license/bit-browser/webpack.config.js",
     "build:opera": "cross-env BROWSER=opera MANIFEST_VERSION=3 NODE_OPTIONS=\"--max-old-space-size=8192\" webpack",
     "build:bit:opera": "cross-env BROWSER=opera MANIFEST_VERSION=3 NODE_OPTIONS=\"--max-old-space-size=8192\" webpack -c ../../bitwarden_license/bit-browser/webpack.config.js",

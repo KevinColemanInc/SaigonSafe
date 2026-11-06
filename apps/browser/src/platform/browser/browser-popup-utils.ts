@@ -23,12 +23,37 @@ export const POPUP_WIDTH_STORAGE_KEY = "bw-popup-width";
 
 export default class BrowserPopupUtils {
   /**
+   * Open a programmatic popup (for example, a login approval) without leaving a
+   * default popup behind that would override the toolbar's full-pane behavior.
+   */
+  static async openToolbarPopup(): Promise<void> {
+    const action = BrowserApi.getBrowserAction();
+    if (!("openPopup" in action) || typeof action.openPopup !== "function") {
+      return;
+    }
+    const popup = await new Promise<string>((resolve) => action.getPopup({}, resolve));
+    if (!popup) {
+      await action.setPopup({ popup: "popup/index.html" });
+    }
+    try {
+      await action.openPopup();
+    } finally {
+      if (!popup) {
+        await action.setPopup({ popup: "" });
+      }
+    }
+  }
+
+  /**
    * Identifies if the popup is within the sidebar.
    *
    * @param win - The passed window object.
    */
   static inSidebar(win: Window): boolean {
-    return BrowserPopupUtils.urlContainsSearchParams(win, "uilocation", "sidebar");
+    return (
+      BrowserPopupUtils.urlContainsSearchParams(win, "uilocation", "sidebar") ||
+      BrowserPopupUtils.inSidePanel(win)
+    );
   }
 
   /**

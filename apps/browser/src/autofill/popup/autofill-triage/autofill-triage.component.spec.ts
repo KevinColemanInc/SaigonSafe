@@ -264,7 +264,7 @@ describe("AutofillTriageComponent", () => {
       );
     });
 
-    it("should re-disable the side panel when destroyed in side panel context", async () => {
+    it("restores the vault panel when leaving triage", async () => {
       jest.spyOn(BrowserPopupUtils, "inSidePanel").mockReturnValue(true);
       jest.spyOn(BrowserApi, "isSidePanelApiSupported", "get").mockReturnValue(true);
       const setSidePanelOptionsSpy = jest
@@ -274,7 +274,11 @@ describe("AutofillTriageComponent", () => {
       await component.ngOnInit();
       component.ngOnDestroy();
 
-      expect(setSidePanelOptionsSpy).toHaveBeenCalledWith({ enabled: false, tabId: mockTab.id });
+      expect(setSidePanelOptionsSpy).toHaveBeenCalledWith({
+        path: "popup/index.html?uilocation=sidepanel",
+        enabled: true,
+        tabId: mockTab.id,
+      });
     });
 
     it("should not disable side panel when destroyed outside side panel context", async () => {

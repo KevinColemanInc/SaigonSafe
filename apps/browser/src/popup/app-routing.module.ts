@@ -69,7 +69,6 @@ import { AutofillComponent } from "../autofill/popup/settings/autofill.component
 import { BlockedDomainsComponent } from "../autofill/popup/settings/blocked-domains.component";
 import { ExcludedDomainsComponent } from "../autofill/popup/settings/excluded-domains.component";
 import { NotificationsSettingsComponent } from "../autofill/popup/settings/notifications.component";
-import { LocalSecurityComponent } from "../tools/popup/local-security/local-security.component";
 import { HealthRiskCategoryDetailComponent } from "../dirt/health/popup/health-risk-category-detail.component";
 import { HealthComponent } from "../dirt/health/popup/health.component";
 import {
@@ -86,6 +85,7 @@ import { CredentialGeneratorComponent } from "../tools/popup/generator/credentia
 import { filePickerPopoutGuard } from "../tools/popup/guards/file-picker-popout.guard";
 import { importUpgradeRedirectGuard } from "../tools/popup/guards/import-upgrade-redirect.guard";
 import { importUpgradeRequiredGuard } from "../tools/popup/guards/import-upgrade-required.guard";
+import { LocalSecurityComponent } from "../tools/popup/local-security/local-security.component";
 import { SendAddEditComponent as SendAddEditV2Component } from "../tools/popup/send-v2/add-edit/send-add-edit.component";
 import { SendCreatedComponent } from "../tools/popup/send-v2/send-created/send-created.component";
 import { SendV2Component } from "../tools/popup/send-v2/send-v2.component";
@@ -411,7 +411,6 @@ const routes: Routes = [
     path: "premium",
     redirectTo: "local-security",
     pathMatch: "full",
-    canActivate: [authGuard],
     data: { elevation: 3 } satisfies RouteDataProperties,
   },
   {
@@ -752,7 +751,6 @@ const routes: Routes = [
     path: "more-from-bitwarden",
     redirectTo: "local-security",
     pathMatch: "full",
-    canActivate: [authGuard],
     data: { elevation: 2 } satisfies RouteDataProperties,
   },
   {

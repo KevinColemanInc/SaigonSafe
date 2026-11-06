@@ -258,12 +258,30 @@ describe("VaultPopupItemsService", () => {
     await expect(tracker.pauseUntilReceived(3)).rejects.toThrow("Timeout exceeded");
   });
 
-  it("should not emit cipher list if syncService.getLastSync returns null", async () => {
+  it("renders cached ciphers before the first sync completes", async () => {
     activeUserLastSync$.next(null);
+
+    const ciphers = await firstValueFrom(service.autoFillCiphers$.pipe(timeout(100)));
+
+    expect(ciphers).toEqual(autoFillCiphers);
+  });
+
+  it("waits for the first sync before showing an uncached vault as empty", async () => {
+    activeUserLastSync$.next(null);
+    cipherServiceMock.cipherListViews$.mockReturnValue(of([]));
 
     const obs$ = service.autoFillCiphers$.pipe(timeout(50));
 
     await expect(firstValueFrom(obs$)).rejects.toThrow("Timeout has occurred");
+  });
+
+  it("renders an empty vault after its first sync", async () => {
+    activeUserLastSync$.next(null);
+    cipherServiceMock.cipherListViews$.mockReturnValue(of([]));
+    const ciphers = firstValueFrom(service.autoFillCiphers$.pipe(timeout(100)));
+    activeUserLastSync$.next(new Date());
+
+    await expect(ciphers).resolves.toEqual([]);
   });
 
   describe("autoFillCiphers$", () => {

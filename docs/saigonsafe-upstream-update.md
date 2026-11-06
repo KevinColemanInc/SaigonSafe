@@ -10,6 +10,26 @@ SaigonSafe artwork, toolbar status variants, autofill branding, browser identiti
 autosave, inline password generation, notes display, and remembered-2FA logout cleanup
 are retained. Autosave also honors upstream organization ownership and restricted-write checks.
 
+## Opening and offline startup
+
+- Toolbar clicks open the full-height Chrome/Edge side panel or Firefox sidebar.
+  Browsers without a side pane open or focus a full vault tab. Temporary popup routes
+  clear themselves afterward so they do not restore the small toolbar popup.
+- Browser foreground and background services use cached server configuration (or
+  conservative defaults when none exists) immediately while refreshing it in the
+  background. Other clients retain their existing configuration-loading behavior.
+- The default configuration retrieval interval is 48 hours; the browser development
+  build no longer overrides it to five seconds. Opening or refocusing the pane requests
+  an asynchronous refresh even for a fresh cache. Concurrent refreshes for the same
+  account/server share one request, and failures keep the cached settings available.
+- Cached vault items can render before the first sync completes. Accounts with no
+  cached items still wait for their first sync before displaying an empty vault.
+  Vault contents continue to use the existing encrypted storage and unlock checks.
+- Initial sync runs independently of startup completion and notification listeners.
+- Legacy promotion redirects rely on the authentication guard on `local-security`.
+  Activation guards on those redirect routes are invalid in Angular and prevent the
+  entire pane from bootstrapping.
+
 ## Free local features
 
 - TOTP generation, countdown, copy, QR capture, context-menu actions and autofill work for
@@ -44,6 +64,24 @@ server. SaigonSafe does not claim to provide cloud storage or server capabilitie
    Chrome and Firefox sequentially because they share `apps/browser/build`.
 
 Nothing is pushed or published by this update.
+
+## Loading local browser builds
+
+The standard build commands share `apps/browser/build`; whichever browser builds last
+replaces that folder's manifest and bundles. Loading a Chrome build in Firefox produces
+the `background.service_worker is currently disabled` error. Do not edit the generated
+manifest to work around this: the browser-specific JavaScript bundles also differ.
+
+Use these commands for separate unpacked builds:
+
+- `npm run build:unpacked:firefox --workspace @bitwarden/browser` writes to
+  `apps/browser/dist/firefox`. Load its `manifest.json` through Firefox's
+  `about:debugging` → This Firefox → Load Temporary Add-on. This is an MV3 build
+  with `background.scripts: ["background.js"]`.
+- `npm run build:unpacked:chrome --workspace @bitwarden/browser` writes to
+  `apps/browser/dist/chrome`. Load that folder through Chrome's Load unpacked action.
+
+These commands leave `apps/browser/build` and the other browser's unpacked build intact.
 
 ## Validation
 
