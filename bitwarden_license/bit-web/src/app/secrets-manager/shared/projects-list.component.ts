@@ -5,6 +5,7 @@ import { Component, EventEmitter, Input, Output, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { catchError, concatMap, map, Observable, of, Subject, switchMap, takeUntil } from "rxjs";
 
+import { NoResults } from "@bitwarden/assets/svg";
 import {
   getOrganizationById,
   OrganizationService,
@@ -43,6 +44,8 @@ export class ProjectsListComponent implements OnInit {
   protected viewEventsAllowed$: Observable<boolean>;
   protected isAdmin$: Observable<boolean>;
   private destroy$: Subject<void> = new Subject<void>();
+
+  readonly noItemsIcon = NoResults;
 
   // FIXME(https://bitwarden.atlassian.net/browse/CL-903): Migrate to Signals
   // eslint-disable-next-line @angular-eslint/prefer-signals

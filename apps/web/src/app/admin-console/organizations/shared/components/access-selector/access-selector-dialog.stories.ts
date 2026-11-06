@@ -1,5 +1,3 @@
-// FIXME: Update this file to be type safe and remove this and next line
-// @ts-strict-ignore
 import { Meta, StoryObj } from "@storybook/angular";
 
 import { AccessSelectorComponent, PermissionMode } from "./access-selector.component";
@@ -11,7 +9,7 @@ import { actionsData, itemsFactory } from "./storybook-utils";
  * Displays the Access Selector in a dialog.
  */
 export default {
-  title: "Web/Organizations/Access Selector/Dialog",
+  title: "Admin Console/Organizations/Access Selector/Dialog",
   decorators: baseComponentDefinition.decorators,
 } as Meta;
 
@@ -19,10 +17,10 @@ type Story = StoryObj<AccessSelectorComponent & { initialValue: AccessItemValue[
 
 const render: Story["render"] = (args) => ({
   props: {
-    items: [],
     valueChanged: actionsData.onValueChanged,
-    initialValue: [],
     ...args,
+    items: args.items ?? [],
+    initialValue: args.initialValue ?? [],
   },
   template: `
     <bit-dialog disableAnimations>

@@ -8,15 +8,13 @@ import { of } from "rxjs";
 import { JslibModule } from "@bitwarden/angular/jslib.module";
 import { ClientType } from "@bitwarden/client-type";
 import { Account, AccountService } from "@bitwarden/common/auth/abstractions/account.service";
-import { MasterPasswordUnlockService } from "@bitwarden/common/key-management/master-password/abstractions/master-password-unlock.service";
-import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
-import { SymmetricCryptoKey } from "@bitwarden/common/platform/models/domain/symmetric-crypto-key";
 import { mockAccountInfoWith } from "@bitwarden/common/spec";
 import { UserKey } from "@bitwarden/common/types/key";
 import {
   AsyncActionsModule,
+  BUTTON_SPINNER_DELAY_MS,
   ButtonModule,
   DialogService,
   FormFieldModule,
@@ -24,12 +22,14 @@ import {
   ToastService,
 } from "@bitwarden/components";
 import { BiometricsStatus, KeyService } from "@bitwarden/key-management";
+// eslint-disable-next-line no-restricted-imports
+import { SymmetricCryptoKey } from "@bitwarden/legacy-crypto";
 import { LogService } from "@bitwarden/logging";
 import { CommandDefinition, MessageListener } from "@bitwarden/messaging";
 import { UnlockService } from "@bitwarden/unlock";
 import { UserId } from "@bitwarden/user-core";
 
-import { UnlockOption, UnlockOptions } from "../../services/lock-component.service";
+import { UnlockOptions } from "../../services/lock-component.service";
 import { WebAuthnPrfUnlockService } from "../../services/webauthn-prf-unlock.service";
 
 import { MasterPasswordLockComponent } from "./master-password-lock.component";
@@ -39,7 +39,6 @@ describe("MasterPasswordLockComponent", () => {
   let fixture: ComponentFixture<MasterPasswordLockComponent>;
 
   const accountService = mock<AccountService>();
-  const masterPasswordUnlockService = mock<MasterPasswordUnlockService>();
   const i18nService = mock<I18nService>();
   const toastService = mock<ToastService>();
   const logService = mock<LogService>();
@@ -49,7 +48,6 @@ describe("MasterPasswordLockComponent", () => {
   const dialogService = mock<DialogService>();
   const unlockService = mock<UnlockService>();
   const keyService = mock<KeyService>();
-  const configService = mock<ConfigService>();
 
   const mockMasterPassword = "testExample";
   const activeAccount: Account = {
@@ -100,7 +98,6 @@ describe("MasterPasswordLockComponent", () => {
     jest.clearAllMocks();
 
     i18nService.t.mockImplementation((key: string) => key);
-    configService.getFeatureFlag.mockResolvedValue(false);
 
     await TestBed.configureTestingModule({
       imports: [
@@ -115,7 +112,6 @@ describe("MasterPasswordLockComponent", () => {
       providers: [
         FormBuilder,
         { provide: AccountService, useValue: accountService },
-        { provide: MasterPasswordUnlockService, useValue: masterPasswordUnlockService },
         { provide: I18nService, useValue: i18nService },
         { provide: ToastService, useValue: toastService },
         { provide: LogService, useValue: logService },
@@ -125,7 +121,6 @@ describe("MasterPasswordLockComponent", () => {
         { provide: DialogService, useValue: dialogService },
         { provide: UnlockService, useValue: unlockService },
         { provide: KeyService, useValue: keyService },
-        { provide: ConfigService, useValue: configService },
       ],
     }).compileComponents();
 
@@ -358,7 +353,6 @@ describe("MasterPasswordLockComponent", () => {
           },
         },
         expectedText: "unlockWithPin",
-        expectedUnlockOption: UnlockOption.Pin,
         shouldShow: true,
         shouldEnable: true,
       },
@@ -372,7 +366,6 @@ describe("MasterPasswordLockComponent", () => {
           },
         },
         expectedText: "unlockWithPin",
-        expectedUnlockOption: UnlockOption.Pin,
         shouldShow: false,
         shouldEnable: false,
       },
@@ -383,7 +376,6 @@ describe("MasterPasswordLockComponent", () => {
           biometrics: { enabled: true, biometricsStatus: BiometricsStatus.Available },
         },
         expectedText: "swapBiometrics",
-        expectedUnlockOption: UnlockOption.Biometrics,
         shouldShow: true,
         shouldEnable: true,
       },
@@ -394,7 +386,6 @@ describe("MasterPasswordLockComponent", () => {
           biometrics: { enabled: false, biometricsStatus: BiometricsStatus.Available },
         },
         expectedText: "swapBiometrics",
-        expectedUnlockOption: UnlockOption.Biometrics,
         shouldShow: true,
         shouldEnable: false,
       },
@@ -405,7 +396,6 @@ describe("MasterPasswordLockComponent", () => {
           biometrics: { enabled: true, biometricsStatus: BiometricsStatus.PlatformUnsupported },
         },
         expectedText: "swapBiometrics",
-        expectedUnlockOption: UnlockOption.Biometrics,
         shouldShow: false,
         shouldEnable: false,
       },
@@ -416,7 +406,6 @@ describe("MasterPasswordLockComponent", () => {
           biometrics: { enabled: false, biometricsStatus: BiometricsStatus.PlatformUnsupported },
         },
         expectedText: "swapBiometrics",
-        expectedUnlockOption: UnlockOption.Biometrics,
         shouldShow: false,
         shouldEnable: false,
       },
@@ -424,16 +413,15 @@ describe("MasterPasswordLockComponent", () => {
 
     test.each(swapButtonScenarios)(
       "renders and handles $name",
-      ({ unlockOptions, expectedText, expectedUnlockOption, shouldShow, shouldEnable }) => {
-        const { secondaryButton, component } = setupComponent(unlockOptions, expectedText);
+      ({ unlockOptions, expectedText, shouldShow, shouldEnable }) => {
+        const { secondaryButton } = setupComponent(unlockOptions, expectedText);
 
         if (shouldShow) {
           expect(secondaryButton).toBeTruthy();
           expect(secondaryButton.nativeElement.textContent?.trim()).toBe(expectedText);
 
           if (shouldEnable) {
-            secondaryButton.nativeElement.click();
-            expect(component.activeUnlockOption()).toBe(expectedUnlockOption);
+            expect(secondaryButton.nativeElement.getAttribute("aria-disabled")).not.toBe("true");
           } else {
             expect(secondaryButton.nativeElement.getAttribute("aria-disabled")).toBe("true");
           }
@@ -442,9 +430,80 @@ describe("MasterPasswordLockComponent", () => {
         }
       },
     );
+
+    it("emits swapToBiometrics when biometrics swap button is clicked", () => {
+      const { secondaryButton } = setupComponent(
+        {
+          pin: { enabled: false },
+          biometrics: { enabled: true, biometricsStatus: BiometricsStatus.Available },
+        },
+        "swapBiometrics",
+      );
+      let emitted = false;
+      component.swapToBiometrics.subscribe(() => {
+        emitted = true;
+      });
+
+      secondaryButton.nativeElement.click();
+
+      expect(emitted).toBe(true);
+    });
+
+    it("emits swapToPin when PIN swap button is clicked", () => {
+      const { secondaryButton } = setupComponent({
+        pin: { enabled: true },
+        biometrics: {
+          enabled: false,
+          biometricsStatus: BiometricsStatus.PlatformUnsupported,
+        },
+      });
+      let emitted = false;
+      component.swapToPin.subscribe(() => {
+        emitted = true;
+      });
+
+      secondaryButton.nativeElement.click();
+
+      expect(emitted).toBe(true);
+    });
   });
 
   describe("submit", () => {
+    let requestAnimationFrameSpy: jest.SpyInstance | undefined;
+
+    afterEach(() => {
+      requestAnimationFrameSpy?.mockRestore();
+    });
+
+    it("waits for the button spinner to render before unlocking", async () => {
+      let renderFrame: FrameRequestCallback | undefined;
+      requestAnimationFrameSpy = jest
+        .spyOn(window, "requestAnimationFrame")
+        .mockImplementation((callback) => {
+          renderFrame = callback;
+          return 0;
+        });
+      unlockService.unlockWithMasterPassword.mockResolvedValue(undefined);
+      keyService.userKey$.mockReturnValue(of(mockUserKey));
+      accountService.activeAccount$ = of(activeAccount);
+      component.formGroup.controls.masterPassword.setValue(mockMasterPassword);
+
+      const submitPromise = component.submit();
+      // Let the component's timers elapse; the frame itself is still held back.
+      await new Promise((resolve) => setTimeout(resolve, BUTTON_SPINNER_DELAY_MS * 2));
+
+      expect(renderFrame).toBeDefined();
+      expect(unlockService.unlockWithMasterPassword).not.toHaveBeenCalled();
+
+      renderFrame!(0);
+      await submitPromise;
+
+      expect(unlockService.unlockWithMasterPassword).toHaveBeenCalledWith(
+        activeAccount.id,
+        mockMasterPassword,
+      );
+    });
+
     test.each([null, undefined as unknown as string, ""])(
       "won't unlock and show password invalid toast when master password is %s",
       async (value) => {
@@ -457,7 +516,7 @@ describe("MasterPasswordLockComponent", () => {
           title: i18nService.t("errorOccurred"),
           message: i18nService.t("masterPasswordRequired"),
         });
-        expect(masterPasswordUnlockService.unlockWithMasterPassword).not.toHaveBeenCalled();
+        expect(unlockService.unlockWithMasterPassword).not.toHaveBeenCalled();
       },
     );
 
@@ -469,21 +528,21 @@ describe("MasterPasswordLockComponent", () => {
 
         await expect(component.submit()).rejects.toThrow("Null or undefined account");
 
-        expect(masterPasswordUnlockService.unlockWithMasterPassword).not.toHaveBeenCalled();
+        expect(unlockService.unlockWithMasterPassword).not.toHaveBeenCalled();
       },
     );
 
     it("shows an error toast and logs the error when unlock with master password fails", async () => {
       const customError = new Error("Specialized error message");
-      masterPasswordUnlockService.unlockWithMasterPassword.mockRejectedValue(customError);
+      unlockService.unlockWithMasterPassword.mockRejectedValue(customError);
       accountService.activeAccount$ = of(activeAccount);
       component.formGroup.controls.masterPassword.setValue(mockMasterPassword);
 
       await component.submit();
 
-      expect(masterPasswordUnlockService.unlockWithMasterPassword).toHaveBeenCalledWith(
-        mockMasterPassword,
+      expect(unlockService.unlockWithMasterPassword).toHaveBeenCalledWith(
         activeAccount.id,
+        mockMasterPassword,
       );
       expect(toastService.showToast).toHaveBeenCalledWith({
         variant: "error",
@@ -497,7 +556,8 @@ describe("MasterPasswordLockComponent", () => {
     });
 
     it("emits userKey when unlock is successful", async () => {
-      masterPasswordUnlockService.unlockWithMasterPassword.mockResolvedValue(mockUserKey);
+      unlockService.unlockWithMasterPassword.mockResolvedValue(undefined);
+      keyService.userKey$.mockReturnValue(of(mockUserKey));
       accountService.activeAccount$ = of(activeAccount);
       component.formGroup.controls.masterPassword.setValue(mockMasterPassword);
       let emittedEvent: { userKey: UserKey; masterPassword: string } | undefined;
@@ -511,10 +571,32 @@ describe("MasterPasswordLockComponent", () => {
 
       expect(emittedEvent?.userKey).toEqual(mockUserKey);
       expect(emittedEvent?.masterPassword).toEqual(mockMasterPassword);
-      expect(masterPasswordUnlockService.unlockWithMasterPassword).toHaveBeenCalledWith(
-        mockMasterPassword,
+      expect(unlockService.unlockWithMasterPassword).toHaveBeenCalledWith(
         activeAccount.id,
+        mockMasterPassword,
       );
+    });
+
+    it("emits an error when user key is missing after unlock", async () => {
+      unlockService.unlockWithMasterPassword.mockResolvedValue(undefined);
+      keyService.userKey$.mockReturnValue(of(null));
+      accountService.activeAccount$ = of(activeAccount);
+      component.formGroup.controls.masterPassword.setValue(mockMasterPassword);
+
+      await component.submit();
+
+      expect(unlockService.unlockWithMasterPassword).toHaveBeenCalledWith(
+        activeAccount.id,
+        mockMasterPassword,
+      );
+      expect(logService.error).toHaveBeenCalledWith(
+        "[MasterPasswordLockComponent] Failed to retrieve user key after master password unlock",
+      );
+      expect(toastService.showToast).toHaveBeenCalledWith({
+        variant: "error",
+        title: i18nService.t("errorOccurred"),
+        message: i18nService.t("invalidMasterPassword"),
+      });
     });
   });
 });

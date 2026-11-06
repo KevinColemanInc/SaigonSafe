@@ -12,24 +12,63 @@
       <bit-label>{{ "notes" | i18n }}</bit-label>
       <textarea bitInput rows="5" formControlName="notes"></textarea>
     </bit-form-field>
-    <bit-form-control
-      *ngIf="passwordRepromptEnabled$ | async"
-      [disableMargin]="hasCustomFields || isPartialEdit"
-    >
-      <input type="checkbox" bitCheckbox formControlName="reprompt" />
-      <bit-label>{{ "passwordPrompt" | i18n }}</bit-label>
-    </bit-form-control>
+    @if (passwordRepromptEnabled$ | async) {
+      <bit-form-control
+        [disableMargin]="
+          (hasCustomFields || isPartialEdit) && !showHTTPAuthenticationCipherSetting()
+        "
+      >
+        <input type="checkbox" bitCheckbox formControlName="reprompt" />
+        <bit-label>{{ "passwordPrompt" | i18n }}</bit-label>
+      </bit-form-control>
+    }
+    @if (showHTTPAuthenticationCipherSetting()) {
+      <bit-form-control [disableMargin]="hasCustomFields || isPartialEdit">
+        <input
+          type="checkbox"
+          bitCheckbox
+          formControlName="httpAuthentication"
+          id="additional-options_input_http-authentication"
+        />
+        <bit-label for="additional-options_input_http-authentication">
+          {{ "httpAuthenticationSettingLabel" | i18n }}
+        </bit-label>
+        <bit-hint class="tw-text-sm">
+          @if (httpAuthenticationBlockedByMatchStrategy()) {
+            {{ "httpAuthenticationSettingRequiresMatchDetectionGuidance" | i18n }}
+          } @else {
+            {{ "httpAuthenticationSettingDescription" | i18n }}
+            <span
+              ><b>{{ "warningCapitalized" | i18n }}</b
+              >: {{ "httpAuthenticationSettingWarning" | i18n }}</span
+            >
+          }
+          {{ " " }}
+          <a
+            bitLink
+            href="#"
+            (click)="openHTTPAuthenticationHelpArticle($event)"
+            endIcon="bwi-external-link"
+            [attr.aria-label]="'openHttpAuthenticationHelpArticleSignpost' | i18n"
+            id="additional-options_link_http-authentication-help"
+          >
+            {{ "learnMore" | i18n }}
+          </a>
+        </bit-hint>
+      </bit-form-control>
+    }
 
-    <button
-      bitLink
-      type="button"
-      linkType="primary"
-      *ngIf="!hasCustomFields && !isPartialEdit && allowNewField"
-      (click)="addCustomField()"
-    >
-      <i class="bwi bwi-plus tw-font-medium" aria-hidden="true"></i>
-      {{ "addField" | i18n }}
-    </button>
+    @if (!hasCustomFields && !isPartialEdit && allowNewField) {
+      <button
+        bitLink
+        startIcon="bwi-plus"
+        type="button"
+        linkType="primary"
+        (click)="addCustomField()"
+      >
+        {{ "addField" | i18n }}
+      </button>
+    }
   </bit-card>
 </section>
 

@@ -212,6 +212,9 @@ export function mockMigrationHelper(
   storage.save.mockImplementation(async (key, value) => {
     (storageJson as any)[key] = value;
   });
+  storage.remove.mockImplementation(async (key) => {
+    delete (storageJson as any)[key];
+  });
   const helper = new MigrationHelper(stateVersion, storage, logService, type, clientType);
 
   const mockHelper = mock<MigrationHelper>();
@@ -233,6 +236,9 @@ export function mockMigrationHelper(
   mockHelper.getKnownUserIds.mockImplementation(() => helper.getKnownUserIds());
   mockHelper.removeFromGlobal.mockImplementation((keyDefinition) =>
     helper.removeFromGlobal(keyDefinition),
+  );
+  mockHelper.removeFromUser.mockImplementation((userId, keyDefinition) =>
+    helper.removeFromUser(userId, keyDefinition),
   );
   mockHelper.remove.mockImplementation((key) => helper.remove(key));
 
@@ -340,7 +346,7 @@ function expectInjectedData(
  * Runs the {@link Migrator.migrate} method of your migrator. You may pass in your test data and get back the data after the migration.
  * This also injects extra properties at every level of your state and makes sure that it can be found.
  * @param migrator Your migrator to use to do the migration
- * @param initalData The data to start with
+ * @param initialData The data to start with
  * @returns State after your migration has ran.
  */
 export async function runMigrator<
@@ -348,10 +354,10 @@ export async function runMigrator<
   const TUsers extends readonly string[],
 >(
   migrator: TMigrator,
-  initalData?: InitialDataHint<TUsers>,
+  initialData?: InitialDataHint<TUsers>,
   direction: "migrate" | "rollback" = "migrate",
 ): Promise<Record<string, unknown>> {
-  const clonedData = JSON.parse(JSON.stringify(initalData ?? {}));
+  const clonedData = JSON.parse(JSON.stringify(initialData ?? {}));
 
   // Inject fake data at every level of the object
   const allInjectedData = injectData(clonedData, []);

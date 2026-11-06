@@ -207,6 +207,24 @@ describe("AutofillConfirmationDialogComponent", () => {
     ]);
   });
 
+  it("includes non-default ports in formatted hostnames", async () => {
+    const { component: c } = await createFreshFixture({
+      params: {
+        currentUrl: "https://example.com:8443/login",
+        savedUris: [makeUri("https://example.com/login"), makeUri("https://example.com:8080")],
+      },
+    });
+    expect(c.formattedCurrentUrl()).toBe("example.com:8443");
+    expect(c.formattedSavedUrls()).toEqual(["example.com", "example.com:8080"]);
+  });
+
+  it("omits default ports from formatted hostnames", async () => {
+    const { component: c } = await createFreshFixture({
+      params: { currentUrl: "https://example.com:443/login", savedUris: [] },
+    });
+    expect(c.formattedCurrentUrl()).toBe("example.com");
+  });
+
   it("formattedSavedUrls returns full URIs when default strategy is StartsWith", async () => {
     const { component: c } = await createFreshFixture({
       uriMatchStrategy: UriMatchStrategy.StartsWith,
@@ -340,6 +358,16 @@ describe("AutofillConfirmationDialogComponent", () => {
       const { component: c } = await createFreshFixture();
       expect(c.dialogTitle()).toBe("siteDoesntMatch");
     });
+
+    it("returns loginNeverMatchTitle when Never strategy is active and URL matches a saved URI", async () => {
+      const { component: c } = await createFreshFixture({
+        params: {
+          currentUrl: "https://example.com/path",
+          savedUris: [makeUri("https://example.com/login", UriMatchStrategy.Never)],
+        },
+      });
+      expect(c.dialogTitle()).toBe("loginNeverMatchTitle");
+    });
   });
 
   describe("dialogBody()", () => {
@@ -359,6 +387,17 @@ describe("AutofillConfirmationDialogComponent", () => {
 
     it("returns loginMultipleSitesDesc when multiple URIs are saved", () => {
       expect(component.dialogBody()).toBe("loginMultipleSitesDesc");
+    });
+
+    it("returns loginNeverMatchDesc when Never strategy is active and URL matches a saved URI", async () => {
+      const { component: c } = await createFreshFixture({
+        uriMatchStrategy: UriMatchStrategy.Never,
+        params: {
+          currentUrl: "https://example.com/path",
+          savedUris: [makeUri("https://example.com/login", UriMatchStrategy.Never)],
+        },
+      });
+      expect(c.dialogBody()).toBe("loginNeverMatchDesc");
     });
   });
 
@@ -424,6 +463,116 @@ describe("AutofillConfirmationDialogComponent", () => {
         "https://two.example.com/b",
         "https://three.example.com/c",
       ]);
+    });
+  });
+
+  describe("Never strategy + current URL match", () => {
+    const neverMatchParams: AutofillConfirmationDialogParams = {
+      currentUrl: "https://example.com/path",
+      savedUris: [makeUri("https://example.com/login", UriMatchStrategy.Never)],
+    };
+
+    it("shows loginNeverMatchTitle via per-URI Never strategy", async () => {
+      const { fixture: vf } = await createFreshFixture({ params: neverMatchParams });
+      const text = vf.nativeElement.textContent as string;
+      expect(text).toContain("loginNeverMatchTitle");
+    });
+
+    it("shows loginNeverMatchTitle via global Never strategy", async () => {
+      const { fixture: vf } = await createFreshFixture({
+        params: neverMatchParams,
+        uriMatchStrategy: UriMatchStrategy.Never,
+      });
+      const text = vf.nativeElement.textContent as string;
+      expect(text).toContain("loginNeverMatchTitle");
+    });
+
+    it("shows loginNeverMatchDesc body text", async () => {
+      const { fixture: vf } = await createFreshFixture({ params: neverMatchParams });
+      const text = vf.nativeElement.textContent as string;
+      expect(text).toContain("loginNeverMatchDesc");
+    });
+
+    it("currentUrlMatchesNeverUri is true when the matching URI is itself the Never one", async () => {
+      const { component: c } = await createFreshFixture({ params: neverMatchParams });
+      expect(c.currentUrlMatchesNeverUri()).toBe(true);
+    });
+
+    it("does NOT show Never UI when a Never URI exists but the matching URI is not the Never one", async () => {
+      const { fixture: vf, component: c } = await createFreshFixture({
+        params: {
+          currentUrl: "https://example.com/path",
+          savedUris: [
+            makeUri("https://other.com/secret", UriMatchStrategy.Never),
+            makeUri("https://example.com", UriMatchStrategy.Exact),
+          ],
+        },
+      });
+      expect(c.currentUrlMatchesNeverUri()).toBe(false);
+      const text = vf.nativeElement.textContent as string;
+      expect(text).not.toContain("loginNeverMatchTitle");
+      expect(text).not.toContain("neverMatch");
+    });
+
+    it("currentUrlMatchesNeverUri is false when the Never URI has a different port", async () => {
+      const { component: c } = await createFreshFixture({
+        params: {
+          currentUrl: "https://example.com:8443/path",
+          savedUris: [makeUri("https://example.com/login", UriMatchStrategy.Never)],
+        },
+      });
+      expect(c.currentUrlMatchesNeverUri()).toBe(false);
+    });
+
+    it("shows URI match rule label and neverMatch badge", async () => {
+      const { fixture: vf } = await createFreshFixture({ params: neverMatchParams });
+      const text = vf.nativeElement.textContent as string;
+      expect(text).toContain("uriMatchRule");
+      expect(text).toContain("neverMatch");
+    });
+
+    it("shows standard dialog buttons", async () => {
+      const { fixture: vf } = await createFreshFixture({ params: neverMatchParams });
+      const text = vf.nativeElement.textContent as string;
+      expect(text).toContain("autofillAndSaveThisSite");
+      expect(text).toContain("autofillOnly");
+      expect(text).toContain("cancel");
+    });
+  });
+
+  describe("synced URI scrolling", () => {
+    function getRows(widths: number[]): HTMLElement[] {
+      const rows = Array.from(
+        fixture.nativeElement.querySelectorAll(
+          '[data-testid="saved-uri"], [data-testid="current-uri"]',
+        ),
+      ) as HTMLElement[];
+      rows.forEach((row, i) => {
+        Object.defineProperty(row, "scrollWidth", { value: widths[i] ?? 100 });
+        Object.defineProperty(row, "clientWidth", { value: 100 });
+      });
+      return rows;
+    }
+
+    it("applies a row's scroll offset to every other URI row", () => {
+      const rows = getRows([300, 300, 300, 300]);
+      rows[0].scrollLeft = 80;
+      component.syncUriScroll(rows[0]);
+
+      expect(rows.map((r) => r.scrollLeft)).toEqual([80, 80, 80, 80]);
+    });
+
+    it("ignores scroll events from rows clamped at their end by a sync", () => {
+      const rows = getRows([300, 150, 300, 300]);
+      rows[0].scrollLeft = 120;
+      component.syncUriScroll(rows[0]);
+
+      // Simulate the browser clamping the shorter row to its max offset
+      rows[1].scrollLeft = 50;
+      component.syncUriScroll(rows[1]);
+
+      expect(rows[0].scrollLeft).toBe(120);
+      expect(rows[2].scrollLeft).toBe(120);
     });
   });
 });

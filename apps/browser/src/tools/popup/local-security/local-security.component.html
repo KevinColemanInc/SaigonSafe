@@ -1,0 +1,47 @@
+<popup-page>
+  <popup-header
+    slot="header"
+    [pageTitle]="'saigonSafeLocalSecurity' | i18n"
+    showBackButton
+  ></popup-header>
+  <p bitTypography="body1">{{ "saigonSafeLocalSecurityDescription" | i18n }}</p>
+  <p bitTypography="body2">{{ "saigonSafeFreeTotpDescription" | i18n }}</p>
+  @if (report$ | async; as report) {
+    <div role="status" aria-live="polite">
+      @if (report.loading) {
+        <p bitTypography="body2">{{ "saigonSafeCheckingVault" | i18n }}</p>
+      } @else if (report.failed) {
+        <p bitTypography="body2">{{ "saigonSafeReportFailed" | i18n }}</p>
+      } @else {
+        <p bitTypography="body2">{{ "saigonSafeLoginsChecked" | i18n: report.checked }}</p>
+        @if (report.findings.length === 0) {
+          <p bitTypography="body2">{{ "saigonSafeNoLocalRisks" | i18n }}</p>
+        }
+      }
+    </div>
+    <ul class="tw-list-none tw-p-0">
+      @for (finding of report.findings; track finding.id) {
+        <li class="tw-border-0 tw-border-b tw-border-solid tw-border-secondary-300 tw-py-3">
+          <a
+            bitLink
+            [routerLink]="['/view-cipher']"
+            [queryParams]="{ cipherId: finding.id, type: 1 }"
+            >{{ finding.name }}</a
+          >
+          <div class="tw-flex tw-flex-wrap tw-gap-2 tw-mt-2">
+            @if (finding.weak) {
+              <span bitBadge variant="warning">{{ "saigonSafeWeakPassword" | i18n }}</span>
+            }
+            @if (finding.reused) {
+              <span bitBadge variant="warning">{{ "saigonSafeReusedPassword" | i18n }}</span>
+            }
+            @if (finding.insecure) {
+              <span bitBadge variant="warning">{{ "saigonSafeInsecureWebsite" | i18n }}</span>
+            }
+          </div>
+        </li>
+      }
+    </ul>
+  }
+  <p bitTypography="body2">{{ "saigonSafeServerFeaturesDescription" | i18n }}</p>
+</popup-page>

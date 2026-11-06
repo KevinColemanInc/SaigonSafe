@@ -1,4 +1,5 @@
-import { Component } from "@angular/core";
+import { Component, inject } from "@angular/core";
+import { toObservable } from "@angular/core/rxjs-interop";
 import { combineLatest, map, Observable, startWith, switchMap } from "rxjs";
 
 import { NudgesService } from "@bitwarden/angular/vault";
@@ -15,8 +16,17 @@ import {
 import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
 import { getUserId } from "@bitwarden/common/auth/services/account.service";
 import { AutofillSettingsServiceAbstraction } from "@bitwarden/common/autofill/services/autofill-settings.service";
+import { BottomNavigationButton } from "@bitwarden/components";
+import { SendPolicyService } from "@bitwarden/send-ui";
+import {
+  ALL_ITEMS_SCOPE,
+  parseVaultScope,
+  VAULT_BASE_ROUTE,
+  vaultScopeCommands,
+} from "@bitwarden/vault";
 
-import { NavButton } from "../platform/popup/layout/popup-tab-navigation.component";
+import { HealthAccessService } from "../dirt/health/popup/services/health-access.service";
+import { VaultPopupListTableFiltersService } from "../vault/popup/services/vault-popup-list-table-filters.service";
 
 // FIXME(https://bitwarden.atlassian.net/browse/CL-764): Migrate to OnPush
 // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
@@ -26,22 +36,48 @@ import { NavButton } from "../platform/popup/layout/popup-tab-navigation.compone
   standalone: false,
 })
 export class TabsV2Component {
-  private hasActiveBadges$ = this.accountService.activeAccount$
-    .pipe(getUserId)
-    .pipe(switchMap((userId) => this.nudgesService.hasActiveBadges$(userId)));
+  constructor(
+    private nudgesService: NudgesService,
+    private accountService: AccountService,
+    private autofillSettingsService: AutofillSettingsServiceAbstraction,
+  ) {}
+
+  private sendPolicyService = inject(SendPolicyService);
+  private healthAccessService = inject(HealthAccessService);
+  private readonly listFiltersService = inject(VaultPopupListTableFiltersService);
+  private readonly vaultBasePath = inject(VAULT_BASE_ROUTE);
+
+  private userId$ = this.accountService.activeAccount$.pipe(getUserId);
+  private hasActiveBadges$ = this.userId$.pipe(
+    switchMap((userId) => this.nudgesService.hasActiveBadges$(userId)),
+  );
 
   private showSettingsBerry$ = combineLatest([
     this.hasActiveBadges$,
     this.autofillSettingsService.showClipboardSettingUpdateNotification$,
   ]).pipe(map(([hasBadges, showClipboard]) => hasBadges || showClipboard));
 
-  protected navButtons$: Observable<NavButton[]> = this.showSettingsBerry$.pipe(
-    startWith(false),
-    map((showBerry) => {
-      return [
+  private healthNavButton$ = this.userId$.pipe(
+    switchMap((userId) => this.healthAccessService.healthNavButton$(userId)),
+  );
+
+  private sendEnabled$ = this.sendPolicyService.disableSend$.pipe(
+    map((disableSend) => !disableSend),
+  );
+
+  protected navButtons$: Observable<BottomNavigationButton[]> = combineLatest([
+    this.showSettingsBerry$.pipe(startWith(false)),
+    this.sendEnabled$.pipe(startWith(true)),
+    this.healthNavButton$.pipe(startWith(undefined)),
+    toObservable(this.listFiltersService.cachedVaultScopeId).pipe(startWith(null)),
+  ]).pipe(
+    map(([showBerry, sendEnabled, healthNavButton, scopeId]) => {
+      const scope = parseVaultScope(scopeId) ?? ALL_ITEMS_SCOPE;
+      const vaultPage = vaultScopeCommands(scope, this.vaultBasePath).join("/");
+      const buttons: BottomNavigationButton[] = [
         {
           label: "vault",
-          page: "/tabs/vault",
+          page: vaultPage,
           icon: VaultInactive,
           iconActive: VaultActive,
         },
@@ -51,12 +87,17 @@ export class TabsV2Component {
           icon: GeneratorInactive,
           iconActive: GeneratorActive,
         },
-        {
-          label: "send",
-          page: "/tabs/send",
-          icon: SendInactive,
-          iconActive: SendActive,
-        },
+        ...(sendEnabled
+          ? [
+              {
+                label: "send",
+                page: "/tabs/send",
+                icon: SendInactive,
+                iconActive: SendActive,
+              } as BottomNavigationButton,
+            ]
+          : []),
+        ...(healthNavButton ? [healthNavButton] : []),
         {
           label: "settings",
           page: "/tabs/settings",
@@ -65,11 +106,7 @@ export class TabsV2Component {
           showBerry,
         },
       ];
+      return buttons;
     }),
   );
-  constructor(
-    private nudgesService: NudgesService,
-    private accountService: AccountService,
-    private autofillSettingsService: AutofillSettingsServiceAbstraction,
-  ) {}
 }

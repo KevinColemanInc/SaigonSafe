@@ -5,7 +5,6 @@ import { BehaviorSubject, firstValueFrom, Observable, of } from "rxjs";
 
 import { Organization } from "@bitwarden/common/admin-console/models/domain/organization";
 import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
-import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import { mockAccountServiceWith } from "@bitwarden/common/spec";
 import { OrganizationId, UserId } from "@bitwarden/common/types/guid";
@@ -20,6 +19,7 @@ import {
   VaultFilterServiceAbstraction as VaultFilterService,
   CipherTypeFilter,
   VaultFilterSection,
+  Vfo1TerminologyService,
 } from "@bitwarden/vault";
 
 import { VaultFilterComponent } from "./vault-filter.component";
@@ -44,6 +44,7 @@ describe("OrganizationVaultFilterComponent", () => {
   let component: VaultFilterComponent;
   let vaultFilterService: MockProxy<VaultFilterService>;
   let restrictedSubject: BehaviorSubject<RestrictedCipherType[]>;
+  let vfo1Enabled: boolean;
 
   /** Helper to set the ciphers$ signal input via the fixture. */
   function setCiphers(ciphers$: Observable<CipherView[]>) {
@@ -51,6 +52,7 @@ describe("OrganizationVaultFilterComponent", () => {
   }
 
   beforeEach(async () => {
+    vfo1Enabled = false;
     vaultFilterService = mock<VaultFilterService>();
     vaultFilterService.buildTypeTree.mockImplementation((head, array) => {
       const headNode = new TreeNode<CipherTypeFilter>(head, null);
@@ -61,6 +63,20 @@ describe("OrganizationVaultFilterComponent", () => {
       return of(headNode);
     });
     vaultFilterService.collapsedFilterNodes$ = of(new Set<string>());
+    vaultFilterService.cipherTypeFilters$ = of([
+      {
+        id: "favorites",
+        name: "favorites",
+        type: "favorites" as CipherTypeFilter["type"],
+        icon: "bwi-star",
+      },
+      { id: "login", name: "typeLogin", type: CipherType.Login, icon: "bwi-globe" },
+      { id: "card", name: "typeCard", type: CipherType.Card, icon: "bwi-credit-card" },
+      { id: "bankAccount", name: "bankAccount", type: CipherType.BankAccount, icon: "bwi-bank" },
+      { id: "identity", name: "typeIdentity", type: CipherType.Identity, icon: "bwi-id-card" },
+      { id: "note", name: "typeSecureNote", type: CipherType.SecureNote, icon: "bwi-sticky-note" },
+      { id: "sshKey", name: "typeSshKey", type: CipherType.SshKey, icon: "bwi-key" },
+    ]);
     vaultFilterService.setCollapsedFilterNodes = jest.fn().mockResolvedValue(undefined);
     vaultFilterService.setOrganizationFilter = jest.fn();
 
@@ -72,8 +88,7 @@ describe("OrganizationVaultFilterComponent", () => {
     const accountService = mockAccountServiceWith(USER_ID);
 
     await TestBed.configureTestingModule({
-      declarations: [VaultFilterComponent],
-      schemas: [NO_ERRORS_SCHEMA],
+      imports: [VaultFilterComponent],
       providers: [
         { provide: VaultFilterService, useValue: vaultFilterService },
         { provide: I18nService, useValue: i18nService },
@@ -83,11 +98,16 @@ describe("OrganizationVaultFilterComponent", () => {
           useValue: { restricted$: restrictedSubject.asObservable() },
         },
         {
-          provide: ConfigService,
-          useValue: { getFeatureFlag$: jest.fn().mockReturnValue(of(true)) },
+          provide: Vfo1TerminologyService,
+          useValue: { iconClass: (icon: string) => icon, enabled: () => vfo1Enabled },
         },
       ],
-    }).compileComponents();
+    })
+      .overrideComponent(VaultFilterComponent, {
+        // Empty imports so no module providers leak in via the component's import chain.
+        set: { imports: [], schemas: [NO_ERRORS_SCHEMA] },
+      })
+      .compileComponents();
 
     fixture = TestBed.createComponent(VaultFilterComponent);
     component = fixture.componentInstance;
@@ -250,6 +270,42 @@ describe("OrganizationVaultFilterComponent", () => {
 
         expect((component as any).addTypeFilter).toHaveBeenCalledWith(["favorites"], ORG_ID);
       });
+    });
+  });
+
+  describe("searchPlaceholder", () => {
+    it("returns 'searchCollection' when a collection is selected and the VFO1 flag is off", () => {
+      (component as any).activeFilter = () => ({
+        isDeleted: false,
+        selectedCollectionNode: { node: { id: "col-1" } },
+      });
+      expect((component as any).searchPlaceholder).toBe("searchCollection");
+    });
+
+    it("returns 'searchSharedFolder' when a collection is selected and the VFO1 flag is on", () => {
+      vfo1Enabled = true;
+      (component as any).activeFilter = () => ({
+        isDeleted: false,
+        selectedCollectionNode: { node: { id: "col-1" } },
+      });
+      expect((component as any).searchPlaceholder).toBe("searchSharedFolder");
+    });
+  });
+
+  describe("addCollectionFilter", () => {
+    it("names the filter node 'collections' when the VFO1 flag is off", async () => {
+      const section = await (component as any).addCollectionFilter();
+      const tree = await firstValueFrom(section.data$);
+      expect(tree.node.name).toBe("collections");
+      expect(tree.children[0].node.name).toBe("Collections");
+    });
+
+    it("names the filter node 'sharedFolders' when the VFO1 flag is on", async () => {
+      vfo1Enabled = true;
+      const section = await (component as any).addCollectionFilter();
+      const tree = await firstValueFrom(section.data$);
+      expect(tree.node.name).toBe("sharedFolders");
+      expect(tree.children[0].node.name).toBe("Shared folders");
     });
   });
 });

@@ -1,8 +1,9 @@
 import { StepperSelectionEvent } from "@angular/cdk/stepper";
-import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
+import { Component, ViewChild } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FormBuilder, Validators } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
-import { firstValueFrom, Subject, switchMap, takeUntil } from "rxjs";
+import { firstValueFrom } from "rxjs";
 
 import {
   InputPasswordFlow,
@@ -10,22 +11,22 @@ import {
   RegistrationFinishService,
 } from "@bitwarden/auth/angular";
 import { LoginStrategyServiceAbstraction, PasswordLoginCredentials } from "@bitwarden/auth/common";
-import { PolicyApiServiceAbstraction } from "@bitwarden/common/admin-console/abstractions/policy/policy-api.service.abstraction";
-import { PolicyService } from "@bitwarden/common/admin-console/abstractions/policy/policy.service.abstraction";
-import { MasterPasswordPolicyOptions } from "@bitwarden/common/admin-console/models/domain/master-password-policy-options";
-import { Policy } from "@bitwarden/common/admin-console/models/domain/policy";
 import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
 import { getUserId } from "@bitwarden/common/auth/services/account.service";
-import { OrganizationInviteService } from "@bitwarden/common/auth/services/organization-invite/organization-invite.service";
 import {
   OrganizationBillingServiceAbstraction as OrganizationBillingService,
   OrganizationInformation,
   PlanInformation,
 } from "@bitwarden/common/billing/abstractions/organization-billing.service";
-import { PlanType, ProductTierType, ProductType } from "@bitwarden/common/billing/enums";
+import {
+  InitiationPath,
+  PlanType,
+  ProductTierType,
+  ProductType,
+} from "@bitwarden/common/billing/enums";
+import { FeatureFlag } from "@bitwarden/common/enums/feature-flag.enum";
 import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
-import { LogService } from "@bitwarden/common/platform/abstractions/log.service";
 import { ValidationService } from "@bitwarden/common/platform/abstractions/validation.service";
 import { ToastService } from "@bitwarden/components";
 import { UserId } from "@bitwarden/user-core";
@@ -35,9 +36,7 @@ import { RouterService } from "../../../core/router.service";
 import { OrganizationCreatedEvent } from "../trial-billing-step/trial-billing-step.component";
 import { VerticalStepperComponent } from "../vertical-stepper/vertical-stepper.component";
 
-export type InitiationPath =
-  | "Password Manager trial from marketing website"
-  | "Secrets Manager trial from marketing website";
+import { parseTrialInitiationParams, TrialInitiationParams } from "./trial-initiation-params";
 
 // FIXME(https://bitwarden.atlassian.net/browse/CL-764): Migrate to OnPush
 // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
@@ -46,7 +45,7 @@ export type InitiationPath =
   templateUrl: "complete-trial-initiation.component.html",
   standalone: false,
 })
-export class CompleteTrialInitiationComponent implements OnInit, OnDestroy {
+export class CompleteTrialInitiationComponent {
   // FIXME(https://bitwarden.atlassian.net/browse/CL-903): Migrate to Signals
   // eslint-disable-next-line @angular-eslint/prefer-signals
   @ViewChild("stepper", { static: false }) verticalStepper!: VerticalStepperComponent;
@@ -58,8 +57,8 @@ export class CompleteTrialInitiationComponent implements OnInit, OnDestroy {
   product?: ProductType;
   /** The tier of product being subscribed to */
   productTier!: ProductTierType;
-  /** Product types that display steppers for Password Manager */
-  stepperProductTypes: ProductTierType[] = [
+  /** Product tiers that show the multi-step trial flow for Password Manager. */
+  private readonly stepperProductTiers: ProductTierType[] = [
     ProductTierType.Teams,
     ProductTierType.Enterprise,
     ProductTierType.Families,
@@ -71,149 +70,116 @@ export class CompleteTrialInitiationComponent implements OnInit, OnDestroy {
   /** True, registering a password is in progress */
   submitting = false;
 
-  /** Valid product types, used to filter out invalid query parameters */
-  validProducts = [ProductType.PasswordManager, ProductType.SecretsManager];
+  /** True when the PAM-billing support flag is on. */
+  private privilegedControlsAvailable = false;
+
+  /** True when the trial includes Privileged Controls — requested by the link and enabled by flag */
+  includesPrivilegedControls = false;
 
   orgInfoSubLabel = "";
   orgId = "";
   orgLabel = "";
   billingSubLabel = "";
-  enforcedPolicyOptions?: MasterPasswordPolicyOptions;
 
   /** User's email address associated with the trial */
   email = "";
   /** Token from the backend associated with the email verification */
   emailVerificationToken?: string;
+  /** Present when the trial was set up by sales rather than self-serve email verification */
+  salesAssistedToken?: string;
   loading = false;
-  productTierValue?: ProductTierType;
 
   trialLength!: number;
   paymentOptional = false;
+
+  /** Parsed query-param model for the current navigation. */
+  private params?: TrialInitiationParams;
 
   orgInfoFormGroup = this.formBuilder.group({
     name: ["", { validators: [Validators.required, Validators.maxLength(50)], updateOn: "change" }],
     billingEmail: [""],
   });
 
-  private destroy$ = new Subject<void>();
   protected readonly ProductType = ProductType;
 
   constructor(
     protected router: Router,
     private route: ActivatedRoute,
     private formBuilder: FormBuilder,
-    private logService: LogService,
-    private policyApiService: PolicyApiServiceAbstraction,
-    private policyService: PolicyService,
     private i18nService: I18nService,
     private routerService: RouterService,
     private organizationBillingService: OrganizationBillingService,
-    private organizationInviteService: OrganizationInviteService,
     private toastService: ToastService,
     private registrationFinishService: RegistrationFinishService,
     private validationService: ValidationService,
     private loginStrategyService: LoginStrategyServiceAbstraction,
     private configService: ConfigService,
     private accountService: AccountService,
-  ) {}
-
-  async ngOnInit(): Promise<void> {
-    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe((qParams) => {
-      // Retrieve email from query params
-      if (qParams.email != null && qParams.email.indexOf("@") > -1) {
-        this.email = qParams.email;
-        this.orgInfoFormGroup.controls.billingEmail.setValue(qParams.email);
-      }
-
-      // Show email validation toast when coming from email
-      if (qParams.fromEmail && qParams.fromEmail === "true") {
-        this.toastService.showToast({
-          title: "",
-          message: this.i18nService.t("emailVerifiedV2"),
-          variant: "success",
-        });
-      }
-
-      if (qParams.token != null) {
-        this.emailVerificationToken = qParams.token;
-      }
-
-      const product = parseInt(qParams.product);
-
-      // Get product from query params, default to password manager
-      this.product = this.validProducts.includes(product) ? product : ProductType.PasswordManager;
-
-      const productTierParam = parseInt(qParams.productTier) as ProductTierType;
-      this.productTierValue = productTierParam;
-
-      /** Only show the trial stepper for a subset of types */
-      const showPasswordManagerStepper = this.stepperProductTypes.includes(productTierParam);
-
-      /** All types of secret manager should see the trial stepper */
-      const showSecretsManagerStepper = this.product === ProductType.SecretsManager;
-
-      if ((showPasswordManagerStepper || showSecretsManagerStepper) && !isNaN(productTierParam)) {
-        this.productTier = productTierParam;
-
-        this.orgLabel = this.planTypeDisplay;
-
-        this.useTrialStepper = true;
-      }
-
-      this.trialLength = qParams.trialLength ? parseInt(qParams.trialLength) : 7;
-      this.paymentOptional = qParams.paymentOptional === "true";
-
-      // Are they coming from an email for sponsoring a families organization
-      // After logging in redirect them to setup the families sponsorship
-      this.setupFamilySponsorship(qParams.sponsorshipToken);
+  ) {
+    this.route.queryParams.pipe(takeUntilDestroyed()).subscribe((queryParams) => {
+      this.params = parseTrialInitiationParams(queryParams);
+      this.applyParams(this.params);
     });
 
-    const invite = await this.organizationInviteService.getOrganizationInvite();
-    let policies: Policy[] | undefined | null = null;
-
-    if (
-      invite != null &&
-      invite.organizationId &&
-      invite.token &&
-      invite.email &&
-      invite.organizationUserId
-    ) {
-      try {
-        policies = await this.policyApiService.getPoliciesByToken(
-          invite.organizationId,
-          invite.token,
-          invite.email,
-          invite.organizationUserId,
-        );
-      } catch (e) {
-        this.logService.error(e);
-      }
-    }
-
-    if (policies !== null) {
-      this.accountService.activeAccount$
-        .pipe(
-          getUserId,
-          switchMap((userId) => this.policyService.masterPasswordPolicyOptions$(userId, policies)),
-          takeUntil(this.destroy$),
-        )
-        .subscribe((enforcedPasswordPolicyOptions) => {
-          this.enforcedPolicyOptions = enforcedPasswordPolicyOptions;
-        });
-    }
+    this.configService
+      .getFeatureFlag$(FeatureFlag.PamBillingSupport)
+      .pipe(takeUntilDestroyed())
+      .subscribe((pamBillingSupport) => {
+        this.privilegedControlsAvailable = pamBillingSupport;
+        this.includesPrivilegedControls = this.params
+          ? this.shouldIncludePrivilegedControls(this.params)
+          : false;
+      });
 
     this.orgInfoFormGroup.controls.name.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.orgInfoFormGroup.controls.name.markAsTouched();
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => this.orgInfoFormGroup.controls.name.markAsTouched());
+  }
+
+  private applyParams(params: TrialInitiationParams): void {
+    if (params.email) {
+      this.email = params.email;
+      this.orgInfoFormGroup.controls.billingEmail.setValue(params.email);
+    }
+
+    if (params.emailVerified) {
+      this.toastService.showToast({
+        title: "",
+        message: this.i18nService.t("emailVerifiedV2"),
+        variant: "success",
       });
+    }
+
+    this.emailVerificationToken = params.emailVerificationToken;
+    this.salesAssistedToken = params.salesAssistedToken;
+    this.product = params.product;
+
+    this.includesPrivilegedControls = this.shouldIncludePrivilegedControls(params);
+    this.trialLength = params.trialLength;
+    this.paymentOptional = params.paymentOptional;
+
+    this.useTrialStepper = this.showsTrialStepper(this.product, params.productTier);
+    if (this.useTrialStepper && params.productTier !== undefined) {
+      this.productTier = params.productTier;
+      this.orgLabel = this.planTypeDisplay;
+    }
+
+    // Coming from an email for sponsoring a families organization: after logging in,
+    // redirect them to set up the families sponsorship.
+    this.setupFamilySponsorship(params.sponsorshipToken);
 
     this.initializing = false;
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+  /** Whether to show the multi-step trial flow for the given product and tier. */
+  private showsTrialStepper(
+    product: ProductType,
+    productTier: ProductTierType | undefined,
+  ): boolean {
+    return (
+      productTier !== undefined &&
+      (this.stepperProductTiers.includes(productTier) || product === ProductType.SecretsManager)
+    );
   }
 
   /** Handle manual stepper change */
@@ -246,19 +212,30 @@ export class CompleteTrialInitiationComponent implements OnInit, OnDestroy {
   /** create an organization on trial without payment method */
   async createOrganizationOnTrial(activeUserId: UserId) {
     this.loading = true;
-    let trialInitiationPath: InitiationPath = "Password Manager trial from marketing website";
+    const trialInitiationPath: InitiationPath = this.salesAssistedToken
+      ? InitiationPath.SalesAssistedTrialFromAdminPortal
+      : this.product === ProductType.SecretsManager
+        ? InitiationPath.SecretsManagerTrialFromMarketingWebsite
+        : InitiationPath.PasswordManagerTrialFromMarketingWebsite;
     let plan: PlanInformation = {
       type: await this.getPlanType(),
       passwordManagerSeats: 1,
     };
 
     if (this.product === ProductType.SecretsManager) {
-      trialInitiationPath = "Secrets Manager trial from marketing website";
       plan = {
         ...plan,
         subscribeToSecretsManager: true,
         isFromSecretsManagerTrial: true,
         secretsManagerSeats: 1,
+      };
+    }
+
+    if (this.includesPrivilegedControls) {
+      plan = {
+        ...plan,
+        subscribeToPrivilegedControls: true,
+        pamSeats: 1,
       };
     }
 
@@ -277,6 +254,7 @@ export class CompleteTrialInitiationComponent implements OnInit, OnDestroy {
         plan,
       },
       activeUserId,
+      this.trialLength,
     );
 
     this.orgId = response?.id;
@@ -354,7 +332,7 @@ export class CompleteTrialInitiationComponent implements OnInit, OnDestroy {
             this.orgInfoFormGroup.value.billingEmail == null
               ? ""
               : this.orgInfoFormGroup.value.billingEmail,
-          initiationPath: "Password Manager trial from marketing website",
+          initiationPath: InitiationPath.PasswordManagerTrialFromMarketingWebsite,
         },
         plan: {
           type: 0,
@@ -392,7 +370,20 @@ export class CompleteTrialInitiationComponent implements OnInit, OnDestroy {
     this.verticalStepper.next();
   }
 
-  private setupFamilySponsorship(sponsorshipToken: string) {
+  /**
+   * Auth team finding:
+   * TODO PM-44167: This does not redirect the user. `setPreviousUrl` only sets an in-memory value that
+   * nothing uses as a post-login redirect, and the next navigation overwrites it. The URL is also
+   * wrong: the families-for-enterprise setup page reads a `token` query param, not `plan`.
+   * Further, no server code sends a `sponsorshipToken` query param to this page: the sponsorship offer
+   * email links to `/accept-families-for-enterprise?token=…` instead. Unsure if an external link
+   * (e.g. the marketing site) could still send it.
+   * Confirm with the Billing team whether this redirect is still needed:
+   * 1. If yes: right before `logIn()`, persist the URL (with `token`) with
+   *    `DeepLinkRedirectService.persistPostLoginRedirectUrl`, so `deepLinkGuard` replays it.
+   * 2. If no: remove this method and the `sponsorshipToken` query param handling.
+   */
+  private setupFamilySponsorship(sponsorshipToken: string | undefined) {
     if (sponsorshipToken != null) {
       const route = this.router.createUrlTree(["setup/families-for-enterprise"], {
         queryParams: { plan: sponsorshipToken },
@@ -411,12 +402,31 @@ export class CompleteTrialInitiationComponent implements OnInit, OnDestroy {
   async finishRegistration(passwordInputResult: PasswordInputResult) {
     this.submitting = true;
     return this.registrationFinishService
-      .finishRegistration(this.email, passwordInputResult, this.emailVerificationToken)
+      .finishRegistration(
+        this.email,
+        passwordInputResult,
+        this.emailVerificationToken,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        this.salesAssistedToken,
+      )
       .catch((e: unknown): null => {
         this.validationService.showError(e);
         this.submitting = false;
         return null;
       });
+  }
+
+  private shouldIncludePrivilegedControls(params: TrialInitiationParams): boolean {
+    return (
+      this.privilegedControlsAvailable &&
+      this.product === ProductType.PasswordManager &&
+      params.productTier === ProductTierType.Enterprise &&
+      params.privilegedControlsRequested
+    );
   }
 
   get trial(): Trial {
@@ -438,6 +448,7 @@ export class CompleteTrialInitiationComponent implements OnInit, OnDestroy {
       product,
       tier,
       length: this.trialLength,
+      privilegedControls: this.includesPrivilegedControls ? { seats: 1 } : undefined,
     };
   }
 }

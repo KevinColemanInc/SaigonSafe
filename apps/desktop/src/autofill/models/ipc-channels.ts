@@ -1,20 +1,19 @@
-export const AUTOTYPE_IPC_CHANNELS = {
-  INIT: "autofill.initAutotype",
-  INITIALIZED: "autofill.autotypeIsInitialized",
-  TOGGLE: "autofill.toggleAutotype",
-  CONFIGURE: "autofill.configureAutotype",
-  LISTEN: "autofill.listenAutotypeRequest",
-  EXECUTION_ERROR: "autofill.autotypeExecutionError",
-  EXECUTE: "autofill.executeAutotype",
+// MVP, delete with PM-41067
+export const AUTOTYPE_MVP_IPC_CHANNELS = {
+  TOGGLE: "autofill.toggleAutotypeMvp",
+  CONFIGURE: "autofill.configureAutotypeMvp",
+  LISTEN: "autofill.listenAutotypeRequestMvp",
+  EXECUTION_ERROR: "autofill.autotypeExecutionErrorMvp",
+  EXECUTE: "autofill.executeAutotypeMvp",
 } as const;
 
 export const SSH_AGENT_IPC_CHANNELS = {
   INIT: "sshagent.init",
   IS_LOADED: "sshagent.isloaded",
-  SET_KEYS: "sshagent.setkeys",
-  SIGN_REQUEST_RESPONSE: "sshagent.signrequestresponse",
-  LOCK: "sshagent.lock",
-  CLEAR_KEYS: "sshagent.clearkeys",
+  STOP: "sshagent.stop",
+  REPLACE: "sshagent.replace",
   SIGN_REQUEST: "sshagent.signrequest",
-  UNLOCK_REQUEST: "sshagent.unlockrequest",
+  SIGN_REQUEST_RESPONSE: "sshagent.signrequestresponse",
+  LIST_KEYS_REQUEST: "sshagent.listkeysrequest",
+  LIST_KEYS_RESPONSE: "sshagent.listkeysresponse",
 } as const;

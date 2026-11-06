@@ -20,13 +20,19 @@ import { ServerCommunicationConfig } from "@bitwarden/sdk-internal";
 
 import { AuthService } from "../../../auth/abstractions/auth.service";
 import { AuthenticationStatus } from "../../../auth/enums/authentication-status";
-import { FeatureFlag, getFeatureFlagValue } from "../../../enums/feature-flag.enum";
+import {
+  AllowedFeatureFlagTypes,
+  FeatureFlag,
+  FeatureFlagValueType,
+  getFeatureFlagValue,
+} from "../../../enums/feature-flag.enum";
 import { UserId } from "../../../types/guid";
 import { ConfigApiServiceAbstraction } from "../../abstractions/config/config-api.service.abstraction";
 import { ConfigService } from "../../abstractions/config/config.service";
 import { ServerConfig } from "../../abstractions/config/server-config";
 import { Environment, EnvironmentService, Region } from "../../abstractions/environment.service";
 import { LogService } from "../../abstractions/log.service";
+import { SdkService } from "../../abstractions/sdk/sdk.service";
 import { devFlagEnabled, devFlagValue } from "../../misc/flags";
 import { ServerConfigData } from "../../models/data/server-config.data";
 import { ServerSettings } from "../../models/domain/server-settings";
@@ -54,6 +60,22 @@ export const GLOBAL_SERVER_CONFIGURATIONS = KeyDefinition.record<ServerConfig, A
   },
 );
 
+export const GLOBAL_FEATURE_FLAG_OVERRIDES = KeyDefinition.record<
+  AllowedFeatureFlagTypes,
+  FeatureFlag
+>(CONFIG_DISK, "featureFlagOverrides", {
+  deserializer: (data) => data,
+});
+
+/** The SDK only takes boolean flags. Nullable so an absent config passes straight through. */
+export function toSdkFeatureFlags(config: ServerConfig | null): Map<string, boolean> {
+  return new Map(
+    Object.entries(config?.featureStates ?? {})
+      .filter(([, value]) => typeof value === "boolean")
+      .map(([key, value]) => [key, value] as [string, boolean]),
+  );
+}
+
 const environmentComparer = (previous: Environment, current: Environment) => {
   return previous.getApiUrl() === current.getApiUrl();
 };
@@ -70,12 +92,17 @@ export class DefaultConfigService implements ConfigService {
 
   cloudRegion$: Observable<Region>;
 
+  private featureFlagOverrides$: Observable<Partial<
+    Record<FeatureFlag, AllowedFeatureFlagTypes>
+  > | null>;
+
   constructor(
     private configApiService: ConfigApiServiceAbstraction,
     private environmentService: EnvironmentService,
     private logService: LogService,
     private stateProvider: StateProvider,
     private authService: AuthService,
+    private sdkService: SdkService,
   ) {
     const globalConfig$ = this.environmentService.globalEnvironment$.pipe(
       distinctUntilChanged(environmentComparer),
@@ -143,6 +170,7 @@ export class DefaultConfigService implements ConfigService {
         }
         return of(existingConfig);
       }),
+      tap((config) => void this.gateLogRecorder(config)),
       // If fetch fails, we'll emit on this subject to fallback to the existing config
       mergeWith(this.failedFetchFallbackSubject),
       share({ connector: () => new ReplaySubject(1), resetOnRefCountZero: () => timer(1000) }),
@@ -155,20 +183,38 @@ export class DefaultConfigService implements ConfigService {
     this.serverSettings$ = this.serverConfig$.pipe(
       map((config) => config?.settings ?? new ServerSettings()),
     );
+
+    this.featureFlagOverrides$ = this.stateProvider.getGlobal(GLOBAL_FEATURE_FLAG_OVERRIDES).state$;
   }
 
   getFeatureFlag$<Flag extends FeatureFlag>(key: Flag) {
-    return this.serverConfig$.pipe(map((serverConfig) => getFeatureFlagValue(serverConfig, key)));
+    return combineLatest([this.serverConfig$, this.featureFlagOverrides$]).pipe(
+      map(([serverConfig, overrides]) => this.resolveFlag(serverConfig, overrides, key)),
+      // Config refreshes re-emit unchanged flags; consumers would restart their work each time.
+      distinctUntilChanged(),
+    );
   }
 
   userCachedFeatureFlag$<Flag extends FeatureFlag>(key: Flag, userId: UserId) {
-    return this.stateProvider
-      .getUser(userId, USER_SERVER_CONFIG)
-      .state$.pipe(map((config) => getFeatureFlagValue(config, key)));
+    return combineLatest([
+      this.stateProvider.getUser(userId, USER_SERVER_CONFIG).state$,
+      this.featureFlagOverrides$,
+    ]).pipe(map(([config, overrides]) => this.resolveFlag(config, overrides, key)));
   }
 
   async getFeatureFlag<Flag extends FeatureFlag>(key: Flag) {
     return await firstValueFrom(this.getFeatureFlag$(key));
+  }
+
+  private resolveFlag<Flag extends FeatureFlag>(
+    serverConfig: ServerConfig | null,
+    overrides: Partial<Record<FeatureFlag, AllowedFeatureFlagTypes>> | null,
+    key: Flag,
+  ): FeatureFlagValueType<Flag> {
+    if (overrides != null && overrides[key] != null) {
+      return overrides[key] as FeatureFlagValueType<Flag>;
+    }
+    return getFeatureFlagValue(serverConfig, key);
   }
 
   checkServerMeetsVersionRequirement$(minimumRequiredServerVersion: SemVer) {
@@ -192,6 +238,22 @@ export class DefaultConfigService implements ConfigService {
     return new Date().getTime() - date.getTime() > RETRIEVAL_INTERVAL;
   }
 
+  /**
+   * Pushes the flight recorder flag to `LogService`. `LogService` can't depend on this
+   * service without a cycle, since this service depends on it.
+   * Remove with `PM30935_FlightRecorderTsLogging`.
+   */
+  private async gateLogRecorder(serverConfig: ServerConfig | null): Promise<void> {
+    try {
+      const overrides = await firstValueFrom(this.featureFlagOverrides$);
+      this.logService.enableRecorder(
+        this.resolveFlag(serverConfig, overrides, FeatureFlag.PM30935_FlightRecorderTsLogging),
+      );
+    } catch {
+      // Never let log plumbing break the config pipeline.
+    }
+  }
+
   // Updates the on-disk configuration with a newly retrieved configuration
   private async renewConfig(
     existingConfig: ServerConfig | null,
@@ -211,7 +273,7 @@ export class DefaultConfigService implements ConfigService {
       clearTimeout(handle);
       const newConfig = new ServerConfig(new ServerConfigData(response));
 
-      this.parseBoostrapConfig(response);
+      this.parseBootstrapConfig(response);
 
       // Update the environment region
       if (
@@ -228,6 +290,8 @@ export class DefaultConfigService implements ConfigService {
           return { ...configs, [environment.getApiUrl()]: newConfig };
         });
       } else {
+        // The SDK client must hold the new flags before anything observing the stored config reacts.
+        await this.sdkService.setFlags(userId, toSdkFeatureFlags(newConfig));
         // update state with new pulled config
         await this.stateProvider.setUserState(USER_SERVER_CONFIG, newConfig, userId);
       }
@@ -249,7 +313,7 @@ export class DefaultConfigService implements ConfigService {
     return this.stateProvider.getUser(userId, USER_SERVER_CONFIG).state$;
   }
 
-  private parseBoostrapConfig(response: ServerConfigResponse) {
+  private parseBootstrapConfig(response: ServerConfigResponse) {
     const bootstrap = response.communication?.bootstrap ?? null;
     const vaultUrl = response.environment?.vault;
 

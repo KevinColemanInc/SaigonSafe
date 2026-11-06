@@ -3,16 +3,21 @@ import { ChangeDetectionStrategy, Component, computed, input } from "@angular/co
 import { firstValueFrom } from "rxjs";
 
 import { JslibModule } from "@bitwarden/angular/jslib.module";
-import { ApiService } from "@bitwarden/common/abstractions/api.service";
-import { ErrorResponse } from "@bitwarden/common/models/response/error.response";
 import { FileDownloadService } from "@bitwarden/common/platform/abstractions/file-download/file-download.service";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import { StateProvider } from "@bitwarden/common/platform/state";
-import { CipherId, EmergencyAccessId } from "@bitwarden/common/types/guid";
+import { CipherId, EmergencyAccessId, UserId } from "@bitwarden/common/types/guid";
+import { CipherSdkService } from "@bitwarden/common/vault/abstractions/cipher-sdk.service";
 import { CipherService } from "@bitwarden/common/vault/abstractions/cipher.service";
 import { AttachmentView } from "@bitwarden/common/vault/models/view/attachment.view";
 import { CipherView } from "@bitwarden/common/vault/models/view/cipher.view";
 import { AsyncActionsModule, IconButtonModule, ToastService } from "@bitwarden/components";
+import {
+  isCipherAdminGetAttachmentDownloadUrlError,
+  isCipherGetAttachmentDownloadUrlError,
+} from "@bitwarden/sdk-internal";
+
+type DownloadOptions = { asAdmin?: boolean; emergencyAccessId?: EmergencyAccessId };
 
 @Component({
   selector: "app-download-attachment",
@@ -38,11 +43,11 @@ export class DownloadAttachmentComponent {
 
   constructor(
     private readonly i18nService: I18nService,
-    private readonly apiService: ApiService,
     private readonly fileDownloadService: FileDownloadService,
     private readonly toastService: ToastService,
     private readonly stateProvider: StateProvider,
     private readonly cipherService: CipherService,
+    private readonly cipherSdkService: CipherSdkService,
   ) {}
 
   protected readonly isDecryptionFailure = computed(() => this.attachment().hasDecryptionError);
@@ -51,63 +56,31 @@ export class DownloadAttachmentComponent {
   readonly download = async () => {
     const attachment = this.attachment();
     const cipher = this.cipher();
-    let url: string | undefined;
 
-    if (!attachment.id) {
-      this.toastService.showToast({
-        variant: "error",
-        message: this.i18nService.t("errorOccurred"),
-      });
+    if (!attachment.id || !attachment.fileName) {
+      this.showErrorToast();
       return;
     }
 
-    try {
-      const attachmentDownloadResponse = this.admin()
-        ? await this.apiService.getAttachmentDataAdmin(cipher.id, attachment.id)
-        : await this.apiService.getAttachmentData(
-            cipher.id,
-            attachment.id,
-            this.emergencyAccessId(),
-          );
-      url = attachmentDownloadResponse.url;
-    } catch (e) {
-      if (e instanceof ErrorResponse && (e as ErrorResponse).statusCode === 404) {
-        url = attachment.url;
-      } else if (e instanceof ErrorResponse) {
-        throw new Error((e as ErrorResponse).getSingleMessage());
-      } else {
-        throw e;
-      }
+    const userId = await firstValueFrom(this.stateProvider.activeUserId$);
+    if (!userId) {
+      this.showErrorToast();
+      return;
     }
 
+    const url = await this.fetchUrl(cipher.id, attachment, userId);
     if (!url) {
-      this.toastService.showToast({
-        variant: "error",
-        message: this.i18nService.t("errorOccurred"),
-      });
+      this.showErrorToast();
       return;
     }
 
     const response = await fetch(new Request(url, { cache: "no-store" }));
     if (response.status !== 200) {
-      this.toastService.showToast({
-        variant: "error",
-        message: this.i18nService.t("errorOccurred"),
-      });
+      this.showErrorToast();
       return;
     }
 
     try {
-      const userId = await firstValueFrom(this.stateProvider.activeUserId$);
-
-      if (!userId || !attachment.fileName) {
-        this.toastService.showToast({
-          variant: "error",
-          message: this.i18nService.t("errorOccurred"),
-        });
-        return;
-      }
-
       const decBuf = await this.cipherService.getDecryptedAttachmentBuffer(
         cipher.id as CipherId,
         attachment,
@@ -123,10 +96,53 @@ export class DownloadAttachmentComponent {
         blobData: decBuf as BlobPart,
       });
     } catch {
-      this.toastService.showToast({
-        variant: "error",
-        message: this.i18nService.t("errorOccurred"),
-      });
+      this.showErrorToast();
     }
   };
+
+  private async fetchUrl(
+    cipherId: string,
+    attachment: AttachmentView,
+    userId: UserId,
+  ): Promise<string | undefined> {
+    if (!attachment.id) {
+      return undefined;
+    }
+
+    try {
+      return await this.cipherSdkService.getAttachmentDownloadUrl(
+        cipherId as CipherId,
+        attachment.id,
+        userId,
+        this.downloadOptions(),
+      );
+    } catch (e) {
+      if (
+        (isCipherAdminGetAttachmentDownloadUrlError(e) ||
+          isCipherGetAttachmentDownloadUrlError(e)) &&
+        e.variant === "NotFound"
+      ) {
+        return attachment.url;
+      }
+      throw e;
+    }
+  }
+
+  private downloadOptions(): DownloadOptions | undefined {
+    if (this.admin()) {
+      return { asAdmin: true };
+    }
+    const eaId = this.emergencyAccessId();
+    if (eaId) {
+      return { emergencyAccessId: eaId };
+    }
+    return undefined;
+  }
+
+  private showErrorToast() {
+    this.toastService.showToast({
+      variant: "error",
+      message: this.i18nService.t("errorOccurred"),
+    });
+  }
 }

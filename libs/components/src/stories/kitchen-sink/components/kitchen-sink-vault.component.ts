@@ -1,4 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
+import { toSignal } from "@angular/core/rxjs-interop";
+
+import { FeatureFlag } from "@bitwarden/common/enums/feature-flag.enum";
+import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 
 import { DialogService } from "../../../dialog";
 import { KitchenSinkSharedModule } from "../kitchen-sink-shared.module";
@@ -8,6 +12,7 @@ import {
   KitchenSinkDialogComponent,
   KitchenSinkDialogWithAutofocusComponent,
 } from "./kitchen-sink-main.component";
+import { KitchenSinkTableV2Component } from "./kitchen-sink-table-v2.component";
 import { KitchenSinkTableComponent } from "./kitchen-sink-table.component";
 import { KitchenSinkToggleListComponent } from "./kitchen-sink-toggle-list.component";
 import { KitchenSinkTourService } from "./kitchen-sink-tour.service";
@@ -18,13 +23,18 @@ import { KitchenSinkTourService } from "./kitchen-sink-tour.service";
   imports: [
     KitchenSinkSharedModule,
     KitchenSinkTableComponent,
+    KitchenSinkTableV2Component,
     KitchenSinkToggleListComponent,
     KitchenSinkFormComponent,
   ],
   template: `
     <bit-section>
       <h2 bitTypography="h2" class="tw-mb-6">Table Example</h2>
-      <bit-kitchen-sink-table></bit-kitchen-sink-table>
+      @if (vfo1Enabled()) {
+        <bit-kitchen-sink-table-v2></bit-kitchen-sink-table-v2>
+      } @else {
+        <bit-kitchen-sink-table></bit-kitchen-sink-table>
+      }
 
       <button
         type="button"
@@ -33,7 +43,6 @@ import { KitchenSinkTourService } from "./kitchen-sink-tour.service";
         [bitPopoverAnchorFor]="tourStep2"
         [popoverOpen]="tourService.tourStep() === 2"
         [spotlight]="true"
-        [spotlightPadding]="12"
         [position]="'below-start'"
       >
         Open Dialog
@@ -57,7 +66,6 @@ import { KitchenSinkTourService } from "./kitchen-sink-tour.service";
       [bitPopoverAnchorFor]="tourStep3"
       [popoverOpen]="tourService.tourStep() === 3"
       [spotlight]="true"
-      [spotlightPadding]="12"
       [position]="'right-center'"
     >
       <h2 bitTypography="h2" class="tw-mb-6">Survey Form</h2>
@@ -86,8 +94,8 @@ import { KitchenSinkTourService } from "./kitchen-sink-tour.service";
         Our form components provide consistent styling and validation patterns.
       </p>
       <div class="tw-flex tw-gap-2 tw-mt-4">
-        <button type="button" bitButton buttonType="primary" (click)="tourService.endTour()">
-          Finish Tour
+        <button type="button" bitButton buttonType="primary" (click)="tourService.nextStep()">
+          Next
         </button>
         <button type="button" bitButton buttonType="secondary" (click)="tourService.endTour()">
           Skip Tour
@@ -99,6 +107,13 @@ import { KitchenSinkTourService } from "./kitchen-sink-tour.service";
 export class KitchenSinkVaultComponent {
   protected readonly dialogService = inject(DialogService);
   protected readonly tourService = inject(KitchenSinkTourService);
+  private readonly configService = inject(ConfigService);
+
+  // remove when VFO1 flag is removed
+  protected readonly vfo1Enabled = toSignal(
+    this.configService.getFeatureFlag$(FeatureFlag.VFO1Foundation),
+    { initialValue: false },
+  );
 
   openDialog() {
     this.dialogService.open(KitchenSinkDialogComponent);

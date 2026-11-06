@@ -2,6 +2,7 @@ import {
   catchError,
   defer,
   EMPTY,
+  filter,
   firstValueFrom,
   from,
   retry,
@@ -27,12 +28,14 @@ import {
   KeyDefinition,
 } from "@bitwarden/state";
 
-/** Fallback manifest URI when the server does not provide one */
-const DEFAULT_MANIFEST_URL =
-  "https://github.com/bitwarden/map-the-web/releases/latest/download/manifest.json";
+/** Client-owned manifest filename, resolved against the resource base URL */
+const MANIFEST_FILENAME = "manifest.json";
 
 /** Manifest key for the forms map version this client targets */
 const TARGET_FORMS_VERSION = "v1";
+
+/** Message command that triggers an immediate manifest check from the background context */
+export const FORCE_TARGETING_RULES_UPDATE_COMMAND = "bgForceTargetingRulesUpdate";
 
 type TargetingRulesDataMeta = {
   /** The last time the data source was checked */
@@ -51,6 +54,15 @@ const SERVER_TARGETING_RULES_META = KeyDefinition.record<TargetingRulesDataMeta,
     }),
   },
 );
+
+/**
+ * Cache key for fill assist targeting-rules metadata. Compound so that two
+ * accounts on the same server with different effective feed URLs get separate
+ * cache entries — no cross-account bleed on account switch.
+ */
+function fillAssistRulesCacheKey(apiUrl: string, effectiveUrl: string): string {
+  return `${apiUrl}::${effectiveUrl}`;
+}
 
 /**
  * Browser-specific service responsible for fetching and syncing targeting rules
@@ -110,6 +122,26 @@ export class TargetingRulesDataService {
     this.configService.serverConfig$.pipe(takeUntil(this._destroy$)).subscribe(() => {
       this._triggerUpdate$.next(false);
     });
+
+    // Trigger a fetch when the fill assist policy changes, so the fetcher
+    // re-checks against a possibly-new effective URL / cache key.
+    this.domainSettingsService.fillAssistPolicy$.pipe(takeUntil(this._destroy$)).subscribe(() => {
+      this._triggerUpdate$.next(false);
+    });
+
+    // Warm the cache when fill assist transitions on. Observing the same
+    // observable the gate reads avoids a race with cross-context state
+    // propagation that a popup-triggered force-update would introduce.
+    // `false` is enough: an opted-out user has no meta entry under their
+    // cache key, so the age check passes on the first post-opt-in fetch.
+    // Using `true` (skip cache-age) would fire a network request on every
+    // MV3 service worker wake for any user with fill assist on.
+    this.domainSettingsService.resolvedEnableFillAssist$
+      .pipe(
+        filter((enabled) => enabled),
+        takeUntil(this._destroy$),
+      )
+      .subscribe(() => this._triggerUpdate$.next(false));
   }
 
   /**
@@ -123,10 +155,14 @@ export class TargetingRulesDataService {
 
   private async _resetMeta(): Promise<void> {
     const env = await firstValueFrom(this.environmentService.environment$);
-    const apiUrl = env.getApiUrl();
+    const resourceBaseUrl = await this._resolveResourceBaseUrl();
+    if (!resourceBaseUrl) {
+      return;
+    }
+    const cacheKey = fillAssistRulesCacheKey(env.getApiUrl(), resourceBaseUrl);
     await this._metaState.update((existing) => ({
       ...existing,
-      [apiUrl]: { cid: undefined, timestamp: 0 },
+      [cacheKey]: { cid: undefined, timestamp: 0 },
     }));
   }
 
@@ -186,13 +222,35 @@ export class TargetingRulesDataService {
       return;
     }
 
+    // Skip when fill assist is off — otherwise an opted-out user would still
+    // have outbound traffic to the (potentially org-admin-configured) rules
+    // feed URL. Cache warmth on opt-in is handled from the settings toggle.
+    const fillAssistEnabled = await firstValueFrom(
+      this.domainSettingsService.resolvedEnableFillAssist$,
+    );
+    if (!fillAssistEnabled) {
+      this.logService.debug("[TargetingRulesDataService] Fill assist is disabled, skipping fetch.");
+      return;
+    }
+
     this.logService.info("[TargetingRulesDataService] Update triggered...");
 
     const env = await firstValueFrom(this.environmentService.environment$);
-    const apiUrl = env.getApiUrl();
+    const resourceBaseUrl = await this._resolveResourceBaseUrl();
+
+    // Without a rules-feed URL there is nothing to fetch, and the reader
+    // resolves no cache key
+    if (!resourceBaseUrl) {
+      this.logService.warning(
+        "[TargetingRulesDataService] No rules-feed URL from policy or server config, skipping fetch.",
+      );
+      return;
+    }
+
+    const cacheKey = fillAssistRulesCacheKey(env.getApiUrl(), resourceBaseUrl);
 
     const allMeta = await firstValueFrom(this._metaState.state$);
-    const meta = allMeta?.[apiUrl];
+    const meta = allMeta?.[cacheKey];
     const cacheAge = Date.now() - (meta?.timestamp ?? 0);
 
     if (!skipCacheAgeCheck && cacheAge < TargetingRulesDataService.UPDATE_INTERVAL) {
@@ -200,18 +258,15 @@ export class TargetingRulesDataService {
       return;
     }
 
-    const manifestUrl = await this._resolveManifestUrl();
+    const manifestUrl = new URL(MANIFEST_FILENAME, resourceBaseUrl);
 
     // Step 1: Fetch the lightweight manifest to check if the data has changed
-    this.logService.info(`[TargetingRulesDataService] Checking manifest at ${manifestUrl}`);
+    this.logService.info(`[TargetingRulesDataService] Checking manifest at ${manifestUrl.href}`);
 
     // Add CDN cache-buster
-    const manifestRequestURL = new URL(manifestUrl);
-    manifestRequestURL.searchParams.set("_", Date.now().toString());
+    manifestUrl.searchParams.set("_", Date.now().toString());
 
-    const manifestResponse = await this.apiService.nativeFetch(
-      new Request(manifestRequestURL.href),
-    );
+    const manifestResponse = await this.apiService.nativeFetch(new Request(manifestUrl.href));
     if (!manifestResponse.ok) {
       throw new Error(
         `Failed to fetch manifest: ${manifestResponse.status} ${manifestResponse.statusText}`,
@@ -234,20 +289,22 @@ export class TargetingRulesDataService {
 
     const remoteCid = formsEntry.cid;
 
-    // If the content hash matches, the data hasn't changed; skip download
+    // If the content hash matches, the data hasn't changed; skip download.
+    // The compound cache key guarantees `meta.cid` was recorded against the
+    // current effective URL, so the comparison is always apples-to-apples.
     if (remoteCid && meta?.cid && meta.cid === remoteCid) {
       this.logService.debug(
         `[TargetingRulesDataService] Data unchanged (cid match), skipping download.`,
       );
       await this._metaState.update((existing) => ({
         ...existing,
-        [apiUrl]: { ...meta, timestamp: Date.now() },
+        [cacheKey]: { ...meta, timestamp: Date.now() },
       }));
       return;
     }
 
     // Step 2: Data has changed (or first fetch); download the map file
-    const formsMapUrl = new URL(formsEntry.filename, manifestRequestURL.href).href;
+    const formsMapUrl = new URL(formsEntry.filename, manifestUrl.href).href;
     this.logService.info(`[TargetingRulesDataService] Fetching updated data from ${formsMapUrl}`);
 
     const response = await this.apiService.nativeFetch(new Request(formsMapUrl));
@@ -271,10 +328,12 @@ export class TargetingRulesDataService {
 
     const rules: TargetingRulesByDomain = resource.hosts;
 
-    await this.domainSettingsService.setTargetingRules(rules);
+    // Pin the write to the snapshot URL so rules and meta land under the
+    // same cache key, even if the effective URL changes mid-fetch.
+    await this.domainSettingsService.setTargetingRules(rules, resourceBaseUrl);
     await this._metaState.update((existing) => ({
       ...existing,
-      [apiUrl]: { timestamp: Date.now(), cid: remoteCid },
+      [cacheKey]: { timestamp: Date.now(), cid: remoteCid },
     }));
 
     this.logService.info(
@@ -283,11 +342,11 @@ export class TargetingRulesDataService {
   }
 
   /**
-   * Resolves the manifest URL by checking the server config first,
-   * falling back to the hardcoded default.
+   * Snapshots the shared effective rules-feed URL so the fetcher and the
+   * targeting-rules reader/writer key their caches off identical inputs.
+   * Resolves `undefined` when neither policy nor server config supplies a URL.
    */
-  private async _resolveManifestUrl(): Promise<string> {
-    const serverConfig = await firstValueFrom(this.configService.serverConfig$);
-    return serverConfig?.environment?.fillAssistRules || DEFAULT_MANIFEST_URL;
+  private async _resolveResourceBaseUrl(): Promise<string | undefined> {
+    return firstValueFrom(this.domainSettingsService.effectiveFillAssistRulesUrl$);
   }
 }

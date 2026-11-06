@@ -1,9 +1,17 @@
-import { NO_ERRORS_SCHEMA } from "@angular/core";
+import { SelectionModel } from "@angular/cdk/collections";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  input,
+  NO_ERRORS_SCHEMA,
+  signal,
+} from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { By } from "@angular/platform-browser";
 import { ActivatedRoute, convertToParamMap, Params, provideRouter, Router } from "@angular/router";
 import { mock } from "jest-mock-extended";
-import { BehaviorSubject, EMPTY, of, Subject } from "rxjs";
+import { BehaviorSubject, EMPTY, firstValueFrom, of, Subject } from "rxjs";
 import { map } from "rxjs/operators";
 
 import {
@@ -13,15 +21,16 @@ import {
 } from "@bitwarden/admin-console/common";
 import { SearchPipe } from "@bitwarden/angular/pipes/search.pipe";
 import { VaultProfileService } from "@bitwarden/angular/vault/services/vault-profile.service";
-import { AuthRequestServiceAbstraction, LockService, LogoutService } from "@bitwarden/auth/common";
+import { AuthRequestServiceAbstraction } from "@bitwarden/auth/common";
 import { AutomaticUserConfirmationService } from "@bitwarden/auto-confirm";
 import { ApiService } from "@bitwarden/common/abstractions/api.service";
 import { OrganizationApiServiceAbstraction } from "@bitwarden/common/admin-console/abstractions/organization/organization-api.service.abstraction";
 import { OrganizationService } from "@bitwarden/common/admin-console/abstractions/organization/organization.service.abstraction";
 import { PolicyService } from "@bitwarden/common/admin-console/abstractions/policy/policy.service.abstraction";
-import { ProviderService } from "@bitwarden/common/admin-console/abstractions/provider.service";
+import { Organization } from "@bitwarden/common/admin-console/models/domain/organization";
 import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
 import { AvatarService } from "@bitwarden/common/auth/abstractions/avatar.service";
+import { LogoutService } from "@bitwarden/common/auth/logout";
 import { BillingAccountProfileStateService } from "@bitwarden/common/billing/abstractions/account/billing-account-profile-state.service";
 import { BillingApiServiceAbstraction } from "@bitwarden/common/billing/abstractions/billing-api.service.abstraction";
 import { EventCollectionService } from "@bitwarden/common/dirt/event-logs";
@@ -34,7 +43,9 @@ import { MessagingService } from "@bitwarden/common/platform/abstractions/messag
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
 import { StateProvider } from "@bitwarden/common/platform/state";
 import { SyncService } from "@bitwarden/common/platform/sync";
-import { UserId } from "@bitwarden/common/types/guid";
+import { ProviderService } from "@bitwarden/common/provider";
+import { FakeGlobalStateProvider } from "@bitwarden/common/spec";
+import { CollectionId, OrganizationId, UserId } from "@bitwarden/common/types/guid";
 import { CipherArchiveService } from "@bitwarden/common/vault/abstractions/cipher-archive.service";
 import { CipherService } from "@bitwarden/common/vault/abstractions/cipher.service";
 import { FolderService } from "@bitwarden/common/vault/abstractions/folder/folder.service.abstraction";
@@ -47,15 +58,28 @@ import { TreeNode } from "@bitwarden/common/vault/models/domain/tree-node";
 import { CipherAuthorizationService } from "@bitwarden/common/vault/services/cipher-authorization.service";
 import { RestrictedItemTypesService } from "@bitwarden/common/vault/services/restricted-item-types.service";
 import { CipherViewLike } from "@bitwarden/common/vault/utils/cipher-view-like-utils";
-import { DialogRef, DialogService, ToastService } from "@bitwarden/components";
+import { DialogRef, DialogService, ScrollLayoutService, ToastService } from "@bitwarden/components";
 import { MessageListener } from "@bitwarden/messaging";
+import { GlobalStateProvider } from "@bitwarden/state";
+import { LockService } from "@bitwarden/unlock";
 import {
+  ASSIGN_COLLECTIONS_DIALOG,
+  AssignCollectionsDialogRef,
+  AssignCollectionsResult,
+  BULK_DELETE_DIALOG,
+  BulkDeleteDialogRef,
+  BulkDeleteDialogResult,
   DefaultCipherFormConfigService,
+  MY_REQUESTS_FILTER_ID,
   PasswordRepromptService,
   RoutedVaultFilterBridgeService,
+  RoutedVaultFilterModel,
   RoutedVaultFilterService,
+  VaultBatchBarService,
+  VaultCopyButtonsService,
   VaultFilter,
   VaultFilterServiceAbstraction,
+  VaultItem,
   VaultItemDialogComponent,
   VaultItemDialogResult,
   VaultItemEvent,
@@ -70,8 +94,24 @@ import { WebVaultPromptService } from "../services/web-vault-prompt.service";
 import { WelcomeDialogService } from "../services/welcome-dialog.service";
 
 import { VaultBannersService } from "./vault-banners/services/vault-banners.service";
+import {
+  VaultGatedCollectionBanner,
+  VAULT_GATED_COLLECTION_BANNER,
+} from "./vault-gated-collection-banner.token";
 import { VaultOnboardingService } from "./vault-onboarding/services/abstraction/vault-onboarding.service";
 import { VaultComponent } from "./vault.component";
+
+@Component({
+  selector: "app-test-gated-collection-banner",
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `<span data-testid="gated-collection-banner"
+    >{{ organizationId() }}/{{ collectionId() }}</span
+  >`,
+})
+class TestGatedCollectionBannerComponent implements VaultGatedCollectionBanner {
+  readonly organizationId = input<OrganizationId | undefined>(undefined);
+  readonly collectionId = input<CollectionId | undefined>(undefined);
+}
 
 const TEST_CIPHER_ID = "test-cipher-id";
 const TEST_USER_ID = "test-user-id" as UserId;
@@ -80,12 +120,14 @@ describe("VaultComponent", () => {
   let component: VaultComponent<any>;
   let fixture: ComponentFixture<VaultComponent<any>>;
   let queryParamsSubject: BehaviorSubject<Params>;
+  let routedFilterSubject: BehaviorSubject<RoutedVaultFilterModel>;
 
   let mockCipher: Cipher;
   let openVaultItemDialogSpy: jest.SpyInstance;
 
   beforeEach(async () => {
     queryParamsSubject = new BehaviorSubject<Params>({});
+    routedFilterSubject = new BehaviorSubject<RoutedVaultFilterModel>({});
     openVaultItemDialogSpy = jest.spyOn(VaultItemDialogComponent, "open").mockReturnValue({
       closed: new Subject<VaultItemDialogResult>(),
     } as unknown as DialogRef<VaultItemDialogResult, unknown>);
@@ -101,6 +143,8 @@ describe("VaultComponent", () => {
 
     const cipherServiceMock = mock<CipherService>();
     cipherServiceMock.get.mockResolvedValue(mockCipher);
+    // The vault list reads the partials-inclusive stream; other consumers read `cipherListViews$`.
+    cipherServiceMock.cipherListViewsIncludingRestricted$.mockReturnValue(of([]));
     cipherServiceMock.cipherListViews$.mockReturnValue(of([]));
     cipherServiceMock.failedToDecryptCiphers$.mockReturnValue(of([]));
 
@@ -131,6 +175,13 @@ describe("VaultComponent", () => {
       imports: [VaultComponent],
       providers: [
         provideRouter([]),
+        // The coachmark tour opens the side nav for its nav-anchored steps, so CoachmarkService
+        // resolves SideNavService, which reads its width from global state.
+        { provide: GlobalStateProvider, useValue: new FakeGlobalStateProvider() },
+        {
+          provide: VAULT_GATED_COLLECTION_BANNER,
+          useValue: TestGatedCollectionBannerComponent,
+        },
         { provide: MessagingService, useValue: mock<MessagingService>() },
         { provide: PlatformUtilsService, useValue: mock<PlatformUtilsService>() },
         { provide: BroadcasterService, useValue: mock<BroadcasterService>() },
@@ -258,7 +309,7 @@ describe("VaultComponent", () => {
           providers: [
             {
               provide: RoutedVaultFilterService,
-              useValue: { filter$: of({}) },
+              useValue: { filter$: routedFilterSubject },
             },
             {
               provide: RoutedVaultFilterBridgeService,
@@ -292,6 +343,37 @@ describe("VaultComponent", () => {
               provide: VaultItemsTransferService,
               useValue: mock<VaultItemsTransferService>(),
             },
+            {
+              provide: VaultCopyButtonsService,
+              useValue: { showQuickCopyActions$: of(false) },
+            },
+            {
+              provide: VaultBatchBarService,
+              useValue: {
+                completed$: EMPTY,
+                selection: new SelectionModel<VaultItem<any>>(true, [], true),
+                setConfig: jest.fn(),
+                bulkArchive: jest.fn(),
+                bulkUnarchive: jest.fn(),
+                bulkRestore: jest.fn(),
+                bulkDelete: jest.fn(),
+                bulkMoveToFolder: jest.fn(),
+                bulkAssignToCollections: jest.fn(),
+                barVisible: signal(false),
+              },
+            },
+            {
+              provide: ASSIGN_COLLECTIONS_DIALOG,
+              useValue: {
+                open: jest.fn().mockResolvedValue(AssignCollectionsResult.Canceled),
+              } satisfies AssignCollectionsDialogRef,
+            },
+            {
+              provide: BULK_DELETE_DIALOG,
+              useValue: {
+                open: jest.fn().mockResolvedValue(BulkDeleteDialogResult.Canceled),
+              } satisfies BulkDeleteDialogRef,
+            },
           ],
         },
       })
@@ -299,6 +381,12 @@ describe("VaultComponent", () => {
         useValue: mock<VaultBannersService>(),
       })
       .compileComponents();
+
+    // Provide a scroll host so `bitScrollLayout` (used by nested table components) can resolve its
+    // scrollable element and doesn't log a "can't find scroll host" error during tests.
+    TestBed.inject(ScrollLayoutService).scrollableRef.set(
+      new ElementRef(document.createElement("div")),
+    );
 
     fixture = TestBed.createComponent(VaultComponent);
     component = fixture.componentInstance;
@@ -400,6 +488,282 @@ describe("VaultComponent", () => {
           });
         });
       });
+    });
+  });
+
+  describe("gated collection banner", () => {
+    function banner(): HTMLElement | null {
+      return fixture.nativeElement.querySelector("[data-testid='gated-collection-banner']");
+    }
+
+    function selectCollection(node: TreeNode<any> | undefined): void {
+      (component as any).selectedCollection = node;
+      fixture.detectChanges();
+    }
+
+    it("mounts the host's banner with the selected collection's organization and id", () => {
+      // `canEdit`/`canDelete` are here only because the same node feeds `app-vault-header` too.
+      selectCollection(
+        new TreeNode(
+          {
+            id: "collection-1",
+            organizationId: "org-1",
+            canEdit: () => false,
+            canDelete: () => false,
+          } as any,
+          null,
+        ),
+      );
+
+      expect(banner()?.textContent).toBe("org-1/collection-1");
+    });
+
+    it("mounts nothing while no single collection is the active filter", () => {
+      selectCollection(undefined);
+
+      expect(banner()).toBeNull();
+    });
+  });
+
+  describe("emptyState$", () => {
+    async function emptyState() {
+      return await firstValueFrom((component as any).emptyState$);
+    }
+
+    it("shows the My requests empty state, without Add item, for the My requests filter", async () => {
+      routedFilterSubject.next({ controlledAccess: MY_REQUESTS_FILTER_ID });
+
+      expect(await emptyState()).toEqual({
+        title: "pamMyRequestsEmptyTitle",
+        description: "pamMyRequestsEmptyDescription",
+        icon: (component as any).userLockIcon,
+      });
+      expect((component as any).showAddCipherBtn).toBe(false);
+    });
+
+    it("falls back to the generic vault state for another controlled-access filter", async () => {
+      routedFilterSubject.next({ controlledAccess: "privileged" });
+
+      expect(await emptyState()).toEqual(expect.objectContaining({ title: "noItemsInVault" }));
+      expect((component as any).showAddCipherBtn).toBe(true);
+    });
+
+    it("still resolves a type filter's empty state", async () => {
+      routedFilterSubject.next({ type: "trash" });
+
+      expect(await emptyState()).toEqual(expect.objectContaining({ title: "noItemsInTrash" }));
+    });
+
+    it("ignores an inherited object key smuggled in through the URL", async () => {
+      routedFilterSubject.next({ controlledAccess: "constructor" });
+
+      expect(await emptyState()).toEqual(expect.objectContaining({ title: "noItemsInVault" }));
+      expect((component as any).showAddCipherBtn).toBe(true);
+    });
+
+    it("lets an active search win over the My requests empty state", async () => {
+      routedFilterSubject.next({ controlledAccess: MY_REQUESTS_FILTER_ID });
+      queryParamsSubject.next({ search: "prod" });
+
+      expect(await emptyState()).toEqual(expect.objectContaining({ title: "noSearchResults" }));
+    });
+  });
+
+  describe("narrowToControlledAccess", () => {
+    const ciphers = [{ id: "a" }, { id: "b" }];
+
+    function narrow(filter: RoutedVaultFilterModel): Promise<unknown> {
+      return firstValueFrom((component as any).narrowToControlledAccess(ciphers, filter));
+    }
+
+    it("passes the list through when no host fills the seam", async () => {
+      expect(await narrow({ controlledAccess: "privileged" })).toBe(ciphers);
+    });
+
+    it("hands the list to the host for the selected option", async () => {
+      const narrow$ = jest.fn().mockReturnValue(of([ciphers[0]]));
+      (component as any).controlledAccessFilter = { options$: of([]), narrow$ };
+
+      expect(await narrow({ controlledAccess: "privileged" })).toEqual([ciphers[0]]);
+      expect(narrow$).toHaveBeenCalledWith("privileged", ciphers);
+    });
+
+    it("passes the list through while no option is selected", async () => {
+      const narrow$ = jest.fn();
+      (component as any).controlledAccessFilter = { options$: of([]), narrow$ };
+
+      expect(await narrow({})).toBe(ciphers);
+      expect(narrow$).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("deleteCipher", () => {
+    let toastSpy: jest.SpyInstance;
+    let translateSpy: jest.SpyInstance;
+
+    function cipher(overrides: Record<string, unknown> = {}): any {
+      return { id: TEST_CIPHER_ID, edit: true, reprompt: 0, ...overrides };
+    }
+
+    beforeEach(() => {
+      // The component resolves its own DialogService, so patch the field as other suites here do.
+      (component as any).dialogService = { openSimpleDialog: jest.fn().mockResolvedValue(true) };
+      toastSpy = jest.spyOn((component as any).toastService, "showToast");
+      translateSpy = jest.spyOn((component as any).i18nService, "t");
+    });
+
+    it("shows an error toast when the delete is refused", async () => {
+      const cipherService = TestBed.inject(CipherService);
+      (cipherService.softDeleteWithServer as jest.Mock).mockRejectedValue(new Error("not found"));
+
+      await component.deleteCipher(cipher());
+
+      expect(translateSpy).toHaveBeenCalledWith("deleteItemError");
+      expect(toastSpy).toHaveBeenCalledWith(expect.objectContaining({ variant: "error" }));
+      expect(toastSpy).not.toHaveBeenCalledWith(expect.objectContaining({ variant: "success" }));
+    });
+
+    it("names the reason when a restricted cipher's delete is refused", async () => {
+      const cipherService = TestBed.inject(CipherService);
+      (cipherService.softDeleteWithServer as jest.Mock).mockRejectedValue(new Error("not found"));
+
+      await component.deleteCipher(cipher({ partial: true }));
+
+      expect(translateSpy).toHaveBeenCalledWith("restrictedItemChangeRefused");
+      expect(toastSpy).toHaveBeenCalledWith(expect.objectContaining({ variant: "error" }));
+    });
+
+    it("reports success when the delete lands", async () => {
+      const cipherService = TestBed.inject(CipherService);
+      (cipherService.softDeleteWithServer as jest.Mock).mockResolvedValue(undefined);
+
+      await component.deleteCipher(cipher());
+
+      expect(translateSpy).toHaveBeenCalledWith("deletedItem");
+      expect(toastSpy).toHaveBeenCalledWith(expect.objectContaining({ variant: "success" }));
+      expect(toastSpy).not.toHaveBeenCalledWith(expect.objectContaining({ variant: "error" }));
+    });
+  });
+
+  describe("viewCipherById", () => {
+    // viewCipherById awaits the dialog's `closed` stream, which the mock never completes.
+    async function openAndFlush(): Promise<void> {
+      void component.viewCipherById(TEST_CIPHER_ID);
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    }
+
+    it("opens the cipher from local state", async () => {
+      await openAndFlush();
+
+      expect(openVaultItemDialogSpy).toHaveBeenCalled();
+      const params = openVaultItemDialogSpy.mock.lastCall[1];
+      expect(params.formConfig.originalCipher).toBe(mockCipher);
+    });
+  });
+
+  describe("addCollection", () => {
+    let dialogOpen: jest.Mock;
+
+    const buildOrg = (id: string, overrides: Partial<Organization> = {}) =>
+      ({
+        id,
+        name: id,
+        canCreateNewCollections: true,
+        isProviderUser: false,
+        ...overrides,
+      }) as Organization;
+
+    beforeEach(() => {
+      dialogOpen = jest.fn().mockReturnValue({
+        closed: of(undefined),
+      } as unknown as DialogRef<unknown, unknown>);
+      (component as any).dialogService = { open: dialogOpen };
+    });
+
+    it("defaults the organization to the active filter's organization when one is selected", async () => {
+      (component as any).allOrganizations = [buildOrg("org-1"), buildOrg("org-2")];
+      component.activeFilter = { organizationId: "org-2" } as unknown as VaultFilter;
+
+      await component.addCollection();
+
+      expect(dialogOpen).toHaveBeenCalled();
+      const config = dialogOpen.mock.lastCall[1];
+      expect(config.data.organizationId).toBe("org-2");
+    });
+
+    it("falls back to the first eligible organization when the individual vault is selected", async () => {
+      (component as any).allOrganizations = [buildOrg("org-1"), buildOrg("org-2")];
+      component.activeFilter = { organizationId: "MyVault" } as unknown as VaultFilter;
+
+      await component.addCollection();
+
+      const config = dialogOpen.mock.lastCall[1];
+      expect(config.data.organizationId).toBe("org-1");
+    });
+
+    it("falls back to the first eligible organization when no organization filter is selected", async () => {
+      (component as any).allOrganizations = [buildOrg("org-1"), buildOrg("org-2")];
+      component.activeFilter = { organizationId: null } as unknown as VaultFilter;
+
+      await component.addCollection();
+
+      const config = dialogOpen.mock.lastCall[1];
+      expect(config.data.organizationId).toBe("org-1");
+    });
+
+    it("falls back to the first eligible organization when the filtered organization cannot create collections", async () => {
+      (component as any).allOrganizations = [
+        buildOrg("org-1"),
+        buildOrg("org-2", { canCreateNewCollections: false }),
+      ];
+      component.activeFilter = { organizationId: "org-2" } as unknown as VaultFilter;
+
+      await component.addCollection();
+
+      const config = dialogOpen.mock.lastCall[1];
+      expect(config.data.organizationId).toBe("org-1");
+    });
+  });
+
+  describe("addCipher", () => {
+    const buildOrg = (id: string, overrides: Partial<Organization> = {}) =>
+      ({
+        id,
+        name: id,
+        enabled: true,
+        ...overrides,
+      }) as Organization;
+
+    it("opens the vault item dialog when the target organization is enabled", async () => {
+      (component as any).allOrganizations = [buildOrg("org-1", { enabled: true })];
+      component.activeFilter = { organizationId: "org-1" } as unknown as VaultFilter;
+
+      // The dialog's `closed` observable never emits in this test setup, so avoid
+      // awaiting the full `addCipher()` call (which awaits dialog closure) and instead
+      // flush pending microtasks until the dialog has been opened.
+      void component.addCipher();
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(openVaultItemDialogSpy).toHaveBeenCalled();
+    });
+
+    it("opens the vault item dialog when no organization is selected (individual vault)", async () => {
+      (component as any).allOrganizations = [];
+      component.activeFilter = { organizationId: "MyVault" } as unknown as VaultFilter;
+
+      void component.addCipher();
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(openVaultItemDialogSpy).toHaveBeenCalled();
+    });
+
+    it("does NOT open the vault item dialog when the target organization is suspended (disabled)", async () => {
+      (component as any).allOrganizations = [buildOrg("org-1", { enabled: false })];
+      component.activeFilter = { organizationId: "org-1" } as unknown as VaultFilter;
+
+      await component.addCipher();
+
+      expect(openVaultItemDialogSpy).not.toHaveBeenCalled();
     });
   });
 });

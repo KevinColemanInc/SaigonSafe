@@ -1,4 +1,6 @@
-import { EncString } from "../../key-management/crypto/models/enc-string";
+// eslint-disable-next-line no-restricted-imports
+import { EncString, SymmetricCryptoKey } from "@bitwarden/legacy-crypto";
+
 import { CipherRepromptType } from "../../vault/enums/cipher-reprompt-type";
 import { CipherType } from "../../vault/enums/cipher-type";
 import { Cipher as CipherDomain } from "../../vault/models/domain/cipher";
@@ -6,13 +8,18 @@ import { CipherView } from "../../vault/models/view/cipher.view";
 
 import { BankAccountExport } from "./bank-account.export";
 import { CardExport } from "./card.export";
+import { DriversLicenseExport } from "./drivers-license.export";
 import { FieldExport } from "./field.export";
 import { IdentityExport } from "./identity.export";
 import { LoginExport } from "./login.export";
+import { PassportExport } from "./passport.export";
 import { PasswordHistoryExport } from "./password-history.export";
 import { SecureNoteExport } from "./secure-note.export";
 import { SshKeyExport } from "./ssh-key.export";
 import { safeGetString } from "./utils";
+
+// Only blob ciphers carry a format version in `data`, e.g. `{"format_version":1,...}`.
+const BLOB_FORMAT_MARKER = '"format_version"';
 
 export class CipherExport {
   static template(): CipherExport {
@@ -37,11 +44,16 @@ export class CipherExport {
       const set = new Set((view.collectionIds ?? []).concat(req.collectionIds ?? []));
       view.collectionIds = Array.from(set.values());
     }
-    view.name = req.name;
+    view.name = req.name ?? "";
     view.notes = req.notes;
     view.favorite = req.favorite;
     view.reprompt = req.reprompt ?? CipherRepromptType.None;
-    view.key = req.key != null ? new EncString(req.key) : undefined;
+    // Only overwrite an existing view.key when the export JSON explicitly carries one.
+    // Leaving it absent (e.g. after CLI redaction) preserves the already-decrypted key
+    // that the bw-edit path fetches before calling toView(), preventing silent key loss.
+    if (req.key != null && !EncString.isSerializedEncString(req.key)) {
+      view.key = SymmetricCryptoKey.fromString(req.key);
+    }
 
     if (req.fields != null) {
       view.fields = req.fields.map((f) => FieldExport.toView(f));
@@ -79,6 +91,16 @@ export class CipherExport {
           view.bankAccount = BankAccountExport.toView(req.bankAccount)!;
         }
         break;
+      case CipherType.DriversLicense:
+        if (req.driversLicense != null) {
+          view.driversLicense = DriversLicenseExport.toView(req.driversLicense)!;
+        }
+        break;
+      case CipherType.Passport:
+        if (req.passport != null) {
+          view.passport = PassportExport.toView(req.passport)!;
+        }
+        break;
     }
 
     if (req.passwordHistory != null) {
@@ -98,11 +120,29 @@ export class CipherExport {
     if (domain.organizationId == null) {
       domain.organizationId = req.organizationId;
     }
-    domain.name = req.name != null ? new EncString(req.name) : new EncString("");
-    domain.notes = req.notes != null ? new EncString(req.notes) : undefined;
     domain.favorite = req.favorite;
     domain.reprompt = req.reprompt ?? CipherRepromptType.None;
     domain.key = req.key != null ? new EncString(req.key) : undefined;
+
+    CipherExport.contentToDomain(req, domain);
+
+    domain.creationDate = req.creationDate ? new Date(req.creationDate) : domain.creationDate;
+    domain.revisionDate = req.revisionDate ? new Date(req.revisionDate) : domain.revisionDate;
+    domain.deletedDate = req.deletedDate ? new Date(req.deletedDate) : undefined;
+    domain.archivedDate = req.archivedDate ? new Date(req.archivedDate) : undefined;
+    return domain;
+  }
+
+  // Blob ciphers seal all content in `data`; their legacy per-field properties stay undefined.
+  private static contentToDomain(req: CipherExport, domain: CipherDomain) {
+    // V2 encryption export only nedes data & cipher key
+    if (req.data != null) {
+      domain.data = req.data;
+      return;
+    }
+
+    domain.name = req.name != null ? new EncString(req.name) : new EncString("");
+    domain.notes = req.notes != null ? new EncString(req.notes) : undefined;
 
     if (req.fields != null) {
       domain.fields = req.fields.map((f) => FieldExport.toDomain(f));
@@ -139,24 +179,28 @@ export class CipherExport {
           domain.bankAccount = BankAccountExport.toDomain(req.bankAccount);
         }
         break;
+      case CipherType.DriversLicense:
+        if (req.driversLicense != null) {
+          domain.driversLicense = DriversLicenseExport.toDomain(req.driversLicense);
+        }
+        break;
+      case CipherType.Passport:
+        if (req.passport != null) {
+          domain.passport = PassportExport.toDomain(req.passport);
+        }
+        break;
     }
 
     if (req.passwordHistory != null) {
       domain.passwordHistory = req.passwordHistory.map((ph) => PasswordHistoryExport.toDomain(ph));
     }
-
-    domain.creationDate = req.creationDate ? new Date(req.creationDate) : domain.creationDate;
-    domain.revisionDate = req.revisionDate ? new Date(req.revisionDate) : domain.revisionDate;
-    domain.deletedDate = req.deletedDate ? new Date(req.deletedDate) : undefined;
-    domain.archivedDate = req.archivedDate ? new Date(req.archivedDate) : undefined;
-    return domain;
   }
 
   type: CipherType = CipherType.Login;
   folderId?: string;
   organizationId?: string;
   collectionIds?: string[];
-  name: string = "";
+  name?: string;
   notes?: string;
   favorite: boolean = false;
   fields?: FieldExport[];
@@ -166,6 +210,8 @@ export class CipherExport {
   identity?: IdentityExport;
   sshKey?: SshKeyExport;
   bankAccount?: BankAccountExport;
+  driversLicense?: DriversLicenseExport;
+  passport?: PassportExport;
   reprompt: CipherRepromptType = CipherRepromptType.None;
   passwordHistory?: PasswordHistoryExport[];
   revisionDate?: Date;
@@ -173,6 +219,7 @@ export class CipherExport {
   deletedDate?: Date;
   archivedDate?: Date;
   key?: string;
+  data?: string;
 
   // Use build method instead of ctor so that we can control order of JSON stringify for pretty print
   build(o: CipherView | CipherDomain) {
@@ -181,13 +228,33 @@ export class CipherExport {
     this.type = o.type;
     this.reprompt = o.reprompt;
 
-    this.name = safeGetString(o.name) ?? "";
+    // Blob ciphers seal the name in `data`; omit it from the export.
+    this.name = CipherExport.isBlob(o) ? undefined : (safeGetString(o.name) ?? "");
     this.notes = safeGetString(o.notes);
     if ("key" in o) {
-      this.key = o.key?.encryptedString;
+      this.key =
+        o.key instanceof SymmetricCryptoKey
+          ? o.key.toBase64()
+          : (o.key as EncString | undefined)?.encryptedString;
     }
 
     this.favorite = o.favorite;
+
+    this.buildContent(o);
+
+    this.creationDate = o.creationDate;
+    this.revisionDate = o.revisionDate;
+    this.deletedDate = o.deletedDate;
+    this.archivedDate = o.archivedDate;
+  }
+
+  // Blob ciphers seal all content in `data`; their legacy per-field properties are undefined.
+  private buildContent(o: CipherView | CipherDomain) {
+    // Legacy ciphers also carry `data`, but their per-field properties are authoritative.
+    if (CipherExport.isBlob(o)) {
+      this.data = o.data;
+      return;
+    }
 
     if (o.fields != null) {
       this.fields = o.fields.map((f) => new FieldExport(f));
@@ -212,15 +279,20 @@ export class CipherExport {
       case CipherType.BankAccount:
         this.bankAccount = new BankAccountExport(o.bankAccount);
         break;
+      case CipherType.DriversLicense:
+        this.driversLicense = new DriversLicenseExport(o.driversLicense);
+        break;
+      case CipherType.Passport:
+        this.passport = new PassportExport(o.passport);
+        break;
     }
 
     if (o.passwordHistory != null) {
       this.passwordHistory = o.passwordHistory.map((ph) => new PasswordHistoryExport(ph));
     }
+  }
 
-    this.creationDate = o.creationDate;
-    this.revisionDate = o.revisionDate;
-    this.deletedDate = o.deletedDate;
-    this.archivedDate = o.archivedDate;
+  private static isBlob(o: CipherView | CipherDomain): o is CipherDomain & { data: string } {
+    return o instanceof CipherDomain && o.data?.includes(BLOB_FORMAT_MARKER) === true;
   }
 }

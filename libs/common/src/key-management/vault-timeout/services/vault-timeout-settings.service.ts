@@ -20,7 +20,8 @@ import {
 import { UserDecryptionOptionsServiceAbstraction } from "@bitwarden/auth/common";
 // This import has been flagged as unallowed for this class. It may be involved in a circular dependency loop.
 // eslint-disable-next-line no-restricted-imports
-import { BiometricStateService, KeyService } from "@bitwarden/key-management";
+import { BiometricStateService } from "@bitwarden/key-management";
+import { AutoUnlockService } from "@bitwarden/unlock";
 
 import { PolicyService } from "../../../admin-console/abstractions/policy/policy.service.abstraction";
 import { PolicyType } from "../../../admin-console/enums";
@@ -31,8 +32,11 @@ import { getUserId } from "../../../auth/services/account.service";
 import { LogService } from "../../../platform/abstractions/log.service";
 import { StateProvider } from "../../../platform/state";
 import { UserId } from "../../../types/guid";
-import { PinStateServiceAbstraction } from "../../pin/pin-state.service.abstraction";
 import { MaximumSessionTimeoutPolicyData, SessionTimeoutTypeService } from "../../session-timeout";
+import {
+  PIN_PROTECTED_USER_KEY_ENVELOPE_EPHEMERAL,
+  PIN_PROTECTED_USER_KEY_ENVELOPE_PERSISTENT,
+} from "../../state-definitions";
 import { VaultTimeoutSettingsService as VaultTimeoutSettingsServiceAbstraction } from "../abstractions/vault-timeout-settings.service";
 import { VaultTimeoutAction } from "../enums/vault-timeout-action.enum";
 import {
@@ -51,9 +55,8 @@ import {
 export class VaultTimeoutSettingsService implements VaultTimeoutSettingsServiceAbstraction {
   constructor(
     private accountService: AccountService,
-    private pinStateService: PinStateServiceAbstraction,
     private userDecryptionOptionsService: UserDecryptionOptionsServiceAbstraction,
-    private keyService: KeyService,
+    private autoUnlockService: AutoUnlockService,
     private tokenService: TokenService,
     private policyService: PolicyService,
     private biometricStateService: BiometricStateService,
@@ -86,7 +89,7 @@ export class VaultTimeoutSettingsService implements VaultTimeoutSettingsServiceA
 
     await this.migrateTokenStorage(userId, action, timeout);
 
-    await this.keyService.refreshAdditionalKeys(userId);
+    await this.autoUnlockService.refreshAutoUnlockKey(userId);
   }
 
   availableVaultTimeoutActions$(userId?: UserId): Observable<VaultTimeoutAction[]> {
@@ -101,7 +104,15 @@ export class VaultTimeoutSettingsService implements VaultTimeoutSettingsServiceA
         combineLatest([
           this.userDecryptionOptionsService.hasMasterPasswordById$(userId),
           this.biometricStateService.biometricUnlockEnabled$(userId),
-          this.pinStateService.pinSet$(userId),
+          combineLatest([
+            this.stateProvider.getUserState$(PIN_PROTECTED_USER_KEY_ENVELOPE_EPHEMERAL, userId),
+            this.stateProvider.getUserState$(PIN_PROTECTED_USER_KEY_ENVELOPE_PERSISTENT, userId),
+          ]).pipe(
+            map(
+              ([ephemeralEnvelope, persistentEnvelope]) =>
+                !!ephemeralEnvelope || !!persistentEnvelope,
+            ),
+          ),
         ]),
       ),
       map(([haveMasterPassword, biometricUnlockEnabled, isPinSet]) => {

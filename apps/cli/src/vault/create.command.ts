@@ -13,21 +13,24 @@ import { AccountService } from "@bitwarden/common/auth/abstractions/account.serv
 import { getUserId } from "@bitwarden/common/auth/services/account.service";
 import { BillingAccountProfileStateService } from "@bitwarden/common/billing/abstractions/account/billing-account-profile-state.service";
 import { FeatureFlag } from "@bitwarden/common/enums/feature-flag.enum";
-import { EncryptService } from "@bitwarden/common/key-management/crypto/abstractions/encrypt.service";
 import { CipherExport } from "@bitwarden/common/models/export/cipher.export";
 import { CollectionExport } from "@bitwarden/common/models/export/collection.export";
 import { FolderExport } from "@bitwarden/common/models/export/folder.export";
 import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { Utils } from "@bitwarden/common/platform/misc/utils";
+import { OrganizationId } from "@bitwarden/common/types/guid";
 import { CipherService } from "@bitwarden/common/vault/abstractions/cipher.service";
 import { FolderApiServiceAbstraction } from "@bitwarden/common/vault/abstractions/folder/folder-api.service.abstraction";
 import { FolderService } from "@bitwarden/common/vault/abstractions/folder/folder.service.abstraction";
 import { CipherType } from "@bitwarden/common/vault/enums";
 import { Folder } from "@bitwarden/common/vault/models/domain/folder";
 import { KeyService } from "@bitwarden/key-management";
+// eslint-disable-next-line no-restricted-imports
+import { EncryptService } from "@bitwarden/legacy-crypto";
 
 import { OrganizationCollectionRequest } from "../admin-console/models/request/organization-collection.request";
 import { OrganizationCollectionResponse } from "../admin-console/models/response/organization-collection.response";
+import { SelectionReadOnly } from "../admin-console/models/selection-read-only";
 import { Response } from "../models/response";
 import { CliUtils } from "../utils";
 
@@ -87,8 +90,10 @@ export class CreateCommand {
       case "attachment":
         return await this.createAttachment(normalizedOptions, additionalData);
       case "folder":
+      case "my-folder":
         return await this.createFolder(req);
       case "org-collection":
+      case "org-shared-folder":
         return await this.createOrganizationCollection(req, normalizedOptions);
       default:
         return Response.badRequest("Unknown object.");
@@ -101,7 +106,11 @@ export class CreateCommand {
 
       const cipherView = CipherExport.toView(req);
 
-      if (cipherView.type === CipherType.BankAccount) {
+      if (
+        cipherView.type === CipherType.BankAccount ||
+        cipherView.type === CipherType.DriversLicense ||
+        cipherView.type === CipherType.Passport
+      ) {
         const newItemTypesEnabled = await firstValueFrom(
           this.configService.getFeatureFlag$(FeatureFlag.PM32009NewItemTypes),
         );
@@ -172,14 +181,6 @@ export class CreateCommand {
       return Response.error("Premium status is required to use this feature.");
     }
 
-    const userKey = await this.keyService.getUserKey();
-    if (userKey == null) {
-      return Response.error(
-        "You must update your encryption key before you can use this feature. " +
-          "See https://help.bitwarden.com/article/update-encryption-key/",
-      );
-    }
-
     try {
       const updatedCipher = await this.cipherService.saveAttachmentRawWithServer(
         cipher,
@@ -202,7 +203,10 @@ export class CreateCommand {
       const folderData = await this.folderApiService.save(folder, activeUserId);
       const newFolder = new Folder(folderData);
       const decFolder = await newFolder.decrypt(userKey);
-      const res = new FolderResponse(decFolder);
+      const useSharedFoldersTerm = await this.configService.getFeatureFlag(
+        FeatureFlag.VFO1Foundation,
+      );
+      const res = new FolderResponse(decFolder, useSharedFoldersTerm);
       return Response.success(res);
     } catch (e) {
       return Response.error(e);
@@ -210,28 +214,42 @@ export class CreateCommand {
   }
 
   private async createOrganizationCollection(req: OrganizationCollectionRequest, options: Options) {
-    if (options.organizationId == null || options.organizationId === "") {
-      return Response.badRequest("`organizationid` option is required.");
+    // The organization id can come from either the `organizationid` option (e.g. a CLI flag, or a
+    // query string parameter when using `bw serve`) or the request body's `organizationId` property.
+    // If both are provided, they must agree; otherwise whichever one was provided is used.
+    const organizationId = Utils.isNullOrWhitespace(options.organizationId)
+      ? req?.organizationId
+      : options.organizationId;
+    if (Utils.isNullOrWhitespace(organizationId)) {
+      return Response.badRequest(
+        "An organization id is required, either via the `--organizationid` option " +
+          "(or `organizationId` query parameter when using `bw serve`), " +
+          "or the request's `organizationId` property.",
+      );
     }
-    if (!Utils.isGuid(options.organizationId)) {
-      return Response.badRequest("`" + options.organizationId + "` is not a GUID.");
+    if (!Utils.isGuid(organizationId)) {
+      return Response.badRequest("`" + organizationId + "` is not a GUID.");
     }
-    if (options.organizationId !== req.organizationId) {
-      return Response.badRequest("`organizationid` option does not match request object.");
+    if (
+      !Utils.isNullOrWhitespace(options.organizationId) &&
+      !Utils.isNullOrWhitespace(req.organizationId) &&
+      options.organizationId !== req.organizationId
+    ) {
+      return Response.badRequest(
+        "The `--organizationid` option (or `organizationId` query parameter) does not match " +
+          "the request's `organizationId` property.",
+      );
     }
+    req.organizationId = organizationId as OrganizationId;
     if (req.name == null || req.name.trim() === "") {
       return Response.badRequest("Collection name is required.");
     }
     try {
-      const orgKey = await this.keyService.getOrgKey(req.organizationId);
+      const userId = await firstValueFrom(this.accountService.activeAccount$.pipe(getUserId));
+      const orgKeys = await firstValueFrom(this.keyService.orgKeys$(userId));
+      const orgKey = orgKeys?.[req.organizationId as OrganizationId] ?? null;
       if (orgKey == null) {
         throw new Error("No encryption key for this organization.");
-      }
-      const userId = await firstValueFrom(
-        this.accountService.activeAccount$.pipe(map((a) => a?.id)),
-      );
-      if (!userId) {
-        return Response.badRequest("No user found.");
       }
       const organization = await firstValueFrom(
         this.organizationService
@@ -254,13 +272,27 @@ export class CreateCommand {
             );
       const request = new CreateCollectionRequest({
         name: await this.encryptService.encryptString(req.name, orgKey),
-        externalId: req.externalId,
+        externalId: req.externalId ?? undefined,
         groups,
         users,
       });
       const response = await this.apiService.postCollection(req.organizationId, request);
       const view = CollectionExport.toView(req, response.id);
-      const res = new OrganizationCollectionResponse(view, groups, users);
+      const serverGroups = response.groups.map(
+        (g) => new SelectionReadOnly(g.id, g.readOnly, g.hidePasswords, g.manage),
+      );
+      const serverUsers = response.users.map(
+        (u) => new SelectionReadOnly(u.id, u.readOnly, u.hidePasswords, u.manage),
+      );
+      const useSharedFoldersTerm = await this.configService.getFeatureFlag(
+        FeatureFlag.VFO1Foundation,
+      );
+      const res = new OrganizationCollectionResponse(
+        view,
+        serverGroups,
+        serverUsers,
+        useSharedFoldersTerm,
+      );
       return Response.success(res);
     } catch (e) {
       return Response.error(e);

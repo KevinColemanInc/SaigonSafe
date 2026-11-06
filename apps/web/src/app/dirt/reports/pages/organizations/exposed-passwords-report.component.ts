@@ -13,12 +13,20 @@ import { CipherService } from "@bitwarden/common/vault/abstractions/cipher.servi
 import { SyncService } from "@bitwarden/common/vault/abstractions/sync/sync.service.abstraction";
 import { CipherView } from "@bitwarden/common/vault/models/view/cipher.view";
 import { CipherViewLikeUtils } from "@bitwarden/common/vault/utils/cipher-view-like-utils";
-import { BerryComponent, ChipFilterComponent, DialogService } from "@bitwarden/components";
+import {
+  BerryComponent,
+  BreadcrumbsModule,
+  ChipFilterComponent,
+  DialogService,
+} from "@bitwarden/components";
+import { LogService } from "@bitwarden/logging";
 import {
   PasswordRepromptService,
   CipherFormConfigService,
   RoutedVaultFilterBridgeService,
   RoutedVaultFilterService,
+  Vfo1IconPipe,
+  Vfo1I18nPipe,
 } from "@bitwarden/vault";
 
 import { HeaderModule } from "../../../../layouts/header/header.module";
@@ -49,6 +57,9 @@ import { ExposedPasswordsReportComponent as BaseExposedPasswordsReportComponent 
     PipesModule,
     ChipFilterComponent,
     BerryComponent,
+    Vfo1IconPipe,
+    Vfo1I18nPipe,
+    BreadcrumbsModule,
   ],
 })
 export class ExposedPasswordsReportComponent
@@ -71,6 +82,7 @@ export class ExposedPasswordsReportComponent
     cipherFormService: CipherFormConfigService,
     adminConsoleCipherFormConfigService: AdminConsoleCipherFormConfigService,
     private collectionService: CollectionService,
+    protected logService: LogService,
   ) {
     super(
       cipherService,
@@ -83,6 +95,7 @@ export class ExposedPasswordsReportComponent
       syncService,
       cipherFormService,
       adminConsoleCipherFormConfigService,
+      logService,
     );
   }
 

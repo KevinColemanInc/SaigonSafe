@@ -1,3 +1,4 @@
+<vault-organization-user-notifications></vault-organization-user-notifications>
 <app-vault-banners [organizations]="organizations$ | async"></app-vault-banners>
 
 <app-vault-header
@@ -14,12 +15,7 @@
   (onOpenAddItemDialog)="openAddItemDialog()"
 ></app-vault-header>
 
-<app-vault-onboarding
-  [ciphers]="ciphers"
-  [orgs]="allOrganizations"
-  (onAddCipher)="addCipher($event)"
->
-</app-vault-onboarding>
+<app-vault-onboarding [ciphers]="ciphers"></app-vault-onboarding>
 
 <div class="tw-flex tw-flex-row -tw-mx-2.5">
   <div class="tw-basis-1/4 tw-max-w-1/4 tw-px-2.5">
@@ -51,6 +47,18 @@
       </bit-callout>
     }
 
+    @if (gatedCollectionBanner && selectedCollection) {
+      <ng-container
+        *ngComponentOutlet="
+          gatedCollectionBanner;
+          inputs: {
+            organizationId: selectedCollection.node.organizationId,
+            collectionId: selectedCollection.node.id,
+          }
+        "
+      />
+    }
+
     <app-vault-items
       #vaultItems
       [ciphers]="ciphers"
@@ -61,9 +69,6 @@
       [showOwner]="true"
       [showCollections]="false"
       [showGroups]="false"
-      [showPremiumFeatures]="canAccessPremium"
-      [showBulkMove]="showBulkMove"
-      [showBulkTrashOptions]="filter.type === 'trash'"
       [useEvents]="false"
       [showAdminActions]="false"
       [showBulkAddToCollections]="true"
@@ -84,27 +89,29 @@
     }
     @if (isEmpty && !performingInitialLoad) {
       <div class="tw-mt-6 tw-flex tw-h-full tw-flex-col tw-items-center tw-justify-start tw-flex-1">
-        <bit-no-items [icon]="(emptyState$ | async)?.icon">
+        <bit-status-lockup>
+          <bit-svg slot="graphic" [content]="(emptyState$ | async)?.icon"></bit-svg>
           <div slot="title">
             {{ (emptyState$ | async)?.title | i18n }}
           </div>
-          <p slot="description" bitTypography="body2" class="tw-max-w-md tw-text-center">
+          <div slot="description" class="tw-max-w-md">
             {{ (emptyState$ | async)?.description | i18n }}
-          </p>
+          </div>
           @if (showAddCipherBtn) {
             <button
               type="button"
-              buttonType="primary"
+              buttonType="secondary"
               bitButton
               (click)="addCipher()"
               slot="button"
             >
-              <i class="bwi bwi-plus bwi-fw" aria-hidden="true"></i>
-              {{ "newItem" | i18n }}
+              {{ "addItem" | i18n }}
             </button>
           }
-        </bit-no-items>
+        </bit-status-lockup>
       </div>
     }
   </div>
 </div>
+
+<bit-vault-batch-action />

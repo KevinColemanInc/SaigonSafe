@@ -1,123 +1,172 @@
-import { firstValueFrom, map, Observable } from "rxjs";
+import { concatMap, firstValueFrom, map, Observable, of, switchMap } from "rxjs";
 
-import { KeyGenerationService } from "@bitwarden/common/key-management/crypto";
-import { EncryptService } from "@bitwarden/common/key-management/crypto/abstractions/encrypt.service";
-import { EncString } from "@bitwarden/common/key-management/crypto/models/enc-string";
-import { SymmetricCryptoKey } from "@bitwarden/common/platform/models/domain/symmetric-crypto-key";
+import { EnvironmentService } from "@bitwarden/common/platform/abstractions/environment.service";
+import { asUuid, SdkService } from "@bitwarden/common/platform/abstractions/sdk/sdk.service";
 import { OrganizationId, UserId } from "@bitwarden/common/types/guid";
-import { KeyService } from "@bitwarden/key-management";
+import {
+  OrganizationId as SdkOrganizationId,
+  OrganizationInviteLinkView as SdkOrganizationInviteLinkView,
+} from "@bitwarden/sdk-internal";
 import { StateProvider } from "@bitwarden/state";
 
-import { OrganizationInviteLinkApiService } from "../abstractions/organization-invite-link-api.service";
 import { OrganizationInviteLinkService } from "../abstractions/organization-invite-link.service";
-import { OrganizationInviteLinkCreateRequest } from "../models/requests/organization-invite-link-create.request";
-import { OrganizationInviteLinkResponseModel } from "../models/responses/organization-invite-link.response";
+import { OrganizationInviteLinkView } from "../models/organization-invite-link.view";
 import { ORGANIZATION_INVITE_LINK_KEY } from "../state/organization-invite-link-state";
 
 export class DefaultOrganizationInviteLinkService implements OrganizationInviteLinkService {
   constructor(
-    private readonly keyService: KeyService,
-    private readonly encryptService: EncryptService,
-    private readonly keyGenerationService: KeyGenerationService,
-    private readonly apiService: OrganizationInviteLinkApiService,
     private readonly stateProvider: StateProvider,
+    private readonly environmentService: EnvironmentService,
+    private readonly sdkService: SdkService,
   ) {}
 
-  inviteLink$(userId: UserId): Observable<OrganizationInviteLinkResponseModel | undefined> {
-    return this.stateProvider
-      .getUser(userId, ORGANIZATION_INVITE_LINK_KEY)
-      .state$.pipe(map((state) => state ?? undefined));
-  }
-
-  async createInviteLink(
+  inviteLink$(
     userId: UserId,
     orgId: OrganizationId,
-    domains: string[],
-  ): Promise<string> {
-    const rawInviteKey = await this.generateCryptoBundle();
-
-    const orgKey = await firstValueFrom(
-      this.keyService.orgKeys$(userId).pipe(
-        map((orgKeys) => {
-          const orgKey = orgKeys?.[orgId as OrganizationId] ?? undefined;
-          if (orgKey == null) {
-            throw new Error(`Organization key not found for org ${orgId}`);
-          }
-
-          return orgKey;
-        }),
-      ),
+  ): Observable<OrganizationInviteLinkView | undefined> {
+    return this.stateProvider.getUser(userId, ORGANIZATION_INVITE_LINK_KEY).state$.pipe(
+      map((record) => record?.[orgId]),
+      switchMap((cached) => (cached == null ? this.get(userId, orgId) : of(cached))),
     );
-
-    const encryptedInviteKey = await this.encryptService.wrapSymmetricKey(rawInviteKey, orgKey);
-
-    const request = new OrganizationInviteLinkCreateRequest({
-      allowedDomains: domains,
-      encryptedInviteKey,
-    });
-
-    const response = await this.apiService.create(orgId, request);
-    await this.upsert(userId, response);
-
-    return this.buildInviteUrl(response.code, rawInviteKey.keyB64);
   }
 
-  async refreshInviteLink(userId: UserId, orgId: OrganizationId): Promise<string> {
-    const cached = await firstValueFrom(this.inviteLink$(userId));
-    const domains = cached?.allowedDomains ?? [];
-    return this.createInviteLink(userId, orgId, domains);
-  }
-
-  async reconstructUrl(userId: UserId, orgId: OrganizationId): Promise<string | undefined> {
-    const response = await this.apiService.get(orgId);
-    if (response == null) {
-      return;
+  async create(
+    userId: UserId,
+    orgId: OrganizationId,
+    allowedDomains: string[],
+    supportsConfirmation: boolean,
+  ): Promise<void> {
+    if (allowedDomains.length === 0) {
+      throw new Error("At least one allowed domain is required.");
     }
 
-    await this.upsert(userId, response);
-
-    const orgKey = await firstValueFrom(
-      this.keyService.orgKeys$(userId).pipe(
-        map((orgKeys) => {
-          const orgKey = orgKeys?.[orgId] ?? undefined;
-          if (orgKey == null) {
-            throw new Error(`Organization key not found for org ${orgId}`);
-          }
-
-          return orgKey;
+    await firstValueFrom(
+      this.sdkService.userClient$(userId).pipe(
+        concatMap(async (sdk) => {
+          using ref = sdk.take();
+          return await ref.value
+            .invite_link()
+            .admin()
+            .create(asUuid<SdkOrganizationId>(orgId), allowedDomains, supportsConfirmation);
         }),
+        concatMap((sdkView) => this.upsert(userId, sdkView)),
       ),
     );
-
-    const encKey = new EncString(response.encryptedInviteKey);
-    const rawInviteKey = await this.encryptService.unwrapSymmetricKey(encKey, orgKey);
-
-    return this.buildInviteUrl(response.code, rawInviteKey.keyB64);
   }
 
-  private buildInviteUrl(code: string, keyB64: string): string {
-    return `/#/join/${code}?key=${keyB64}`;
+  async updateAllowedDomains(
+    userId: UserId,
+    orgId: OrganizationId,
+    allowedDomains: string[],
+  ): Promise<void> {
+    if (allowedDomains.length === 0) {
+      throw new Error("At least one allowed domain is required.");
+    }
+
+    await firstValueFrom(
+      this.sdkService.userClient$(userId).pipe(
+        concatMap(async (sdk) => {
+          using ref = sdk.take();
+          return await ref.value
+            .invite_link()
+            .admin()
+            .update_allowed_domains(asUuid<SdkOrganizationId>(orgId), allowedDomains);
+        }),
+        concatMap((sdkView) => this.upsert(userId, sdkView)),
+      ),
+    );
   }
 
-  async upsert(userId: UserId, data: OrganizationInviteLinkResponseModel): Promise<void> {
-    await this.stateProvider.getUser(userId, ORGANIZATION_INVITE_LINK_KEY).update(() => data);
+  async setInviteConfirmation(
+    userId: UserId,
+    orgId: OrganizationId,
+    supportsConfirmation: boolean,
+  ): Promise<void> {
+    await firstValueFrom(
+      this.sdkService.userClient$(userId).pipe(
+        concatMap(async (sdk) => {
+          using ref = sdk.take();
+          const inviteLink = ref.value
+            .invite_link()
+            .admin()
+            .update_confirmation(asUuid<SdkOrganizationId>(orgId), supportsConfirmation);
+          return await inviteLink;
+        }),
+        concatMap((sdkView) => this.upsert(userId, sdkView)),
+      ),
+    );
+  }
+
+  async refresh(
+    userId: UserId,
+    orgId: OrganizationId,
+    supportsConfirmation: boolean,
+  ): Promise<void> {
+    await firstValueFrom(
+      this.sdkService.userClient$(userId).pipe(
+        concatMap(async (sdk) => {
+          using ref = sdk.take();
+          return await ref.value
+            .invite_link()
+            .admin()
+            .refresh(asUuid<SdkOrganizationId>(orgId), supportsConfirmation);
+        }),
+        concatMap((sdkView) => this.upsert(userId, sdkView)),
+      ),
+    );
+  }
+
+  private async upsert(
+    userId: UserId,
+    sdkView: SdkOrganizationInviteLinkView,
+  ): Promise<OrganizationInviteLinkView> {
+    const url = await this.buildUrl(sdkView.urlFragment);
+    const view = OrganizationInviteLinkView.fromSdk(sdkView, url);
+
+    await this.stateProvider.getUser(userId, ORGANIZATION_INVITE_LINK_KEY).update((state) => {
+      const record = state ?? ({} as Record<OrganizationId, OrganizationInviteLinkView>);
+      return { ...record, [view.organizationId]: view };
+    });
+
+    return view;
   }
 
   async delete(userId: UserId, orgId: OrganizationId): Promise<void> {
-    await this.apiService.delete(orgId);
-    await this.clear(userId);
+    await firstValueFrom(
+      this.sdkService.userClient$(userId).pipe(
+        concatMap(async (sdk) => {
+          using ref = sdk.take();
+          await ref.value.invite_link().admin().delete(asUuid<SdkOrganizationId>(orgId));
+        }),
+      ),
+    );
+    await this.stateProvider
+      .getUser(userId, ORGANIZATION_INVITE_LINK_KEY)
+      .update((state) => (state == null ? state : { ...state, [orgId]: undefined }));
   }
 
-  async clear(userId: UserId): Promise<void> {
-    await this.stateProvider.getUser(userId, ORGANIZATION_INVITE_LINK_KEY).update(() => undefined);
+  private async buildUrl(urlFragment: string): Promise<string> {
+    const env = await firstValueFrom(this.environmentService.environment$);
+    return `${env.getWebVaultUrl()}/${urlFragment}`;
   }
 
-  /**
-   * Generates a raw symmetric key for the invite link.
-   *
-   * TODO: Replace with `generateOrganizationInviteCryptoBundle` from the SDK once available.
-   */
-  private async generateCryptoBundle(): Promise<SymmetricCryptoKey> {
-    return this.keyGenerationService.createKey(256);
+  private async get(
+    userId: UserId,
+    orgId: OrganizationId,
+  ): Promise<OrganizationInviteLinkView | undefined> {
+    const sdkView = await firstValueFrom(
+      this.sdkService.userClient$(userId).pipe(
+        concatMap(async (sdk) => {
+          using ref = sdk.take();
+          return await ref.value.invite_link().admin().get(asUuid<SdkOrganizationId>(orgId));
+        }),
+      ),
+    );
+
+    if (sdkView == null) {
+      return undefined;
+    }
+
+    return await this.upsert(userId, sdkView);
   }
 }

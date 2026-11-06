@@ -1,7 +1,6 @@
 // FIXME: Update this file to be type safe and remove this and next line
 // @ts-strict-ignore
 import { OptionValues } from "commander";
-import * as inquirer from "inquirer";
 import { firstValueFrom } from "rxjs";
 
 import {
@@ -10,8 +9,16 @@ import {
 } from "@bitwarden/common/admin-console/abstractions/organization/organization.service.abstraction";
 import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
 import { getUserId } from "@bitwarden/common/auth/services/account.service";
+import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
+import { LogService } from "@bitwarden/common/platform/abstractions/log.service";
 import { SyncService } from "@bitwarden/common/vault/abstractions/sync/sync.service.abstraction";
-import { ImportServiceAbstraction, ImportType } from "@bitwarden/importer-core";
+import {
+  CredentialKind,
+  ImportRecordErrorReason,
+  ImportServiceAbstraction,
+  ImportType,
+  SdkImportCredentials,
+} from "@bitwarden/importer-core";
 
 import { Response } from "../models/response";
 import { MessageResponse } from "../models/response/message.response";
@@ -23,6 +30,8 @@ export class ImportCommand {
     private organizationService: OrganizationService,
     private syncService: SyncService,
     private accountService: AccountService,
+    private logService: LogService,
+    private i18nService: I18nService,
   ) {}
 
   async run(format: ImportType, filepath: string, options: OptionValues): Promise<Response> {
@@ -52,22 +61,57 @@ export class ImportCommand {
     if (options.formats || false) {
       return await this.list();
     } else {
-      return await this.import(format, filepath, organizationId);
+      return await this.import(format, filepath, organizationId, options);
     }
   }
 
-  private async import(format: ImportType, filepath: string, organizationId: string) {
+  private async import(
+    format: ImportType,
+    filepath: string,
+    organizationId: string,
+    options: OptionValues,
+  ) {
     if (format == null) {
       return Response.badRequest("`format` was not provided.");
+    }
+    const importOption = this.importService.getImportOption(format);
+    // A format without file types signs in to the vendor instead, which only the apps can do.
+    if (importOption != null && importOption.acceptedFileTypes.length === 0) {
+      return Response.badRequest(this.i18nService.t("importDirectOnlyError", importOption.name));
     }
     if (filepath == null || filepath === "") {
       return Response.badRequest("`filepath` was not provided.");
     }
-    const promptForPassword_callback = async () => {
-      return await this.promptPassword();
-    };
+
+    // SDK-backed importers parse/encrypt/submit entirely in the SDK.
+    if (importOption?.sdk != null) {
+      return await this.importWithSdk(format, filepath, organizationId, options);
+    }
+
+    // Lazy-load jsdom and polyfill DOMParser only when actually running an import.
+    // jsdom is heavy and only needed by the XML/HTML importers; loading it eagerly
+    // slows CLI startup for every other command.
+    const { JSDOM } = await import("jsdom");
+    global.DOMParser = new JSDOM().window.DOMParser;
+
+    const promptForPassword_callback = () => this.resolveImportPassword(options);
+
+    // The web UI exposes the Keeper method via a dropdown
+    // The CLI infers it from the file extension when the user passes the unified `keeper` ID
+    let resolvedFormat: ImportType = format;
+    if (format === "keeper") {
+      const lower = filepath.toLowerCase();
+      if (lower.endsWith(".csv")) {
+        resolvedFormat = "keepercsv";
+      } else if (lower.endsWith(".json")) {
+        resolvedFormat = "keeperjson";
+      } else {
+        return Response.badRequest("Cannot determine Keeper file type. Use a .csv or .json file.");
+      }
+    }
+
     const importer = await this.importService.getImporter(
-      format,
+      resolvedFormat,
       promptForPassword_callback,
       organizationId,
     );
@@ -91,9 +135,23 @@ export class ImportCommand {
 
       const response = await this.importService.import(importer, contents, organizationId);
       if (response.success) {
-        // FIXME: Verify that this floating promise is intentional. If it is, add an explanatory comment and ensure there is proper error handling.
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        this.syncService.fullSync(true);
+        await this.syncService.fullSync(true);
+
+        // Some items may have been skipped while the rest imported. Report which ones and why.
+        const skipped = response.errors ?? [];
+        if (skipped.length > 0) {
+          const details = skipped
+            .map(
+              (e) =>
+                `  - ${e.id != null && e.id.trim() !== "" ? e.id : "(unidentified item)"}: ${this.importErrorReasonText(e.reason)}`,
+            )
+            .join("\n");
+          const message = `${skipped.length} item(s) could not be imported and were skipped:\n${details}`;
+          const res = new MessageResponse("Imported " + filepath, message);
+          res.raw = message;
+          return Response.success(res);
+        }
+
         return Response.success(new MessageResponse("Imported " + filepath, null));
       }
     } catch (err) {
@@ -104,9 +162,91 @@ export class ImportCommand {
     }
   }
 
+  private async importWithSdk(
+    format: ImportType,
+    filepath: string,
+    organizationId: string,
+    options: OptionValues,
+  ) {
+    let file: Uint8Array;
+    try {
+      file = await CliUtils.readBinaryFile(filepath);
+    } catch {
+      return Response.badRequest(`Could not read file: ${filepath}`);
+    }
+    if (file == null || file.length === 0) {
+      return Response.badRequest("Import file was empty.");
+    }
+
+    try {
+      const credentials = await this.collectSdkCredentials(
+        this.importService.getImportOption(format)?.sdk?.credentialKind,
+        options,
+      );
+
+      const summary = await this.importService.importWithSdk(
+        format,
+        file,
+        credentials,
+        organizationId,
+        undefined,
+        // run() already rejected callers without import permission for this org
+        true,
+      );
+      const total = summary.ciphers.reduce((count, c) => count + c.count, 0);
+
+      await this.syncService.fullSync(true);
+      return Response.success(
+        new MessageResponse(`Imported ${total} item(s) from ${filepath}`, null),
+      );
+    } catch (err) {
+      const messageKey = this.importService.sdkErrorMessageKey(format, err);
+      if (messageKey != null) {
+        return Response.badRequest(this.i18nService.t(messageKey));
+      }
+      return Response.badRequest(err.message ?? err);
+    }
+  }
+
+  /** Collects the credentials an SDK importer declared, from CLI flags/prompts. */
+  private async collectSdkCredentials(
+    kind: CredentialKind | undefined,
+    options: OptionValues,
+  ): Promise<SdkImportCredentials> {
+    switch (kind) {
+      case CredentialKind.password:
+        return { kind: "password", password: await this.resolveImportPassword(options) };
+      case CredentialKind.passwordWithKeyFile: {
+        const password = await this.resolveImportPassword(options);
+        // A key file may optionally protect the database in addition to the password.
+        const keyFile = options.keyfile ? await CliUtils.readBinaryFile(options.keyfile) : null;
+        return { kind: "passwordWithKeyFile", password, keyFile };
+      }
+      default:
+        return { kind: "none" };
+    }
+  }
+
+  private importErrorReasonText(reason: ImportRecordErrorReason): string {
+    switch (reason) {
+      case ImportRecordErrorReason.SshKeyParseFailed:
+        return "SSH key could not be imported";
+      case ImportRecordErrorReason.UnsupportedType:
+        return "unsupported item type";
+      case ImportRecordErrorReason.UnsupportedFeature:
+        return "unsupported feature";
+      case ImportRecordErrorReason.FolderDecryptionFailed:
+        return "folder could not be decrypted";
+      default:
+        return "could not be imported";
+    }
+  }
+
   private async list() {
     const options = this.importService
       .getImportOptions()
+      // The CLI imports from a file, so a direct-only format has no route here to advertise.
+      .filter((option) => option.acceptedFileTypes.length > 0)
       .sort((a, b) => {
         return a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
       })
@@ -117,14 +257,20 @@ export class ImportCommand {
     return Response.success(res);
   }
 
-  private async promptPassword() {
-    const answer: inquirer.Answers = await inquirer.createPromptModule({
-      output: process.stderr,
-    })({
-      type: "password",
-      name: "password",
-      message: "Import file password:",
-    });
-    return answer.password;
+  private async resolveImportPassword(options: OptionValues): Promise<string> {
+    const password = await CliUtils.getPassword(
+      null,
+      { passwordFile: options.passwordfile, passwordEnv: options.passwordenv },
+      this.logService,
+      "Import file password:",
+    );
+    if (password instanceof Response) {
+      // BW_NOINTERACTION with no password source. Throwing surfaces as a badRequest via the
+      // import() catch block (and aborts the importer's credentials callback).
+      throw new Error(
+        "Import file password is required. Provide --passwordfile or --passwordenv, or run interactively.",
+      );
+    }
+    return password;
   }
 }

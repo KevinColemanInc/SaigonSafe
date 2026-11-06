@@ -4,8 +4,9 @@ import { Jsonify } from "type-fest";
 
 import { MemberDecryptionType } from "../../../auth/enums/sso";
 import { ProductTierType } from "../../../billing/enums";
+import { ProviderType } from "../../../provider/enums";
 import { OrganizationId } from "../../../types/guid";
-import { OrganizationUserStatusType, OrganizationUserType, ProviderType } from "../../enums";
+import { OrganizationUserStatusType, OrganizationUserType } from "../../enums";
 import { PermissionsApi } from "../api/permissions.api";
 import { OrganizationData } from "../data/organization.data";
 
@@ -37,6 +38,12 @@ export class Organization {
   useResetPassword: boolean;
   useSecretsManager: boolean;
   usePasswordManager: boolean;
+  usePam: boolean;
+  /**
+   * This member's own PAM seat, drawn against the organization's {@link usePam} subscription.
+   * Acting on a governed item needs both; see {@link canAccessPrivilegedAccess}.
+   */
+  accessPam: boolean;
   useActivateAutofillPolicy: boolean;
   useAutomaticUserConfirmation: boolean;
   selfHost: boolean;
@@ -78,21 +85,21 @@ export class Organization {
   limitCollectionDeletion: boolean;
 
   /**
-   * Refers to the ability for an owner/admin to access all collection items, regardless of assigned collections
-   */
-  limitItemDeletion: boolean;
-  /**
    * Refers to the ability to limit delete permission of collection items.
    * If set to true, members can only delete items when they have a Can Manage permission over the collection.
    * If set to false, members can delete items when they have a Can Manage OR Can Edit permission over the collection.
    */
+  limitItemDeletion: boolean;
+  /**
+   * Refers to the ability for an owner/admin to access all collection items, regardless of assigned collections
+   */
   allowAdminAccessToAllCollectionItems: boolean;
   /**
-   * Indicates if this organization manages the user.
-   * A user is considered managed by an organization if their email domain
+   * Indicates if this organization claims the user.
+   * A user is considered claimed by an organization if their email domain
    * matches one of the verified domains of that organization, and the user is a member of it.
    */
-  userIsManagedByOrganization: boolean;
+  userIsClaimedByOrganization: boolean;
   useAccessIntelligence: boolean;
   useAdminSponsoredFamilies: boolean;
   useDisableSMAdsForUsers: boolean;
@@ -128,6 +135,8 @@ export class Organization {
     this.useResetPassword = obj.useResetPassword;
     this.useSecretsManager = obj.useSecretsManager;
     this.usePasswordManager = obj.usePasswordManager;
+    this.usePam = obj.usePam;
+    this.accessPam = obj.accessPam;
     this.useActivateAutofillPolicy = obj.useActivateAutofillPolicy;
     this.useAutomaticUserConfirmation = obj.useAutomaticUserConfirmation;
     this.selfHost = obj.selfHost;
@@ -160,7 +169,7 @@ export class Organization {
     this.limitCollectionDeletion = obj.limitCollectionDeletion;
     this.limitItemDeletion = obj.limitItemDeletion;
     this.allowAdminAccessToAllCollectionItems = obj.allowAdminAccessToAllCollectionItems;
-    this.userIsManagedByOrganization = obj.userIsManagedByOrganization;
+    this.userIsClaimedByOrganization = obj.userIsClaimedByOrganization;
     this.useAccessIntelligence = obj.useAccessIntelligence;
     this.useAdminSponsoredFamilies = obj.useAdminSponsoredFamilies;
     this.useDisableSMAdsForUsers = obj.useDisableSMAdsForUsers ?? false;
@@ -238,6 +247,19 @@ export class Organization {
     );
   }
 
+  /**
+   * Whether the user can assign collection access to a group. Members with the Manage Groups
+   * custom permission can only do so when collection management settings permit admin access to
+   * all collection items; users who can edit any collection outright are unaffected by that
+   * setting.
+   */
+  get canAssignAccessToAnyCollection() {
+    return (
+      this.canEditAnyCollection ||
+      (this.permissions.manageGroups && this.allowAdminAccessToAllCollectionItems)
+    );
+  }
+
   get canEditUnmanagedCollections() {
     // Any admin or custom user with editAnyCollection permission can edit unmanaged collections
     return this.isAdmin || this.permissions.editAnyCollection;
@@ -310,6 +332,26 @@ export class Organization {
     return (this.isAdmin || this.permissions.managePolicies) && this.usePolicies;
   }
 
+  /**
+   * Whether the member may author access rules. Mirrors the server's
+   * `ManageAccessRulesRequirement`, which admits no provider, though {@link isAdmin} counts one as
+   * an Owner.
+   */
+  get canManageAccessRules() {
+    return (
+      (this.isAdmin || this.permissions.manageAccessRules) && this.usePam && !this.isProviderUser
+    );
+  }
+
+  /**
+   * Whether the member may administer access connectors, their target systems and rotation
+   * configs. Mirrors the server's `ManageAccessConnectorRequirement`, which also admits no
+   * provider.
+   */
+  get canManageRotation() {
+    return (this.isAdmin || this.permissions.manageRotation) && this.usePam && !this.isProviderUser;
+  }
+
   get canManageUsers() {
     return this.isAdmin || this.permissions.manageUsers;
   }
@@ -373,6 +415,13 @@ export class Organization {
   get hasReseller() {
     return this.hasProvider && this.providerType === ProviderType.Reseller;
   }
+  /**
+   * Whether this member may use PAM. Mirrors the server's `CurrentContextOrganization.AccessPam`.
+   * An admin without a seat can manage PAM but not use it.
+   */
+  get canAccessPrivilegedAccess() {
+    return this.usePam && this.accessPam;
+  }
 
   get canAccessSecretsManager() {
     return this.useSecretsManager && this.accessSecretsManager;
@@ -417,6 +466,6 @@ export class Organization {
   }
 
   get canUseAccessIntelligence() {
-    return this.productTierType === ProductTierType.Enterprise;
+    return this.useAccessIntelligence;
   }
 }

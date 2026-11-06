@@ -1,10 +1,10 @@
 // FIXME: Update this file to be type safe and remove this and next line
 // @ts-strict-ignore
 import { CommonModule } from "@angular/common";
-import { Component, computed, DestroyRef, input, Input, OnInit } from "@angular/core";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { Component, computed, DestroyRef, inject, input, Input, OnInit } from "@angular/core";
+import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from "@angular/forms";
-import { concatMap, distinctUntilChanged, firstValueFrom, map } from "rxjs";
+import { concatMap, distinctUntilChanged, firstValueFrom, map, of, switchMap } from "rxjs";
 
 import { JslibModule } from "@bitwarden/angular/jslib.module";
 import { ClientType } from "@bitwarden/client-type";
@@ -16,6 +16,7 @@ import {
 } from "@bitwarden/common/admin-console/models/collections";
 import { Organization } from "@bitwarden/common/admin-console/models/domain/organization";
 import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
+import { AvatarService } from "@bitwarden/common/auth/abstractions/avatar.service";
 import { getUserId } from "@bitwarden/common/auth/services/account.service";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
@@ -23,16 +24,21 @@ import { Utils } from "@bitwarden/common/platform/misc/utils";
 import { CollectionId, OrganizationId, UserId } from "@bitwarden/common/types/guid";
 import { CipherView } from "@bitwarden/common/vault/models/view/cipher.view";
 import {
-  BadgeComponent,
   CardComponent,
+  ChipActionComponent,
   FormFieldModule,
+  getAvatarDefaultColor,
   IconButtonModule,
+  IconTileOptions,
   SectionHeaderComponent,
   SelectItemView,
   SelectModule,
   TypographyModule,
 } from "@bitwarden/components";
 
+import { orgIconTile, personalIconTile } from "../../../models/vault-icon-tile";
+import { Vfo1I18nPipe } from "../../../pipes/vfo1-i18n.pipe";
+import { Vfo1TerminologyService } from "../../../services/vfo1-terminology.service";
 import {
   CipherFormConfig,
   OptionalInitialValues,
@@ -46,6 +52,7 @@ import { CipherFormContainer } from "../../cipher-form-container";
   templateUrl: "./item-details-section.component.html",
   imports: [
     CardComponent,
+    ChipActionComponent,
     TypographyModule,
     FormFieldModule,
     ReactiveFormsModule,
@@ -54,10 +61,15 @@ import { CipherFormContainer } from "../../cipher-form-container";
     IconButtonModule,
     JslibModule,
     CommonModule,
-    BadgeComponent,
+    Vfo1I18nPipe,
   ],
 })
 export class ItemDetailsSectionComponent implements OnInit {
+  private vfo1TerminologyService = inject(Vfo1TerminologyService);
+  protected readonly vfo1Enabled = this.vfo1TerminologyService.enabled;
+
+  private avatarService = inject(AvatarService);
+
   itemDetailsForm = this.formBuilder.group({
     name: ["", [Validators.required]],
     organizationId: [null],
@@ -175,6 +187,30 @@ export class ItemDetailsSectionComponent implements OnInit {
       });
   }
 
+  /**
+   * Icon tiles per organization id, colored to match the vault's tile in the side nav and item
+   * table. Built once from {@link organizations} so each template binding gets a stable object —
+   * `bit-select` maps its options in an `afterRenderEffect` that re-runs on a changed reference.
+   */
+  protected orgIconTiles = new Map<string, IconTileOptions>();
+
+  /**
+   * The personal vault's icon tile, tinted to the user's avatar color once it resolves. Falls back
+   * to the palette default so the tile never renders uncolored while the color loads.
+   */
+  protected readonly personalVaultTile = toSignal(
+    this.accountService.activeAccount$.pipe(
+      switchMap((account) =>
+        account
+          ? this.avatarService
+              .getUserAvatarColor$(account.id)
+              .pipe(map((color) => personalIconTile(color ?? getAvatarDefaultColor(account.id))))
+          : of(personalIconTile("brand")),
+      ),
+    ),
+    { initialValue: personalIconTile("brand") },
+  );
+
   get favoriteIcon() {
     return this.itemDetailsForm.controls.favorite.value ? "bwi-star-f" : "bwi-star";
   }
@@ -209,19 +245,23 @@ export class ItemDetailsSectionComponent implements OnInit {
   }
 
   get defaultOwner() {
-    return this.allowPersonalOwnership ? null : this.organizations[0].id;
+    // Default to personal ownership if permitted or if there are no other alternatives
+    // (in which case the top level component will show an error toast on submit)
+    if (this.allowPersonalOwnership || this.organizations.length === 0) {
+      return null;
+    }
+    return this.organizations[0].id;
   }
 
   async ngOnInit() {
     this.organizations = this.config.organizations.sort(
       Utils.getSortFunction(this.i18nService, "name"),
     );
+    this.orgIconTiles = new Map(
+      this.organizations.map((org) => [org.id, orgIconTile(org.productTierType)]),
+    );
 
     this.userId = await firstValueFrom(this.accountService.activeAccount$.pipe(getUserId));
-
-    if (!this.allowPersonalOwnership && this.organizations.length === 0) {
-      throw new Error("No organizations available for ownership.");
-    }
 
     const prefillCipher = this.cipherFormContainer.getInitialCipherView();
 
@@ -367,9 +407,14 @@ export class ItemDetailsSectionComponent implements OnInit {
 
   private setCollectionControlState() {
     const initialCipherView = this.cipherFormContainer.getInitialCipherView();
+    // These permission checks are only meaningful for existing, server-fetched ciphers whose
+    // edit/viewPassword flags reflect real server-side permissions. Skip for new ciphers (no id).
+    if (!initialCipherView?.id) {
+      return;
+    }
     const orgId = this.itemDetailsForm.controls.organizationId.value as OrganizationId;
     const organization = this.organizations.find((o) => o.id === orgId);
-    if (!organization || !initialCipherView) {
+    if (!organization) {
       return;
     }
     // Disable the collection control if either of the following apply:

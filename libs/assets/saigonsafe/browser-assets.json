@@ -8,7 +8,7 @@
     },
     {
       "path": "scripts/branding/generate-browser-assets.cjs",
-      "sha256": "8bb9e1f4e2ce3d39b52aa5b63bb5767896295a500c00f1a45101456ccb0bd837"
+      "sha256": "d72e1fd86439c1acdba96500dde616a31f8983418637911792f5f9f106942942"
     }
   ],
   "outputs": [
@@ -23,6 +23,10 @@
     {
       "path": "libs/assets/src/svg/svgs/bitwarden-logo.icon.ts",
       "sha256": "ebba26e5153699e0a8fd5ad01490372ead92ba5dc0b845061098a80e6d206a5f"
+    },
+    {
+      "path": "libs/assets/src/svg/svgs/bitwarden-logo-beta.icon.ts",
+      "sha256": "2739cb3b167c5c171db2082bd5dc1fa2478d4b7cde0be0b97d72d1691e58f225"
     },
     {
       "path": "libs/assets/src/svg/svgs/bitwarden-icon.ts",
@@ -86,7 +90,7 @@
     },
     {
       "path": "apps/browser/src/images/icon16.png",
-      "sha256": "0e2ad275e5a8c5acc02887bbe28addd4c03190fa7b4ee07c8dd495d105e3fbd6",
+      "sha256": "773605526c0114b32b5237703d1ff4c49a0aef15a48fba82df9e1b1fc306b830",
       "width": 16,
       "height": 16,
       "source": "libs/assets/saigonsafe/browser/icon16.svg"
@@ -97,7 +101,7 @@
     },
     {
       "path": "apps/browser/src/images/icon16_gray.png",
-      "sha256": "3d38c91234174474ffb95873939f6fd95aa548e721cd5c1cdc6909f1c3f85e83",
+      "sha256": "530173b9ad462e7a2a9b968fff50049677000889188d2667c79af66434887eda",
       "width": 16,
       "height": 16,
       "source": "libs/assets/saigonsafe/browser/icon16_gray.svg"
@@ -108,7 +112,7 @@
     },
     {
       "path": "libs/assets/saigonsafe/local-build/icon16.png",
-      "sha256": "5f334bff381f9b327917a13990ad52d2a9733c7cf95e2e7f909a992f3d7a5368",
+      "sha256": "2b7b5f11b4bd0682bb7f08318c2786fccf60265476dc1ffce8261414f88321d8",
       "width": 16,
       "height": 16,
       "source": "libs/assets/saigonsafe/browser/local-build/icon16.svg"
@@ -119,7 +123,7 @@
     },
     {
       "path": "libs/assets/saigonsafe/local-build/icon16_gray.png",
-      "sha256": "b72fc4e96c6784dc17afb53584db5eb083540ad934fb790207bbd31eaa630304",
+      "sha256": "78e044ef59ba7974fbd178f5d9a0ddf0c711007d7fd32669ddbc74da8804dae0",
       "width": 16,
       "height": 16,
       "source": "libs/assets/saigonsafe/browser/local-build/icon16_gray.svg"
@@ -130,7 +134,7 @@
     },
     {
       "path": "apps/browser/src/images/icon19.png",
-      "sha256": "b75c1a32db5a7c44253d0f724776ec6533acb983d68d71c67adaed24da2c35d7",
+      "sha256": "8b15c2b9aca77a910e3f591c6bf648f9ee126de19af585ed3c255d001767a65f",
       "width": 19,
       "height": 19,
       "source": "libs/assets/saigonsafe/browser/icon19.svg"
@@ -141,7 +145,7 @@
     },
     {
       "path": "apps/browser/src/images/icon19_gray.png",
-      "sha256": "c9b9c73eca4d46879644c2f862db2480947e74259130b2aeae1a2b1b70cad39f",
+      "sha256": "6f90434f70493a834be694e41c9ccd21869b5927f96013d9bfe4b40119b30312",
       "width": 19,
       "height": 19,
       "source": "libs/assets/saigonsafe/browser/icon19_gray.svg"
@@ -152,7 +156,7 @@
     },
     {
       "path": "libs/assets/saigonsafe/local-build/icon19.png",
-      "sha256": "62acc2053202011988cff6d331a6e9d4b341ec2de11683fdcdacc760ca0cf96a",
+      "sha256": "094ca88299b02fb1c3e6cab00c4522f9190864ab74c016f03bec6555390e7a95",
       "width": 19,
       "height": 19,
       "source": "libs/assets/saigonsafe/browser/local-build/icon19.svg"
@@ -163,7 +167,7 @@
     },
     {
       "path": "libs/assets/saigonsafe/local-build/icon19_gray.png",
-      "sha256": "b31fc14f4893ce1322ee10bdb28467295030a8c420da052303f2daed4fe7afb3",
+      "sha256": "e69586cb420bdf03a29c966502b580cdc390c3984af6510b4a1353e927d9d539",
       "width": 19,
       "height": 19,
       "source": "libs/assets/saigonsafe/browser/local-build/icon19_gray.svg"
@@ -174,7 +178,7 @@
     },
     {
       "path": "apps/browser/src/images/icon32.png",
-      "sha256": "1397c7ed8d170074f9d6e33eaa07352a38ee9181807829e9d8e072be0a90dde5",
+      "sha256": "2afeeb517176c8c9ce1cf158a2f1e321939a6e167df51c50f8e66dac9badfc5f",
       "width": 32,
       "height": 32,
       "source": "libs/assets/saigonsafe/browser/icon32.svg"
@@ -185,7 +189,7 @@
     },
     {
       "path": "apps/browser/src/images/icon32_gray.png",
-      "sha256": "ad6fdf5d4625c31b0eb3adfa4cf52bd9839d4ade87fc6d8fa94b530422c398e1",
+      "sha256": "ba7b3f5b9c94926e3666d959fe725047a7dd773070ccc89e207b185f64a0b00f",
       "width": 32,
       "height": 32,
       "source": "libs/assets/saigonsafe/browser/icon32_gray.svg"
@@ -196,7 +200,7 @@
     },
     {
       "path": "libs/assets/saigonsafe/local-build/icon32.png",
-      "sha256": "d574684afaec098c7fe51f0f1722ab8def95658a79f1d312662272cc4c5d1e8f",
+      "sha256": "65adbe94203d0dad6808d5d1835362bd71b853f7ebe8fbc34bf600b873081e3a",
       "width": 32,
       "height": 32,
       "source": "libs/assets/saigonsafe/browser/local-build/icon32.svg"
@@ -207,7 +211,7 @@
     },
     {
       "path": "libs/assets/saigonsafe/local-build/icon32_gray.png",
-      "sha256": "610a3b1200555610fa401b982af60030d8208c9f91bd5dbf54eafba7e2136ccf",
+      "sha256": "ffc2c7abdf458fada8e2b08fc559892173608f0707dfb7e23c142c10c1eefc40",
       "width": 32,
       "height": 32,
       "source": "libs/assets/saigonsafe/browser/local-build/icon32_gray.svg"
@@ -218,7 +222,7 @@
     },
     {
       "path": "apps/browser/src/images/icon38.png",
-      "sha256": "3bf131854af7b3eda63c4d847ca78eb5b26cb4d99deb215bb99f3bcedb054396",
+      "sha256": "40b8fc3415a6102fe631ec69c0ef35f5650d8ba5198645a2768fd7e55ac4ef09",
       "width": 38,
       "height": 38,
       "source": "libs/assets/saigonsafe/browser/icon38.svg"
@@ -229,7 +233,7 @@
     },
     {
       "path": "apps/browser/src/images/icon38_gray.png",
-      "sha256": "ce038402376162a4b682b55c9d8a8ecd713d2c2ecbcd4faac9fc3d1c8013a73e",
+      "sha256": "01108b5a6ee910da2163ad0d75cb1543a8ef790c2dbb8a2ff2b115ab48e1a912",
       "width": 38,
       "height": 38,
       "source": "libs/assets/saigonsafe/browser/icon38_gray.svg"
@@ -240,7 +244,7 @@
     },
     {
       "path": "libs/assets/saigonsafe/local-build/icon38.png",
-      "sha256": "b2c7676d4ee8d69ee4313abdfb3c8fdaa22349113eff33ed8226f556b45ea8ac",
+      "sha256": "b1816eabe0eb815d586d458ce1ed79245fca07d74c07b0647f5a728c459ac5a9",
       "width": 38,
       "height": 38,
       "source": "libs/assets/saigonsafe/browser/local-build/icon38.svg"
@@ -251,7 +255,7 @@
     },
     {
       "path": "libs/assets/saigonsafe/local-build/icon38_gray.png",
-      "sha256": "c18088aaaf1227db0141a296743d8f07ee85bef385ea8a2da4f6a88c364f2850",
+      "sha256": "c6ca61061e696bc6e01d0c2c138e99d451fd0fd27f59e917b4b2b7d6b9441bcf",
       "width": 38,
       "height": 38,
       "source": "libs/assets/saigonsafe/browser/local-build/icon38_gray.svg"
@@ -262,7 +266,7 @@
     },
     {
       "path": "apps/browser/src/images/icon48.png",
-      "sha256": "7111fbb3097a25108ac58651ff311e9e5396d5b910da2f0e06717e0f45f0d542",
+      "sha256": "98fd74e5cc06a2b970513aa9f85dcf4bcffd841796d12df683639521e2e699ee",
       "width": 48,
       "height": 48,
       "source": "libs/assets/saigonsafe/browser/icon48.svg"
@@ -273,7 +277,7 @@
     },
     {
       "path": "apps/browser/src/images/icon48_gray.png",
-      "sha256": "b4d58e0ad0b25e7f06cd4c81dda75ab8314c9ad72dca107113bc67955deb9fb5",
+      "sha256": "6d38ced163401567c1474d6a2fe5c0f072bb416be5cbe16312869fd2fd203174",
       "width": 48,
       "height": 48,
       "source": "libs/assets/saigonsafe/browser/icon48_gray.svg"
@@ -284,7 +288,7 @@
     },
     {
       "path": "libs/assets/saigonsafe/local-build/icon48.png",
-      "sha256": "af7788fdd70fd186b33cc144696c6d3ffa054b4232b205d785b0427d4ecf90be",
+      "sha256": "90aa672ceb7284315fc74c890ad32aebd44d0946afe20af2a9d1d0b559d2e941",
       "width": 48,
       "height": 48,
       "source": "libs/assets/saigonsafe/browser/local-build/icon48.svg"
@@ -295,7 +299,7 @@
     },
     {
       "path": "libs/assets/saigonsafe/local-build/icon48_gray.png",
-      "sha256": "b1e25a8e75e1e4d8fa7d0634c624806f0d6e04b7a891a9d83ea463805b76ac5a",
+      "sha256": "b514f6e4da95c25df97b1b9568dc31c7130c5dde6cd52878efccdd2d0ec9bf91",
       "width": 48,
       "height": 48,
       "source": "libs/assets/saigonsafe/browser/local-build/icon48_gray.svg"
@@ -306,7 +310,7 @@
     },
     {
       "path": "apps/browser/src/images/icon96.png",
-      "sha256": "d34965cddd52664bd84d87f9804a4848e5b925253e36157611afe2664a095631",
+      "sha256": "11ff375ec1eb234e1d56c8012dbf4f9ed7344b290824472da9890b153a44934f",
       "width": 96,
       "height": 96,
       "source": "libs/assets/saigonsafe/browser/icon96.svg"
@@ -317,7 +321,7 @@
     },
     {
       "path": "apps/browser/src/images/icon96_gray.png",
-      "sha256": "da3ee742124e8b599e7f7271f3073bcaa3ce85408eb971f7827f632551f2faf6",
+      "sha256": "b186e2cea2c2b4503c8ef51e0e4597e41d1a32af07a118b8cf0c4a70993b34f2",
       "width": 96,
       "height": 96,
       "source": "libs/assets/saigonsafe/browser/icon96_gray.svg"
@@ -328,7 +332,7 @@
     },
     {
       "path": "libs/assets/saigonsafe/local-build/icon96.png",
-      "sha256": "e89cfa56af51957f0966de8130988d2fe445482840e08c16d119353c223433eb",
+      "sha256": "93bfeee7a2b347394b6c9094b800a7b415fb18b7743efc05b7c93a34e3464b70",
       "width": 96,
       "height": 96,
       "source": "libs/assets/saigonsafe/browser/local-build/icon96.svg"
@@ -339,7 +343,7 @@
     },
     {
       "path": "libs/assets/saigonsafe/local-build/icon96_gray.png",
-      "sha256": "855d9fc8b0c65f124f19a87cfe6f99cc9a646190ae02ee8f76e7ddae92767a1f",
+      "sha256": "71d2cf549685e51e65f47e5080166e2aa62abf0f528383a2aec75b1df4a19bf0",
       "width": 96,
       "height": 96,
       "source": "libs/assets/saigonsafe/browser/local-build/icon96_gray.svg"
@@ -350,7 +354,7 @@
     },
     {
       "path": "apps/browser/src/images/icon128.png",
-      "sha256": "17930be70d253e00b7d92eab7357221dc87be7f9ccf7fb1727b5adb77bddf5e7",
+      "sha256": "c131d4fcdc7dbc6214f045557161e82c478c2bee265605bd5864f6ad3c24ae91",
       "width": 128,
       "height": 128,
       "source": "libs/assets/saigonsafe/browser/icon128.svg"
@@ -361,7 +365,7 @@
     },
     {
       "path": "apps/browser/src/images/icon128_gray.png",
-      "sha256": "c9a664b6e8baf122cb630b5accf8cce2767241591aad0cad0054bd2e68dd0110",
+      "sha256": "53eec0d7d91ad9d27b24ec5db7549a8a416457c033426edba69d299720eb33f9",
       "width": 128,
       "height": 128,
       "source": "libs/assets/saigonsafe/browser/icon128_gray.svg"
@@ -372,7 +376,7 @@
     },
     {
       "path": "libs/assets/saigonsafe/local-build/icon128.png",
-      "sha256": "001cad080bae884a64abf3884d9fd994d6e322c70964ec08a389d85c141d3223",
+      "sha256": "18224296741581a71b5c9bd992d01217d41ce9e43d7d02e341c1d71e8f3ef927",
       "width": 128,
       "height": 128,
       "source": "libs/assets/saigonsafe/browser/local-build/icon128.svg"
@@ -383,7 +387,7 @@
     },
     {
       "path": "libs/assets/saigonsafe/local-build/icon128_gray.png",
-      "sha256": "59d4096024dfdbe2da9753afda86e987cc0a674ba8a46d3817993c93ca4733cc",
+      "sha256": "d7ef9080c0a18dc810b892a628001083a60b2fb567965c86e899f97628167696",
       "width": 128,
       "height": 128,
       "source": "libs/assets/saigonsafe/browser/local-build/icon128_gray.svg"
@@ -394,7 +398,7 @@
     },
     {
       "path": "apps/browser/src/images/icon19_locked.png",
-      "sha256": "00636fcb0584db0fd3cc538e3390d9e8008c318e5f14368e146228018b7ed7a4",
+      "sha256": "f9c43f9e7923eac35718d522ef815677ddbba3900d35e650310ee225022678e3",
       "width": 19,
       "height": 19,
       "source": "libs/assets/saigonsafe/browser/icon19_locked.svg"
@@ -405,7 +409,7 @@
     },
     {
       "path": "apps/browser/src/images/berry19.png",
-      "sha256": "89ad694bc08c169441d8de0846033a10022fa352543d09bf9a9c706bcb9100ca",
+      "sha256": "f22727906c86aa98552ec629497bc528db345f93cccd1ba75069457d57effc19",
       "width": 19,
       "height": 19,
       "source": "libs/assets/saigonsafe/browser/berry19.svg"
@@ -416,7 +420,7 @@
     },
     {
       "path": "libs/assets/saigonsafe/local-build/icon19_locked.png",
-      "sha256": "77812821854f24949ccff50ea6f4517e9da94dd633768c66cfdc8fc5a4d514dd",
+      "sha256": "42cbd41522dc378b27e0587ccdd30f6e2a3e74587c260a8c387667ffe817afdf",
       "width": 19,
       "height": 19,
       "source": "libs/assets/saigonsafe/browser/local-build/icon19_locked.svg"
@@ -427,7 +431,7 @@
     },
     {
       "path": "libs/assets/saigonsafe/local-build/berry19.png",
-      "sha256": "88eec593070c08cf32bcbac0793ed1a25285c0553531c2050cb2bab6e444053d",
+      "sha256": "00f183eeff4f15629bc1875db23cf517d3a5a14f92c7475f3dbf426bc4905b74",
       "width": 19,
       "height": 19,
       "source": "libs/assets/saigonsafe/browser/local-build/berry19.svg"
@@ -438,7 +442,7 @@
     },
     {
       "path": "apps/browser/src/images/icon38_locked.png",
-      "sha256": "aa1a409228ea8c8bbb6d5d1994858f4b2cdc0b9df84c282f783ed6fc293ba8ea",
+      "sha256": "ab842a35c57bc4c5add71eff090d98ffd73b62c5751a819478a448ce03dd0e36",
       "width": 38,
       "height": 38,
       "source": "libs/assets/saigonsafe/browser/icon38_locked.svg"
@@ -449,7 +453,7 @@
     },
     {
       "path": "apps/browser/src/images/berry38.png",
-      "sha256": "6d78d42495696d92a624adc27f77f65800aa8ce00563687f0bd25c8fcf56ef48",
+      "sha256": "b968910c80d194c7709fe5bbfb9b195a88cd06e104922f510c28e76443a05143",
       "width": 38,
       "height": 38,
       "source": "libs/assets/saigonsafe/browser/berry38.svg"
@@ -460,7 +464,7 @@
     },
     {
       "path": "libs/assets/saigonsafe/local-build/icon38_locked.png",
-      "sha256": "101db1a0d777e9212b07cffc3d21fe8ed1a32ba73df35ff47f63088f52818111",
+      "sha256": "38261351f0c60c6bce062877abc81db7006fd1c111441037751860290707a40b",
       "width": 38,
       "height": 38,
       "source": "libs/assets/saigonsafe/browser/local-build/icon38_locked.svg"
@@ -471,7 +475,7 @@
     },
     {
       "path": "libs/assets/saigonsafe/local-build/berry38.png",
-      "sha256": "8d4cb0e3be464cd253e35c55af97cb16d30f5a1294a78acd5ddb9b5a9a2b2cc9",
+      "sha256": "dd94fb87b55832546e612ff8fe615a7f211507390a3d9aecaed5ced96c117ca3",
       "width": 38,
       "height": 38,
       "source": "libs/assets/saigonsafe/browser/local-build/berry38.svg"
@@ -482,7 +486,7 @@
     },
     {
       "path": "apps/browser/src/images/icon18_safari.png",
-      "sha256": "7f9b1d204cd4eadcb56db179c6e1a1027d66c0c62ecdbe08fbef236ab0fb1192",
+      "sha256": "d4d1ab1919d3f4d13d386a583bfefb56b7765cad09ba334b0a0da4a10371dea9",
       "width": 18,
       "height": 18,
       "source": "libs/assets/saigonsafe/browser/icon18_safari.svg"
@@ -493,7 +497,7 @@
     },
     {
       "path": "apps/browser/src/images/icon18_safari@2x.png",
-      "sha256": "7b37736610e936095fe16fc9994d2b83dd5bf84d7fa2ce4f82de945f68a6fd1a",
+      "sha256": "68d6c0fd091d846c3150dd12b4aa3bd9704774456fc350be67e74238b5af86c9",
       "width": 36,
       "height": 36,
       "source": "libs/assets/saigonsafe/browser/icon18_safari@2x.svg"
@@ -504,7 +508,7 @@
     },
     {
       "path": "apps/browser/src/images/icon18_safari_locked.png",
-      "sha256": "097d5256c9fe9ece72f01d6690f889e1f1b5e8933945dd248c3dd8969e9006d5",
+      "sha256": "bfc8e143b45f15ccd0ccf37c0de33ff0feab1f7235e9d56cb0ef88a3042a2d81",
       "width": 18,
       "height": 18,
       "source": "libs/assets/saigonsafe/browser/icon18_safari_locked.svg"
@@ -515,28 +519,28 @@
     },
     {
       "path": "apps/browser/src/images/icon18_safari_locked@2x.png",
-      "sha256": "d9ccbdf6a046b0486ce3b1f39285189e1dc6e3390da79894178ad7cffde2d175",
+      "sha256": "229c5f81934822b1c6f22013e27f04834e046674f98c23036d35c1666c13a833",
       "width": 36,
       "height": 36,
       "source": "libs/assets/saigonsafe/browser/icon18_safari_locked@2x.svg"
     },
     {
       "path": "apps/browser/src/safari/desktop/Assets.xcassets/AppIcon.appiconset/icon16.png",
-      "sha256": "0e2ad275e5a8c5acc02887bbe28addd4c03190fa7b4ee07c8dd495d105e3fbd6",
+      "sha256": "773605526c0114b32b5237703d1ff4c49a0aef15a48fba82df9e1b1fc306b830",
       "width": 16,
       "height": 16,
       "source": "libs/assets/saigonsafe/browser/icon16.svg"
     },
     {
       "path": "apps/browser/src/safari/desktop/Assets.xcassets/AppIcon.appiconset/icon32.png",
-      "sha256": "1397c7ed8d170074f9d6e33eaa07352a38ee9181807829e9d8e072be0a90dde5",
+      "sha256": "2afeeb517176c8c9ce1cf158a2f1e321939a6e167df51c50f8e66dac9badfc5f",
       "width": 32,
       "height": 32,
       "source": "libs/assets/saigonsafe/browser/icon32.svg"
     },
     {
       "path": "apps/browser/src/safari/desktop/Assets.xcassets/AppIcon.appiconset/icon128.png",
-      "sha256": "17930be70d253e00b7d92eab7357221dc87be7f9ccf7fb1727b5adb77bddf5e7",
+      "sha256": "c131d4fcdc7dbc6214f045557161e82c478c2bee265605bd5864f6ad3c24ae91",
       "width": 128,
       "height": 128,
       "source": "libs/assets/saigonsafe/browser/icon128.svg"
@@ -547,7 +551,7 @@
     },
     {
       "path": "apps/browser/src/popup/images/logo-dark@2x.png",
-      "sha256": "85aa5624791d245d9f8fcdd543d357ddb63272608dc995c5de1481928b1c9eb4",
+      "sha256": "d674346509da62758c74520f6da6b4f8d6248205865ee93d02660c650526d235",
       "width": 568,
       "height": 86,
       "source": "libs/assets/saigonsafe/browser/logo-dark@2x.svg"
@@ -558,7 +562,7 @@
     },
     {
       "path": "apps/browser/src/popup/images/logo-white@2x.png",
-      "sha256": "3b972b2117ea950f6df430e362b81c175d23c3c4d7a240bf45ffefb3291cdf05",
+      "sha256": "88a77904e7fddb8c9a31aeb42723757963c1baa9f4b29f0a0ec44eb3313c01b8",
       "width": 568,
       "height": 86,
       "source": "libs/assets/saigonsafe/browser/logo-white@2x.svg"
@@ -569,7 +573,7 @@
     },
     {
       "path": "apps/browser/src/popup/images/bwi-globe.png",
-      "sha256": "428aee6b3e6f90c585437601ff636c2081ef7ba60b59adf55092ea524f89dfb5",
+      "sha256": "6f6cfdf8f31d4a7ee459434d949fd263334eef5f82750612d5c64c6f30bc04fa",
       "width": 19,
       "height": 19,
       "source": "libs/assets/saigonsafe/browser/bwi-globe.svg"
@@ -580,7 +584,7 @@
     },
     {
       "path": "apps/browser/src/popup/images/bwi-passkey.png",
-      "sha256": "37445625d74293f08306eeaa60e341bdb22ef5eb75024f64426598c9a7e93abe",
+      "sha256": "c0a74e6a15e8d0a7321d8c7026475e9758c07480b4dbda50b6ac82addd102968",
       "width": 38,
       "height": 38,
       "source": "libs/assets/saigonsafe/browser/bwi-passkey.svg"
@@ -591,7 +595,7 @@
     },
     {
       "path": "apps/browser/src/images/at-risk-password-carousel/generate_password.light.png",
-      "sha256": "ccd6ed3474bf0ce08f00bffdb7575feece3cf51ecd2996999787feeb7d3c76af",
+      "sha256": "7da41a1f614c2f0371c2ffb13b8a684114e3e9dd174da439ca8a316bb4374ad4",
       "width": 864,
       "height": 573,
       "source": "libs/assets/saigonsafe/browser/generate_password.light.svg"
@@ -602,7 +606,7 @@
     },
     {
       "path": "apps/browser/src/images/at-risk-password-carousel/generate_password.dark.png",
-      "sha256": "d8612e789598dec170a0e70810bc18ecca65c6f83dd8c6f60d296c7364a64a71",
+      "sha256": "d1b00f93957245b62335b08577c18a76bdb620177b03c5dc7df4074a03281639",
       "width": 864,
       "height": 573,
       "source": "libs/assets/saigonsafe/browser/generate_password.dark.svg"
@@ -613,7 +617,7 @@
     },
     {
       "path": "apps/browser/src/images/at-risk-password-carousel/update_login.light.png",
-      "sha256": "82b052311b062b7f50bc23ce0ac018284ee28d95270d60072fc347dc6d8f73ba",
+      "sha256": "5a9f357b4f2b464e94c0ce2fc1b09ca51664138b18ee05345849fbebf6024995",
       "width": 864,
       "height": 573,
       "source": "libs/assets/saigonsafe/browser/update_login.light.svg"
@@ -624,7 +628,7 @@
     },
     {
       "path": "apps/browser/src/images/at-risk-password-carousel/update_login.dark.png",
-      "sha256": "cff1e80b8d7d0eea666afefcf4246463115dd22435b33a0d186338f3ddee480a",
+      "sha256": "8822e63a2f9cec57f02f67f6759b0f5b17c032c937d86e362ef8d15cf72e4738",
       "width": 864,
       "height": 573,
       "source": "libs/assets/saigonsafe/browser/update_login.dark.svg"
@@ -635,7 +639,7 @@
     },
     {
       "path": "apps/browser/src/images/at-risk-password-carousel/review_at-risk_logins.light.png",
-      "sha256": "1941f8b40ea5ffafd2dcc67acacb1574009bd74503ef577ea0128a363d6a7273",
+      "sha256": "43619828ab6cbcf63d5e53f3883e681e2a87fbdecc284b1a3e2b9ca60100664d",
       "width": 864,
       "height": 573,
       "source": "libs/assets/saigonsafe/browser/review_at-risk_logins.light.svg"
@@ -646,7 +650,7 @@
     },
     {
       "path": "apps/browser/src/images/at-risk-password-carousel/review_at-risk_logins.dark.png",
-      "sha256": "173a34a4767f153e9e00e2f8a9f912027928a483c2713b50ab0a28b749494813",
+      "sha256": "33ac2e6015b6f04aab051270f56278da44db200573e7729845d45e19178c18d6",
       "width": 864,
       "height": 573,
       "source": "libs/assets/saigonsafe/browser/review_at-risk_logins.dark.svg"

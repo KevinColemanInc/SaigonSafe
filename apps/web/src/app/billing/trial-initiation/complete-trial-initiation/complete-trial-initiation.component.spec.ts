@@ -8,17 +8,16 @@ import { BehaviorSubject, of } from "rxjs";
 
 import { RegistrationFinishService } from "@bitwarden/auth/angular";
 import { LoginStrategyServiceAbstraction } from "@bitwarden/auth/common";
-import { PolicyApiServiceAbstraction } from "@bitwarden/common/admin-console/abstractions/policy/policy-api.service.abstraction";
-import { PolicyService } from "@bitwarden/common/admin-console/abstractions/policy/policy.service.abstraction";
 import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
-import { OrganizationInviteService } from "@bitwarden/common/auth/services/organization-invite/organization-invite.service";
 import { OrganizationBillingServiceAbstraction } from "@bitwarden/common/billing/abstractions/organization-billing.service";
-import { ProductTierType, ProductType } from "@bitwarden/common/billing/enums";
+import { InitiationPath, ProductTierType, ProductType } from "@bitwarden/common/billing/enums";
+import { FeatureFlag } from "@bitwarden/common/enums/feature-flag.enum";
 import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import { LogService } from "@bitwarden/common/platform/abstractions/log.service";
 import { ValidationService } from "@bitwarden/common/platform/abstractions/validation.service";
 import { ToastService } from "@bitwarden/components";
+import { UserId } from "@bitwarden/user-core";
 
 import { RouterService } from "../../../core/router.service";
 
@@ -33,6 +32,7 @@ describe("CompleteTrialInitiationComponent", () => {
   let mockConfigService: MockProxy<ConfigService>;
   let mockOrganizationBillingService: MockProxy<OrganizationBillingServiceAbstraction>;
   let mockAccountService: MockProxy<AccountService>;
+  let pamBillingSupport$: BehaviorSubject<boolean>;
 
   beforeEach(async () => {
     mockRouter = mock<Router>();
@@ -47,8 +47,11 @@ describe("CompleteTrialInitiationComponent", () => {
     // Mock activeAccount$ to return a valid user ID
     mockAccountService.activeAccount$ = of({ id: "user-id-123" } as any);
 
-    // Mock getFeatureFlag$ to return false by default
-    mockConfigService.getFeatureFlag$.mockReturnValue(of(false));
+    // PAM billing-support flag, controllable per test; defaults off.
+    pamBillingSupport$ = new BehaviorSubject<boolean>(false);
+    mockConfigService.getFeatureFlag$.mockImplementation((key) =>
+      key === FeatureFlag.PamBillingSupport ? pamBillingSupport$ : of(false),
+    );
 
     await TestBed.configureTestingModule({
       declarations: [CompleteTrialInitiationComponent],
@@ -58,15 +61,12 @@ describe("CompleteTrialInitiationComponent", () => {
         { provide: ActivatedRoute, useValue: mockActivatedRoute },
         { provide: ConfigService, useValue: mockConfigService },
         { provide: LogService, useValue: mock<LogService>() },
-        { provide: PolicyApiServiceAbstraction, useValue: mock<PolicyApiServiceAbstraction>() },
-        { provide: PolicyService, useValue: mock<PolicyService>() },
         { provide: I18nService, useValue: mock<I18nService>() },
         { provide: RouterService, useValue: mock<RouterService>() },
         {
           provide: OrganizationBillingServiceAbstraction,
           useValue: mockOrganizationBillingService,
         },
-        { provide: OrganizationInviteService, useValue: mock<OrganizationInviteService>() },
         { provide: ToastService, useValue: mock<ToastService>() },
         { provide: RegistrationFinishService, useValue: mock<RegistrationFinishService>() },
         { provide: ValidationService, useValue: mock<ValidationService>() },
@@ -89,10 +89,6 @@ describe("CompleteTrialInitiationComponent", () => {
         product: ProductType.PasswordManager,
         productTier: ProductTierType.Enterprise,
       });
-
-      await component.ngOnInit();
-      await fixture.whenStable();
-
       expect(component.paymentOptional).toBe(true);
     });
 
@@ -102,10 +98,6 @@ describe("CompleteTrialInitiationComponent", () => {
         product: ProductType.PasswordManager,
         productTier: ProductTierType.Enterprise,
       });
-
-      await component.ngOnInit();
-      await fixture.whenStable();
-
       expect(component.paymentOptional).toBe(false);
     });
 
@@ -114,10 +106,6 @@ describe("CompleteTrialInitiationComponent", () => {
         product: ProductType.PasswordManager,
         productTier: ProductTierType.Enterprise,
       });
-
-      await component.ngOnInit();
-      await fixture.whenStable();
-
       expect(component.paymentOptional).toBe(false);
     });
 
@@ -127,10 +115,6 @@ describe("CompleteTrialInitiationComponent", () => {
         product: ProductType.PasswordManager,
         productTier: ProductTierType.Enterprise,
       });
-
-      await component.ngOnInit();
-      await fixture.whenStable();
-
       expect(component.trialLength).toBe(7);
     });
 
@@ -139,36 +123,99 @@ describe("CompleteTrialInitiationComponent", () => {
         product: ProductType.PasswordManager,
         productTier: ProductTierType.Enterprise,
       });
-
-      await component.ngOnInit();
-      await fixture.whenStable();
-
       expect(component.trialLength).toBe(7);
+    });
+
+    it("should read salesAssistedToken from query params", async () => {
+      mockActivatedRoute.queryParams.next({
+        salesAssistedToken: "sales-assisted-token-123",
+        product: ProductType.PasswordManager,
+        productTier: ProductTierType.Enterprise,
+      });
+      expect(component.salesAssistedToken).toBe("sales-assisted-token-123");
+    });
+  });
+
+  describe("trial stepper visibility", () => {
+    it("shows the stepper for a Password Manager Enterprise tier", () => {
+      mockActivatedRoute.queryParams.next({
+        product: ProductType.PasswordManager,
+        productTier: ProductTierType.Enterprise,
+      });
+      expect(component.useTrialStepper).toBe(true);
+    });
+
+    it("shows the stepper for any Secrets Manager tier", () => {
+      mockActivatedRoute.queryParams.next({
+        product: ProductType.SecretsManager,
+        productTier: ProductTierType.Free,
+      });
+      expect(component.useTrialStepper).toBe(true);
+    });
+
+    it("hides the stepper when no tier is provided", () => {
+      mockActivatedRoute.queryParams.next({ product: ProductType.PasswordManager });
+      expect(component.useTrialStepper).toBe(false);
+    });
+  });
+
+  describe("finishRegistration()", () => {
+    it("should forward salesAssistedToken to finishRegistration", async () => {
+      const registrationFinishService = TestBed.inject(
+        RegistrationFinishService,
+      ) as MockProxy<RegistrationFinishService>;
+      registrationFinishService.finishRegistration.mockResolvedValue(undefined);
+
+      mockActivatedRoute.queryParams.next({
+        email: "test@example.com",
+        token: "email-verification-token",
+        salesAssistedToken: "sales-assisted-token-123",
+      });
+
+      const passwordInputResult = {} as any;
+      await component.finishRegistration(passwordInputResult);
+
+      expect(registrationFinishService.finishRegistration).toHaveBeenCalledWith(
+        "test@example.com",
+        passwordInputResult,
+        "email-verification-token",
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        "sales-assisted-token-123",
+      );
     });
   });
 
   describe("showBillingStep getter", () => {
-    beforeEach(() => {
-      component.product = ProductType.PasswordManager;
-      component.productTier = ProductTierType.Enterprise;
-    });
-
     it("should hide billing step when paymentOptional is true", () => {
-      component.paymentOptional = true;
+      mockActivatedRoute.queryParams.next({
+        product: ProductType.PasswordManager,
+        productTier: ProductTierType.Enterprise,
+        paymentOptional: "true",
+      });
 
       expect(component.showBillingStep).toBe(false);
     });
 
     it("should show billing step when paymentOptional is false", () => {
-      component.paymentOptional = false;
+      mockActivatedRoute.queryParams.next({
+        product: ProductType.PasswordManager,
+        productTier: ProductTierType.Enterprise,
+        paymentOptional: "false",
+      });
 
       expect(component.showBillingStep).toBe(true);
     });
 
     it("should hide billing step for Secrets Manager Free regardless of other conditions", () => {
-      component.product = ProductType.SecretsManager;
-      component.productTier = ProductTierType.Free;
-      component.paymentOptional = false;
+      mockActivatedRoute.queryParams.next({
+        product: ProductType.SecretsManager,
+        productTier: ProductTierType.Free,
+        paymentOptional: "false",
+      });
 
       expect(component.showBillingStep).toBe(false);
     });
@@ -176,8 +223,6 @@ describe("CompleteTrialInitiationComponent", () => {
 
   describe("Organization Creation Flow", () => {
     beforeEach(() => {
-      component.product = ProductType.PasswordManager;
-      component.productTier = ProductTierType.Enterprise;
       component.orgInfoFormGroup.patchValue({
         name: "Test Org",
         billingEmail: "test@example.com",
@@ -185,8 +230,12 @@ describe("CompleteTrialInitiationComponent", () => {
     });
 
     it("should call createOrganizationOnTrial when paymentOptional is true and trialLength > 0", async () => {
-      component.trialLength = 7;
-      component.paymentOptional = true;
+      mockActivatedRoute.queryParams.next({
+        product: ProductType.PasswordManager,
+        productTier: ProductTierType.Enterprise,
+        trialLength: "7",
+        paymentOptional: "true",
+      });
 
       const createOnTrialSpy = jest
         .spyOn(component, "createOrganizationOnTrial")
@@ -202,8 +251,12 @@ describe("CompleteTrialInitiationComponent", () => {
     });
 
     it("should call conditionallyCreateOrganization when paymentOptional is true but trialLength is 0", async () => {
-      component.trialLength = 0;
-      component.paymentOptional = true;
+      mockActivatedRoute.queryParams.next({
+        product: ProductType.PasswordManager,
+        productTier: ProductTierType.Enterprise,
+        trialLength: "0",
+        paymentOptional: "true",
+      });
 
       const createOnTrialSpy = jest
         .spyOn(component, "createOrganizationOnTrial")
@@ -219,8 +272,12 @@ describe("CompleteTrialInitiationComponent", () => {
     });
 
     it("should call conditionallyCreateOrganization when paymentOptional is false", async () => {
-      component.trialLength = 7;
-      component.paymentOptional = false;
+      mockActivatedRoute.queryParams.next({
+        product: ProductType.PasswordManager,
+        productTier: ProductTierType.Enterprise,
+        trialLength: "7",
+        paymentOptional: "false",
+      });
 
       const createOnTrialSpy = jest
         .spyOn(component, "createOrganizationOnTrial")
@@ -236,29 +293,211 @@ describe("CompleteTrialInitiationComponent", () => {
     });
   });
 
-  describe("Integration: paymentOptional acceptance criteria", () => {
+  describe("createOrganizationOnTrial", () => {
     beforeEach(() => {
-      component.product = ProductType.PasswordManager;
-      component.productTier = ProductTierType.Enterprise;
+      mockActivatedRoute.queryParams.next({
+        product: ProductType.PasswordManager,
+        productTier: ProductTierType.Enterprise,
+      });
+      component.orgInfoFormGroup.patchValue({
+        name: "Test Org",
+        billingEmail: "test@example.com",
+      });
+      component.verticalStepper = { next: jest.fn() } as any;
+      mockOrganizationBillingService.purchaseSubscriptionNoPaymentMethod.mockResolvedValue({
+        id: "org-id",
+        name: "Test Org",
+      } as any);
     });
 
-    it("AC2: should hide billing step when paymentOptional=true regardless of trialLength", () => {
-      component.paymentOptional = true;
-      component.trialLength = 7;
+    const passedInitiationPath = () =>
+      mockOrganizationBillingService.purchaseSubscriptionNoPaymentMethod.mock.calls[0][0]
+        .organization.initiationPath;
 
+    it("uses the marketing website path for Password Manager without a salesAssistedToken", async () => {
+      await component.createOrganizationOnTrial("user-id-123" as UserId);
+
+      expect(passedInitiationPath()).toBe(InitiationPath.PasswordManagerTrialFromMarketingWebsite);
+    });
+
+    it("uses the sales-assisted path for Password Manager when salesAssistedToken is present", async () => {
+      mockActivatedRoute.queryParams.next({
+        product: ProductType.PasswordManager,
+        productTier: ProductTierType.Enterprise,
+        salesAssistedToken: "sales-assisted-token-123",
+      });
+
+      await component.createOrganizationOnTrial("user-id-123" as UserId);
+
+      expect(passedInitiationPath()).toBe(InitiationPath.SalesAssistedTrialFromAdminPortal);
+    });
+
+    it("uses the marketing website path for Secrets Manager without a salesAssistedToken", async () => {
+      mockActivatedRoute.queryParams.next({
+        product: ProductType.SecretsManager,
+        productTier: ProductTierType.Enterprise,
+      });
+
+      await component.createOrganizationOnTrial("user-id-123" as UserId);
+
+      expect(passedInitiationPath()).toBe(InitiationPath.SecretsManagerTrialFromMarketingWebsite);
+    });
+
+    it("uses the sales-assisted path for Secrets Manager when salesAssistedToken is present", async () => {
+      mockActivatedRoute.queryParams.next({
+        product: ProductType.SecretsManager,
+        productTier: ProductTierType.Enterprise,
+        salesAssistedToken: "sales-assisted-token-123",
+      });
+
+      await component.createOrganizationOnTrial("user-id-123" as UserId);
+
+      expect(passedInitiationPath()).toBe(InitiationPath.SalesAssistedTrialFromAdminPortal);
+    });
+  });
+
+  describe("Privileged Controls", () => {
+    it("parses the product list when the flag is on", async () => {
+      pamBillingSupport$.next(true);
+      mockActivatedRoute.queryParams.next({
+        product: "0,2",
+        productTier: ProductTierType.Enterprise,
+      });
+      expect(component.product).toBe(ProductType.PasswordManager);
+      expect(component.includesPrivilegedControls).toBe(true);
+    });
+
+    it("ignores Privileged Controls when the flag is off", async () => {
+      pamBillingSupport$.next(false);
+      mockActivatedRoute.queryParams.next({
+        product: "0,2",
+        productTier: ProductTierType.Enterprise,
+      });
+      expect(component.product).toBe(ProductType.PasswordManager);
+      expect(component.includesPrivilegedControls).toBe(false);
+    });
+
+    it("does not add Privileged Controls to a Secrets Manager trial", async () => {
+      pamBillingSupport$.next(true);
+      mockActivatedRoute.queryParams.next({
+        product: "1,2",
+        productTier: ProductTierType.Enterprise,
+      });
+
+      expect(component.product).toBe(ProductType.SecretsManager);
+      expect(component.includesPrivilegedControls).toBe(false);
+    });
+
+    it("does not add Privileged Controls on a non-Enterprise tier", async () => {
+      pamBillingSupport$.next(true);
+      mockActivatedRoute.queryParams.next({
+        product: "0,2",
+        productTier: ProductTierType.Families,
+      });
+
+      expect(component.product).toBe(ProductType.PasswordManager);
+      expect(component.includesPrivilegedControls).toBe(false);
+    });
+
+    it("exposes Privileged Controls at a seat minimum of 1 on the trial getter when included", async () => {
+      pamBillingSupport$.next(true);
+      mockActivatedRoute.queryParams.next({
+        product: "0,2",
+        productTier: ProductTierType.Enterprise,
+      });
+      expect(component.trial.privilegedControls).toEqual({ seats: 1 });
+    });
+
+    it("carries Privileged Controls into the no-payment org creation", async () => {
+      pamBillingSupport$.next(true);
+      mockActivatedRoute.queryParams.next({
+        product: "0,2",
+        productTier: ProductTierType.Enterprise,
+      });
+      component.orgInfoFormGroup.patchValue({ name: "Test Org", billingEmail: "test@example.com" });
+      component.verticalStepper = { next: jest.fn() } as any;
+      mockOrganizationBillingService.purchaseSubscriptionNoPaymentMethod.mockResolvedValue({
+        id: "org-id",
+        name: "Test Org",
+      } as any);
+
+      await component.createOrganizationOnTrial("user-id-123" as UserId);
+
+      const plan =
+        mockOrganizationBillingService.purchaseSubscriptionNoPaymentMethod.mock.calls[0][0].plan;
+      expect(plan).toEqual(
+        expect.objectContaining({
+          passwordManagerSeats: 1,
+          subscribeToPrivilegedControls: true,
+          pamSeats: 1,
+        }),
+      );
+    });
+  });
+
+  describe("one-time param side effects", () => {
+    it("shows the email-verified toast once when the PAM flag resolves after the params arrive", () => {
+      const toastService = TestBed.inject(ToastService) as MockProxy<ToastService>;
+
+      // Cold config: the flag starts at its default (false), then resolves true once the server
+      // config lands — the common marketing-link path where the vault was never loaded.
+      mockActivatedRoute.queryParams.next({
+        fromEmail: "true",
+        product: ProductType.PasswordManager,
+        productTier: ProductTierType.Enterprise,
+      });
+      pamBillingSupport$.next(true);
+
+      expect(toastService.showToast).toHaveBeenCalledTimes(1);
+    });
+
+    it("still enables Privileged Controls when the flag resolves after the params arrive", () => {
+      mockActivatedRoute.queryParams.next({
+        product: "0,2",
+        productTier: ProductTierType.Enterprise,
+      });
+      expect(component.includesPrivilegedControls).toBe(false);
+
+      pamBillingSupport$.next(true);
+
+      expect(component.includesPrivilegedControls).toBe(true);
+    });
+  });
+
+  describe("Integration: paymentOptional acceptance criteria", () => {
+    it("AC2: should hide billing step when paymentOptional=true regardless of trialLength", () => {
+      mockActivatedRoute.queryParams.next({
+        product: ProductType.PasswordManager,
+        productTier: ProductTierType.Enterprise,
+        paymentOptional: "true",
+        trialLength: "7",
+      });
       expect(component.showBillingStep).toBe(false);
 
-      component.trialLength = 0;
+      mockActivatedRoute.queryParams.next({
+        product: ProductType.PasswordManager,
+        productTier: ProductTierType.Enterprise,
+        paymentOptional: "true",
+        trialLength: "0",
+      });
       expect(component.showBillingStep).toBe(false);
     });
 
     it("should show billing step when paymentOptional=false", () => {
-      component.paymentOptional = false;
-      component.trialLength = 7;
-
+      mockActivatedRoute.queryParams.next({
+        product: ProductType.PasswordManager,
+        productTier: ProductTierType.Enterprise,
+        paymentOptional: "false",
+        trialLength: "7",
+      });
       expect(component.showBillingStep).toBe(true);
 
-      component.trialLength = 0;
+      mockActivatedRoute.queryParams.next({
+        product: ProductType.PasswordManager,
+        productTier: ProductTierType.Enterprise,
+        paymentOptional: "false",
+        trialLength: "0",
+      });
       expect(component.showBillingStep).toBe(true);
     });
   });

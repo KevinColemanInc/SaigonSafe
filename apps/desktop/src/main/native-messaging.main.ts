@@ -5,17 +5,28 @@ import { homedir, userInfo } from "os";
 import * as path from "path";
 
 import { ipcMain } from "electron";
+import { Subject } from "rxjs";
 
 import { LogService } from "@bitwarden/common/platform/abstractions/log.service";
+import {
+  DesktopIpcPeerClientType,
+  IpcClientTypeMessage,
+  isIpcClientTypeMessage,
+} from "@bitwarden/common/platform/ipc";
 import { ipc, windows_registry } from "@bitwarden/desktop-napi";
 
 import { isDev } from "../utils";
 
+import { isWindowsStore } from "./platform-utils.main";
 import { WindowMain } from "./window.main";
 
 export class NativeMessagingMain {
   private ipcServer: ipc.NativeIpcServer | null;
-  private connected: number[] = [];
+  /** Connected clients by id, with the type each announced; `Unknown` until it announces. */
+  private clients = new Map<number, DesktopIpcPeerClientType>();
+
+  private _messages$ = new Subject<ipc.IpcMessage>();
+  readonly messages$ = this._messages$.asObservable();
 
   constructor(
     private logService: LogService,
@@ -77,19 +88,23 @@ export class NativeMessagingMain {
     if (this.ipcServer) {
       this.ipcServer.stop();
     }
-
+    this.logService.info("Starting native messaging server");
     this.ipcServer = await ipc.NativeIpcServer.listen("bw", (error, msg) => {
       switch (msg.kind) {
         case ipc.IpcMessageType.Connected: {
-          this.connected.push(msg.clientId);
-          this.logService.info("Native messaging client " + msg.clientId + " has connected");
+          const announcement = parseAnnouncement(msg.message);
+          const clientType = announcement?.clientType ?? DesktopIpcPeerClientType.Unknown;
+          this.clients.set(msg.clientId, clientType);
+
+          // Only the known detail of an untrusted frame is logged.
+          this.logService.info(
+            `Native messaging client ${msg.clientId} has connected as ${clientType}`,
+            { extensionId: announcement?.extensionId },
+          );
           break;
         }
         case ipc.IpcMessageType.Disconnected: {
-          const index = this.connected.indexOf(msg.clientId);
-          if (index > -1) {
-            this.connected.splice(index, 1);
-          }
+          this.clients.delete(msg.clientId);
 
           this.logService.info("Native messaging client " + msg.clientId + " has disconnected");
           break;
@@ -98,6 +113,7 @@ export class NativeMessagingMain {
           try {
             const msgJson = JSON.parse(msg.message);
             this.logService.debug("Native messaging message:", msgJson);
+            this._messages$.next(msg);
             this.windowMain.win?.webContents.send("nativeMessaging", msgJson);
           } catch (e) {
             this.logService.warning("Error processing message:", e, msg.message);
@@ -110,7 +126,9 @@ export class NativeMessagingMain {
       }
     });
 
-    this.logService.info("Native messaging server started at:", this.ipcServer.getPath());
+    for (const path of this.ipcServer.getPaths()) {
+      this.logService.info("Native messaging server started at:", path);
+    }
 
     ipcMain.on("nativeMessagingReply", (event, msg) => {
       if (msg != null) {
@@ -123,37 +141,73 @@ export class NativeMessagingMain {
     this.ipcServer?.stop();
   }
 
+  /**
+   * The client type a connected client announced, `Unknown` for one that announced none, or
+   * `undefined` for a client that is not connected.
+   *
+   * `desktop_proxy` always announces, so `Unknown` also covers a proxy that predates the
+   * announcement.
+   */
+  clientTypeFor(clientId: number): DesktopIpcPeerClientType | undefined {
+    return this.clients.get(clientId);
+  }
+
   send(message: object) {
     this.logService.debug("Native messaging reply:", message);
     this.ipcServer?.send(JSON.stringify(message));
   }
 
-  async generateManifests() {
-    const baseJson = {
+  sendTo(clientId: number, message: object) {
+    this.logService.debug("Native messaging targeted reply to client", clientId, ":", message);
+    this.ipcServer?.sendTo(clientId, JSON.stringify(message));
+  }
+
+  private async generateChromeJson(binaryPath: string) {
+    return {
       name: "com.8bit.bitwarden",
       description: "Bitwarden desktop <-> browser bridge",
-      path: this.binaryPath(),
+      path: binaryPath,
       type: "stdio",
-    };
-
-    if (!existsSync(baseJson.path)) {
-      throw new Error(`Unable to find binary: ${baseJson.path}`);
-    }
-
-    const firefoxJson = {
-      ...baseJson,
-      ...{ allowed_extensions: ["{446900e4-71c2-419f-a6a7-df9c091e268b}"] },
-    };
-    const chromeJson = {
-      ...baseJson,
       allowed_origins: await this.loadChromeIds(),
     };
+  }
+
+  private async generateFirefoxJson(binaryPath: string) {
+    return {
+      name: "com.8bit.bitwarden",
+      description: "Bitwarden desktop <-> browser bridge",
+      path: binaryPath,
+      type: "stdio",
+      allowed_extensions: ["{446900e4-71c2-419f-a6a7-df9c091e268b}"],
+    };
+  }
+
+  async generateManifests() {
+    const proxyPath = this.binaryPath();
+    if (!existsSync(proxyPath)) {
+      throw new Error(`Unable to find proxy binary: ${proxyPath}`);
+    }
+    // Browsers may not launch executables inside the Appx, only its execution aliases.
+    const binaryPath = isWindowsStore() ? this.appxProxyAliasPath() : proxyPath;
+
+    // When debugging against a dedicated chrome profile, only that profile gets a
+    // manifest, so the real browser installs are left untouched.
+    if (this.debugChromeProfileDir() != null) {
+      await this.generateDebugChromeManifest(binaryPath);
+      return;
+    }
 
     switch (process.platform) {
       case "win32": {
-        const destination = path.join(this.userPath, "browsers");
-        await this.writeManifest(path.join(destination, "firefox.json"), firefoxJson);
-        await this.writeManifest(path.join(destination, "chrome.json"), chromeJson);
+        const destination = this.windowsManifestDirectory();
+        await this.writeManifest(
+          path.join(destination, "firefox.json"),
+          await this.generateFirefoxJson(binaryPath),
+        );
+        await this.writeManifest(
+          path.join(destination, "chrome.json"),
+          await this.generateChromeJson(binaryPath),
+        );
 
         const nmhs = this.getWindowsNMHS();
         for (const [name, [key, subkey]] of Object.entries(nmhs)) {
@@ -167,16 +221,26 @@ export class NativeMessagingMain {
       }
       case "darwin": {
         const nmhs = this.getDarwinNMHS();
-        for (const [key, value] of Object.entries(nmhs)) {
-          if (existsSync(value)) {
-            const p = path.join(value, "NativeMessagingHosts", "com.8bit.bitwarden.json");
+        for (const [key, browserDirectory] of Object.entries(nmhs)) {
+          if (
+            this.getDarwinDetectPaths(key, browserDirectory).some((directory) =>
+              existsSync(directory),
+            )
+          ) {
+            const nmhsPath = path.join(browserDirectory, "NativeMessagingHosts");
+            const manifestPath = path.join(nmhsPath, "com.8bit.bitwarden.json");
 
-            let manifest: any = chromeJson;
-            if (key === "Firefox" || key === "Zen") {
-              manifest = firefoxJson;
+            try {
+              let manifest: any = await this.generateChromeJson(binaryPath);
+              if (key === "Firefox" || key === "Zen") {
+                await fs.mkdir(nmhsPath, { recursive: true });
+                manifest = await this.generateFirefoxJson(binaryPath);
+              }
+
+              await this.writeManifest(manifestPath, manifest);
+            } catch (e) {
+              this.logService.error(`Unable to install the ${key} manifest in ${nmhsPath}: ${e}`);
             }
-
-            await this.writeManifest(p, manifest);
           } else {
             this.logService.warning(`${key} not found, skipping.`);
           }
@@ -184,28 +248,120 @@ export class NativeMessagingMain {
         break;
       }
       case "linux": {
-        for (const [key, value] of Object.entries(this.getLinuxNMHS())) {
-          if (existsSync(value)) {
+        // Because on linux, the path inside the sandbox is different, and we want to support:
+        // Flatpak App, Unsandboxed App, Flatpak Browser, Unsandboxed Browser, Snap App, Unsandboxed App
+        // and any combination of the above, we copy the binary to the applications native-messaging-hosts path
+        // so that a canonical path to put in the manifest can be used.
+
+        // Unsandboxed browser
+        await this.createFirefoxDir(
+          `${this.homedir()}/.config/mozilla/`,
+          `${this.homedir()}/.mozilla`,
+        );
+        for (const [key, browserDirectory] of Object.entries(this.getLinuxNMHS())) {
+          if (existsSync(browserDirectory)) {
+            let nhmsPath = path.join(browserDirectory, "NativeMessagingHosts");
+            if (key === "Firefox") {
+              nhmsPath = path.join(browserDirectory, "native-messaging-hosts");
+            }
+            const browserBinaryPath = path.join(nhmsPath, ".bitwarden_desktop_proxy");
+
+            // Only generate the NMHS dir if the browser directory exists
+            await fs.mkdir(nhmsPath, { recursive: true });
+
+            await this.linkOrCopy(binaryPath, browserBinaryPath);
+            this.logService.info(
+              `[Native messaging] Hard-linked ${binaryPath} to ${browserBinaryPath}`,
+            );
+
             if (key === "Firefox") {
               await this.writeManifest(
-                path.join(value, "native-messaging-hosts", "com.8bit.bitwarden.json"),
-                firefoxJson,
+                path.join(nhmsPath, "com.8bit.bitwarden.json"),
+                await this.generateFirefoxJson(browserBinaryPath),
               );
             } else {
               await this.writeManifest(
-                path.join(value, "NativeMessagingHosts", "com.8bit.bitwarden.json"),
-                chromeJson,
+                path.join(nhmsPath, "com.8bit.bitwarden.json"),
+                await this.generateChromeJson(browserBinaryPath),
               );
             }
           } else {
             this.logService.warning(`${key} not found, skipping.`);
           }
         }
+
+        await this.createFirefoxDir(
+          `${this.homedir()}/.var/app/org.mozilla.firefox`,
+          this.getFlatpakNMHS().Firefox,
+        );
+        for (const [key, value] of Object.entries(this.getFlatpakNMHS())) {
+          if (existsSync(value)) {
+            const sandboxedProxyBinaryPath = path.join(value, ".bitwarden_desktop_proxy");
+            await this.linkOrCopy(binaryPath, sandboxedProxyBinaryPath);
+            this.logService.info(
+              `[Native messaging] Hard-linked ${binaryPath} to ${sandboxedProxyBinaryPath}`,
+            );
+
+            if (key === "Firefox") {
+              await this.writeManifest(
+                path.join(value, "com.8bit.bitwarden.json"),
+                await this.generateFirefoxJson(sandboxedProxyBinaryPath),
+              );
+            } else if (key === "Chrome" || key === "Chromium" || key === "Microsoft Edge") {
+              await this.writeManifest(
+                path.join(value, "com.8bit.bitwarden.json"),
+                await this.generateChromeJson(sandboxedProxyBinaryPath),
+              );
+            } else {
+              this.logService.warning(`Flatpak ${key} not supported, skipping.`);
+            }
+          } else {
+            this.logService.warning(`${key} not found, skipping.`);
+          }
+        }
+
         break;
       }
       default:
         break;
     }
+  }
+
+  // Chrome only reads per-profile NativeMessagingHosts directories on macOS and Linux;
+  // on Windows it discovers hosts through the registry, which is shared with the
+  // installed client, so the debug profile is not supported there.
+  private debugChromeProfileDir(): string | null {
+    const profileDir = process.env.BITWARDEN_CHROME_PROFILE_DIR;
+
+    if (!profileDir) {
+      return null;
+    }
+
+    if (process.platform === "win32") {
+      this.logService.warning(
+        "[Native messaging] BITWARDEN_CHROME_PROFILE_DIR is not supported on Windows, ignoring it",
+      );
+      return null;
+    }
+
+    return profileDir;
+  }
+
+  // Allow pointing chrome at a custom local profile for debugging
+  private async generateDebugChromeManifest(binaryPath: string) {
+    const profileDir = this.debugChromeProfileDir();
+
+    if (!profileDir) {
+      return;
+    }
+
+    const nmhsPath = path.join(profileDir, "NativeMessagingHosts");
+    await fs.mkdir(nmhsPath, { recursive: true });
+
+    await this.writeManifest(
+      path.join(nmhsPath, "com.8bit.bitwarden.json"),
+      await this.generateChromeJson(binaryPath),
+    );
   }
 
   async generateDdgManifests() {
@@ -235,8 +391,9 @@ export class NativeMessagingMain {
   async removeManifests() {
     switch (process.platform) {
       case "win32": {
-        await this.removeIfExists(path.join(this.userPath, "browsers", "firefox.json"));
-        await this.removeIfExists(path.join(this.userPath, "browsers", "chrome.json"));
+        const destination = this.windowsManifestDirectory();
+        await this.removeIfExists(path.join(destination, "firefox.json"));
+        await this.removeIfExists(path.join(destination, "chrome.json"));
 
         const nmhs = this.getWindowsNMHS();
         for (const [, [key, subkey]] of Object.entries(nmhs)) {
@@ -264,6 +421,11 @@ export class NativeMessagingMain {
               path.join(value, "NativeMessagingHosts", "com.8bit.bitwarden.json"),
             );
           }
+        }
+
+        for (const [, value] of Object.entries(this.getFlatpakNMHS())) {
+          await this.removeIfExists(path.join(value, "com.8bit.bitwarden.json"));
+          await this.removeIfExists(path.join(value, ".bitwarden_desktop_proxy"));
         }
 
         break;
@@ -332,8 +494,19 @@ export class NativeMessagingMain {
       Vivaldi: `${this.homedir()}/Library/Application\ Support/Vivaldi/`,
       Zen: `${this.homedir()}/Library/Application\ Support/Zen/`,
       Helium: `${this.homedir()}/Library/Application\ Support/net.imput.helium/`,
+      Brave: `${this.homedir()}/Library/Application\ Support/BraveSoftware/Brave-Browser/`,
+      "Brave Beta": `${this.homedir()}/Library/Application\ Support/BraveSoftware/Brave-Browser-Beta/`,
+      "Brave Nightly": `${this.homedir()}/Library/Application\ Support/BraveSoftware/Brave-Browser-Nightly/`,
     };
     /* eslint-enable no-useless-escape */
+  }
+
+  private getDarwinDetectPaths(browser: string, browserDirectory: string): string[] {
+    if (browser === "Firefox") {
+      return [`${this.homedir()}/Library/Application Support/Firefox/`, browserDirectory];
+    }
+
+    return [browserDirectory];
   }
 
   private getLinuxNMHS() {
@@ -344,6 +517,27 @@ export class NativeMessagingMain {
       "Microsoft Edge": `${this.homedir()}/.config/microsoft-edge/`,
       Vivaldi: `${this.homedir()}/.config/vivaldi/`,
       Brave: `${this.homedir()}/.config/BraveSoftware/Brave-Browser/`,
+      Helium: `${this.homedir()}/.config/net.imput.helium/`,
+    };
+  }
+
+  // Firefox may be installed without the dir it reads native messaging hosts from
+  // (e.g. XDG profiles in ~/.config/mozilla, no ~/.mozilla). Create it so Firefox is detected.
+  // E.g. firefoxDir: ~/.config/mozilla/, hostsDir: ~/.mozilla
+  private async createFirefoxDir(firefoxDir: string, hostsDir: string) {
+    if (!existsSync(firefoxDir)) {
+      return;
+    }
+
+    await fs.mkdir(hostsDir, { recursive: true });
+  }
+
+  private getFlatpakNMHS() {
+    return {
+      Firefox: `${this.homedir()}/.var/app/org.mozilla.firefox/.mozilla/native-messaging-hosts/`,
+      Chrome: `${this.homedir()}/.var/app/com.google.Chrome/config/google-chrome/NativeMessagingHosts/`,
+      Chromium: `${this.homedir()}/.var/app/org.chromium.Chromium/config/chromium/NativeMessagingHosts/`,
+      "Microsoft Edge": `${this.homedir()}/.var/app/com.microsoft.Edge/config/microsoft-edge/NativeMessagingHosts/`,
     };
   }
 
@@ -399,6 +593,11 @@ export class NativeMessagingMain {
       }
     }
 
+    const debugProfileDir = this.debugChromeProfileDir();
+    if (debugProfileDir != null) {
+      chromePaths.push(debugProfileDir);
+    }
+
     for (const chromePath of chromePaths) {
       try {
         // The chrome profile directories are named "Default", "Profile 1", "Profile 2", etc.
@@ -408,35 +607,39 @@ export class NativeMessagingMain {
         });
 
         for (const profile of profiles) {
-          try {
-            // Read the profile Preferences file and find the extension commands section
-            const prefs = JSON.parse(
-              await fs.readFile(path.join(chromePath, profile, "Preferences"), "utf8"),
-            );
-            const commands: Map<string, any> = prefs.extensions.commands;
+          // Chrome writes keyboard-shortcut assignments to "Preferences" only when "was_assigned"
+          // is true. Freshly-loaded dev extensions may have the correct commands in
+          // "Secure Preferences" but not yet in "Preferences", so scan both files.
+          for (const prefsFile of ["Preferences", "Secure Preferences"]) {
+            try {
+              const prefs = JSON.parse(
+                await fs.readFile(path.join(chromePath, profile, prefsFile), "utf8"),
+              );
+              const commands: Map<string, any> = prefs.extensions?.commands;
 
-            // If one of the commands is autofill_login or generate_password, we know it's probably the Bitwarden extension
-            for (const { command_name, extension } of Object.values(commands)) {
-              if (command_name === "autofill_login" || command_name === "generate_password") {
-                ids.add(`chrome-extension://${extension}/`);
-                this.logService.info(`Found extension from ${chromePath}: ${extension}`);
+              // If one of the commands is autofill_login or generate_password, we know it's probably the Bitwarden extension
+              for (const { command_name, extension } of Object.values(commands ?? {})) {
+                if (command_name === "autofill_login" || command_name === "generate_password") {
+                  ids.add(`chrome-extension://${extension}/`);
+                  this.logService.info(`Found extension from ${chromePath}: ${extension}`);
+                }
               }
-            }
 
-            // Match via settings too. Sometimes global commands don't register properly.
-            const settings: Map<string, any> = prefs.extensions.settings;
-            for (const [extension, setting] of Object.entries(settings)) {
-              if (setting.commands) {
-                for (const [command_name] of Object.entries(setting.commands)) {
-                  if (command_name === "autofill_login" || command_name === "generate_password") {
-                    ids.add(`chrome-extension://${extension}/`);
-                    this.logService.info(`Found extension ${chromePath}: ${extension}`);
+              // Match via settings too. Sometimes global commands don't register properly.
+              const settings: Map<string, any> = prefs.extensions?.settings;
+              for (const [extension, setting] of Object.entries(settings ?? {})) {
+                if (setting.commands) {
+                  for (const [command_name] of Object.entries(setting.commands)) {
+                    if (command_name === "autofill_login" || command_name === "generate_password") {
+                      ids.add(`chrome-extension://${extension}/`);
+                      this.logService.info(`Found extension ${chromePath}: ${extension}`);
+                    }
                   }
                 }
               }
+            } catch (e) {
+              this.logService.info(`Error reading preferences: ${e}`);
             }
-          } catch (e) {
-            this.logService.info(`Error reading preferences: ${e}`);
           }
         }
       } catch {
@@ -470,9 +673,47 @@ export class NativeMessagingMain {
     return path.join(path.dirname(this.exePath), `desktop_proxy${ext}`);
   }
 
+  /**
+   * Where the manifests the registry points browsers at are written.
+   *
+   * The Appx's writes to new AppData folders are redirected into the package, where browsers
+   * looking at the original path won't find them. So the Appx writes them into its package folder
+   * directly, and registers that path. Its install directory is named for the package full name,
+   * `<name>_<version>_<arch>_<resourceId>_<publisherId>`, and its family name is
+   * `<name>_<publisherId>`.
+   */
+  private windowsManifestDirectory() {
+    if (!isWindowsStore()) {
+      return path.join(this.userPath, "browsers");
+    }
+
+    const [, name, publisherId] = process.resourcesPath.match(
+      /\\WindowsApps\\([^_\\]+)_[^\\]*_([^_\\]+)\\/,
+    );
+    return path.join(
+      process.env.LOCALAPPDATA,
+      "Packages",
+      `${name}_${publisherId}`,
+      "LocalState",
+      "browsers",
+    );
+  }
+
+  /** The proxy's execution alias, as declared in custom-appx-extensions.*.xml. */
+  private appxProxyAliasPath() {
+    const alias = process.resourcesPath.includes("8bitSolutionsLLC.BitwardenBeta_")
+      ? "bitwarden_beta_desktop_proxy.exe"
+      : "bitwarden_desktop_proxy.exe";
+    return path.join(process.env.LOCALAPPDATA, "Microsoft", "WindowsApps", alias);
+  }
+
   private homedir() {
     if (process.platform === "darwin") {
       return userInfo().homedir;
+    } else if (process.env.SNAP) {
+      // Snap mounts a different user directory, making it impossible to access the unsandboxed paths of native messaging hosts under that dir.
+      const username = userInfo().username;
+      return path.join("/home", username);
     } else {
       return homedir();
     }
@@ -482,5 +723,35 @@ export class NativeMessagingMain {
     if (existsSync(path)) {
       await fs.unlink(path);
     }
+  }
+
+  private async linkOrCopy(source: string, destination: string) {
+    try {
+      if (existsSync(destination)) {
+        await fs.unlink(destination);
+      }
+      await fs.link(source, destination);
+      this.logService.info(`[Native messaging] Hard-linked ${source} to ${destination}`);
+    } catch (e) {
+      this.logService.warning(
+        `[Native messaging] Failed to hard-link ${source} to ${destination}, copying instead: ${e}`,
+      );
+      await fs.copyFile(source, destination);
+      this.logService.info(`[Native messaging] Copied ${source} to ${destination}`);
+    }
+  }
+}
+
+/** The client announcement carried by a `Connected` event, or `undefined` if it has none. */
+function parseAnnouncement(message: string | null | undefined): IpcClientTypeMessage | undefined {
+  if (message == null) {
+    return undefined;
+  }
+
+  try {
+    const json: unknown = JSON.parse(message);
+    return isIpcClientTypeMessage(json) ? json : undefined;
+  } catch {
+    return undefined;
   }
 }

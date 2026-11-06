@@ -1,10 +1,20 @@
 import { AsyncPipe, NgTemplateOutlet } from "@angular/common";
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal,
+  viewChild,
+} from "@angular/core";
 import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { combineLatest, firstValueFrom, map, Observable, of, shareReplay, switchMap } from "rxjs";
 
-import { CollectionAdminService } from "@bitwarden/admin-console/common";
+import {
+  CollectionAdminService,
+  OrganizationUserInviteRequest,
+} from "@bitwarden/admin-console/common";
 import { OrganizationService } from "@bitwarden/common/admin-console/abstractions/organization/organization.service.abstraction";
 import { OrganizationUserType } from "@bitwarden/common/admin-console/enums";
 import { PermissionsApi } from "@bitwarden/common/admin-console/models/api/permissions.api";
@@ -12,8 +22,11 @@ import { CollectionAdminView } from "@bitwarden/common/admin-console/models/coll
 import { Organization } from "@bitwarden/common/admin-console/models/domain/organization";
 import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
 import { getUserId } from "@bitwarden/common/auth/services/account.service";
+import { FeatureFlag } from "@bitwarden/common/enums/feature-flag.enum";
+import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import { getById } from "@bitwarden/common/platform/misc";
+import { OrganizationId } from "@bitwarden/common/types/guid";
 import {
   A11yTitleDirective,
   AsyncActionsModule,
@@ -35,13 +48,9 @@ import {
   ToastService,
 } from "@bitwarden/components";
 import { I18nPipe } from "@bitwarden/ui-common";
+import { Vfo1I18nPipe } from "@bitwarden/vault";
 
-import {
-  GroupApiService,
-  GroupDetailsView,
-  OrganizationUserAdminView,
-  UserAdminService,
-} from "../../../core";
+import { GroupApiService, GroupDetailsView } from "../../../core";
 import { OrganizationUserView } from "../../../core/views/organization-user.view";
 import {
   AccessItemType,
@@ -51,15 +60,22 @@ import {
   convertToSelectionView,
   PermissionMode,
 } from "../../../shared/components/access-selector";
-import { MemberDialogResult } from "../member-dialog/member-dialog.component";
+import { MemberActionsService } from "../../services";
+import { MemberDialogResult } from "../member-dialog/member-dialog.types";
+import { NestedCheckboxComponent } from "../member-dialog/nested-checkbox.component";
 import { commaSeparatedEmails } from "../member-dialog/validators/comma-separated-emails.validator";
 import {
   getEmailBatchLimit,
   inputEmailLimitValidator,
   isDynamicSeatPlan,
+  isSeatConstrainedEmailBatch,
 } from "../member-dialog/validators/input-email-limit.validator";
+import { parseCommaSeparatedEmails } from "../member-dialog/validators/parse-comma-separated-emails";
 import { revokedEmailsValidator } from "../member-dialog/validators/revoked-emails.validator";
 
+// TODO(guided-tour removal): delete this import along with the rest of the guided tour. See the
+// header comment in by-link-tab-tour.component.ts for the full removal checklist.
+import { ByLinkTabTourComponent } from "./by-link-tab-tour.component";
 import { ByLinkTabComponent } from "./by-link-tab.component";
 
 export interface InviteMembersDialogParams {
@@ -67,6 +83,9 @@ export interface InviteMembersDialogParams {
   isOnSecretsManagerStandalone: boolean;
   occupiedSeatCount: number;
   allOrganizationUsers: OrganizationUserView[];
+  // TODO(guided-tour removal): delete this field along with the rest of the guided tour. See the
+  // header comment in by-link-tab-tour.component.ts for the full removal checklist.
+  showCoachMarks?: boolean;
 }
 
 @Component({
@@ -81,6 +100,9 @@ export interface InviteMembersDialogParams {
     AsyncPipe,
     ButtonModule,
     ByLinkTabComponent,
+    // TODO(guided-tour removal): remove this entry along with the rest of the guided tour. See
+    // the header comment in by-link-tab-tour.component.ts for the full removal checklist.
+    ByLinkTabTourComponent,
     CheckboxModule,
     DialogModule,
     DisclosureComponent,
@@ -88,12 +110,14 @@ export interface InviteMembersDialogParams {
     FormFieldModule,
     I18nPipe,
     LinkModule,
+    NestedCheckboxComponent,
     NgTemplateOutlet,
     RadioButtonModule,
     ReactiveFormsModule,
     SelectModule,
     TabsModule,
     IconModule,
+    Vfo1I18nPipe,
   ],
 })
 export class InviteMembersDialogComponent {
@@ -103,16 +127,54 @@ export class InviteMembersDialogComponent {
   private readonly formBuilder = inject(FormBuilder);
   private readonly collectionAdminService = inject(CollectionAdminService);
   private readonly groupService = inject(GroupApiService);
-  private readonly userService = inject(UserAdminService);
   private readonly accountService = inject(AccountService);
   private readonly organizationService = inject(OrganizationService);
   private readonly toastService = inject(ToastService);
+  private readonly memberActionsService = inject(MemberActionsService);
+  private readonly configService = inject(ConfigService);
+
+  private readonly byLinkTab = viewChild(ByLinkTabComponent);
 
   protected readonly organizationUserType = OrganizationUserType;
   protected readonly PermissionMode = PermissionMode;
   protected readonly isOnSecretsManagerStandalone = this.params.isOnSecretsManagerStandalone;
-  protected readonly selectedTabIndex = signal(0);
+  // TODO(guided-tour removal): change back to `signal(0)`, dropping the `showCoachMarks`
+  // ternary. See the header comment in by-link-tab-tour.component.ts for the full removal
+  // checklist.
+  protected readonly selectedTabIndex = signal(this.params.showCoachMarks ? 1 : 0);
   protected readonly moreSettingsOpen = signal(false);
+
+  protected readonly privilegedControlsEnabled = toSignal(
+    this.configService.getFeatureFlag$(FeatureFlag.Pam),
+    { initialValue: false },
+  );
+
+  protected readonly rotationEnabled = toSignal(
+    this.configService.getFeatureFlag$(FeatureFlag.PamAccessConnector),
+    { initialValue: false },
+  );
+
+  protected byLinkTabDirty(): boolean {
+    return this.byLinkTab()?.form.dirty ?? false;
+  }
+
+  protected get byLinkTabHasUrl$(): Observable<boolean> {
+    return this.byLinkTab()?.hasInviteLinkUrl$ ?? of(false);
+  }
+
+  readonly copyLink = async () => {
+    await this.byLinkTab()?.copyLink();
+  };
+
+  readonly deactivateLink = async () => {
+    await this.byLinkTab()?.deactivateLink();
+  };
+
+  // TODO(guided-tour removal): delete this method along with the rest of the guided tour. See
+  // the header comment in by-link-tab-tour.component.ts for the full removal checklist.
+  protected finishTour(): void {
+    this.close(MemberDialogResult.Canceled);
+  }
 
   protected readonly formGroup = this.formBuilder.group({
     emails: [""],
@@ -137,6 +199,8 @@ export class InviteMembersDialogComponent {
     managePolicies: false,
     manageUsers: false,
     manageResetPassword: false,
+    manageAccessRules: false,
+    manageRotation: false,
   });
 
   protected readonly organization$: Observable<Organization> =
@@ -220,18 +284,27 @@ export class InviteMembersDialogComponent {
 
   constructor() {
     this.organization$.pipe(takeUntilDestroyed()).subscribe((organization) => {
-      const emailBatchLimit = getEmailBatchLimit(organization, this.params.occupiedSeatCount);
-      this.setFormValidators(emailBatchLimit);
+      this.setFormValidators(organization);
     });
   }
 
-  private setFormValidators(emailBatchLimit: number) {
+  private setFormValidators(organization: Organization) {
+    const batchLimit = getEmailBatchLimit(organization, this.params.occupiedSeatCount);
+    const seatConstrained = isSeatConstrainedEmailBatch(
+      organization,
+      this.params.occupiedSeatCount,
+    );
+
     const emailsControlValidators = [
       Validators.required,
       commaSeparatedEmails,
       inputEmailLimitValidator(
-        emailBatchLimit,
-        (maxEmailsCount: number) => this.i18nService.t("tooManyEmails", maxEmailsCount),
+        batchLimit,
+        (maxEmailsCount: number) =>
+          this.i18nService.t(
+            seatConstrained ? "tooManyEmailsForRemainingSeats" : "tooManyEmails",
+            maxEmailsCount,
+          ),
         this.params.allOrganizationUsers.map((u) => u.email),
       ),
       revokedEmailsValidator(
@@ -258,29 +331,31 @@ export class InviteMembersDialogComponent {
     });
   }
 
-  private async getUserView(): Promise<OrganizationUserAdminView> {
-    const userView = new OrganizationUserAdminView();
-    userView.organizationId = this.params.organizationId;
-    userView.type = this.formGroup.value.type ?? OrganizationUserType.User;
-
-    userView.permissions = this.setRequestPermissions(
-      userView.type !== OrganizationUserType.Custom,
-    );
-
-    userView.collections = (this.formGroup.value.access ?? [])
+  private async handleInviteUsers(organizationId: OrganizationId) {
+    const emails = [...new Set(parseCommaSeparatedEmails(this.formGroup.value.emails))];
+    const type = this.formGroup.value.type ?? OrganizationUserType.User;
+    const groups = (this.formGroup.value.groups ?? []).map((m) => m.id);
+    const accessSecretsManager = this.formGroup.value.accessSecretsManager ?? false;
+    const permissions = this.setRequestPermissions(type !== OrganizationUserType.Custom);
+    const collections = (this.formGroup.value.access ?? [])
       .filter((v) => v.type === AccessItemType.Collection)
       .map(convertToSelectionView);
 
-    userView.groups = (this.formGroup.value.groups ?? []).map((m) => m.id);
+    const request: OrganizationUserInviteRequest = new OrganizationUserInviteRequest({
+      emails,
+      type,
+      groups,
+      accessSecretsManager,
+      permissions,
+      collections,
+    });
 
-    userView.accessSecretsManager = this.formGroup.value.accessSecretsManager ?? false;
+    const result = await this.memberActionsService.invite(organizationId, request);
 
-    return userView;
-  }
-
-  private async handleInviteUsers(userView: OrganizationUserAdminView) {
-    const emails = [...new Set((this.formGroup.value.emails ?? "").trim().split(/\s*,\s*/))];
-    await this.userService.invite(emails, userView);
+    if (result.success === false) {
+      this.toastService.showToast({ variant: "error", message: result.error });
+      return;
+    }
 
     this.toastService.showToast({
       variant: "success",
@@ -306,8 +381,7 @@ export class InviteMembersDialogComponent {
       return;
     }
 
-    const userView = await this.getUserView();
-    await this.handleInviteUsers(userView);
+    await this.handleInviteUsers(organization.id);
   };
 
   protected cancel() {

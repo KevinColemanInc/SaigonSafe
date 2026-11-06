@@ -35,5 +35,6 @@ import { AppComponent } from "./app.component";
   ],
   declarations: [AppComponent],
   bootstrap: [AppComponent],
+  providers: [],
 })
 export class AppModule {}

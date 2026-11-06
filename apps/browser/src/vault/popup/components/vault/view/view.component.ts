@@ -1,13 +1,14 @@
 // FIXME: Update this file to be type safe and remove this and next line
 // @ts-strict-ignore
 import { CommonModule } from "@angular/common";
-import { Component } from "@angular/core";
+import { Component, inject } from "@angular/core";
 import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { FormsModule } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
 import { firstValueFrom, Observable, switchMap, of, map } from "rxjs";
 
 import { JslibModule } from "@bitwarden/angular/jslib.module";
+import { BrowserPremiumUpgradePromptService } from "@bitwarden/browser/billing/popup/services/browser-premium-upgrade-prompt.service";
 import { CollectionView } from "@bitwarden/common/admin-console/models/collections";
 import { Organization } from "@bitwarden/common/admin-console/models/domain/organization";
 import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
@@ -38,14 +39,15 @@ import { CipherViewLikeUtils } from "@bitwarden/common/vault/utils/cipher-view-l
 import { filterOutNullish } from "@bitwarden/common/vault/utils/observable-utilities";
 import {
   AsyncActionsModule,
-  BadgeModule,
   ButtonModule,
   CalloutModule,
+  ChipActionComponent,
   DialogService,
   IconButtonModule,
   SearchModule,
   ToastService,
 } from "@bitwarden/components";
+import { ShareButtonComponent } from "@bitwarden/tools-share";
 import {
   ArchiveCipherUtilitiesService,
   CipherViewComponent,
@@ -61,7 +63,6 @@ import { PopupFooterComponent } from "../../../../../platform/popup/layout/popup
 import { PopupHeaderComponent } from "../../../../../platform/popup/layout/popup-header.component";
 import { PopupPageComponent } from "../../../../../platform/popup/layout/popup-page.component";
 import { PopupRouterCacheService } from "../../../../../platform/popup/view-cache/popup-router-cache.service";
-import { BrowserPremiumUpgradePromptService } from "../../../services/browser-premium-upgrade-prompt.service";
 import { BrowserViewPasswordHistoryService } from "../../../services/browser-view-password-history.service";
 import {
   ROUTES_AFTER_EDIT_DELETION,
@@ -105,7 +106,8 @@ type LoadAction =
     AsyncActionsModule,
     PopOutComponent,
     CalloutModule,
-    BadgeModule,
+    ChipActionComponent,
+    ShareButtonComponent,
   ],
   providers: [
     { provide: ViewPasswordHistoryService, useClass: BrowserViewPasswordHistoryService },
@@ -113,6 +115,8 @@ type LoadAction =
   ],
 })
 export class ViewComponent {
+  private readonly configService = inject(ConfigService);
+
   private activeUserId: UserId;
 
   headerText: string;
@@ -124,12 +128,11 @@ export class ViewComponent {
   senderTabId?: number;
   routeAfterDeletion?: ROUTES_AFTER_EDIT_DELETION;
 
-  //feature flag
-  private readonly pm30521FeatureFlag = toSignal(
-    this.configService.getFeatureFlag$(FeatureFlag.PM30521_AutofillButtonViewLoginScreen),
-  );
-
   private readonly autofillAllowed = toSignal(this.vaultPopupAutofillService.autofillAllowed$);
+  private readonly pm32009NewItemTypesEnabled = toSignal(
+    this.configService.getFeatureFlag$(FeatureFlag.PM32009NewItemTypes),
+    { initialValue: false },
+  );
   private uriMatchStrategy$ = this.domainSettingsService.resolvedDefaultUriMatchStrategy$;
   protected showFooter$: Observable<boolean>;
   protected userCanArchive$ = this.accountService.activeAccount$
@@ -153,7 +156,6 @@ export class ViewComponent {
     private archiveService: CipherArchiveService,
     private archiveCipherUtilsService: ArchiveCipherUtilitiesService,
     private domainSettingsService: DomainSettingsService,
-    private configService: ConfigService,
     private afterDeletionNavigationService: VaultPopupAfterDeletionNavigationService,
   ) {
     this.subscribeToParams();
@@ -223,14 +225,17 @@ export class ViewComponent {
   }
 
   setHeader(type: CipherType) {
+    const newItemTypesEnabled = this.pm32009NewItemTypesEnabled();
     const translation = {
-      [CipherType.Login]: "viewItemHeaderLogin",
-      [CipherType.Card]: "viewItemHeaderCard",
-      [CipherType.Identity]: "viewItemHeaderIdentity",
-      [CipherType.SecureNote]: "viewItemHeaderNote",
+      [CipherType.Login]: "viewItemHeaderLoginSentenceCase",
+      [CipherType.Card]: "viewItemHeaderCardSentenceCase",
+      [CipherType.Identity]: "viewItemHeaderIdentitySentenceCase",
+      [CipherType.SecureNote]: newItemTypesEnabled
+        ? "viewItemHeaderSecureNote"
+        : "viewItemHeaderNoteSentenceCase",
       [CipherType.SshKey]: "viewItemHeaderSshKey",
       [CipherType.BankAccount]: "viewItemHeaderBankAccount",
-      [CipherType.DriversLicense]: "viewItemHeaderDriversLicense",
+      [CipherType.DriversLicense]: "viewItemHeaderLicense",
       [CipherType.Passport]: "viewItemHeaderPassport",
     };
     return this.i18nService.t(translation[type]);
@@ -338,30 +343,18 @@ export class ViewComponent {
   }
 
   showAutofillButton(): boolean {
-    //feature flag
-    if (!this.pm30521FeatureFlag()) {
-      return false;
-    }
-
     if (!this.autofillAllowed()) {
       return false;
     }
 
     const validAutofillType = (
-      [CipherType.Login, CipherType.Card, CipherType.Identity] as CipherType[]
+      [CipherType.Login, CipherType.Card, CipherType.Identity, CipherType.SshKey] as CipherType[]
     ).includes(CipherViewLikeUtils.getType(this.cipher));
 
     return validAutofillType && !(this.cipher.isArchived || this.cipher.isDeleted);
   }
 
   async doAutofill() {
-    //feature flag
-    if (
-      !(await this.configService.getFeatureFlag(FeatureFlag.PM30521_AutofillButtonViewLoginScreen))
-    ) {
-      return;
-    }
-
     //for non login types that are still auto-fillable
     if (CipherViewLikeUtils.getType(this.cipher) !== CipherType.Login) {
       await this.vaultPopupAutofillService.doAutofill(this.cipher, true, true);

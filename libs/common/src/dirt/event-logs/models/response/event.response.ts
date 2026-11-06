@@ -26,6 +26,9 @@ export class EventResponse extends BaseResponse {
   projectId: string;
   serviceAccountId: string;
   grantedServiceAccountId: string;
+  sendId: string;
+  accessRequestId: string;
+  accessLeaseId: string;
 
   constructor(response: any) {
     super(response);
@@ -51,5 +54,8 @@ export class EventResponse extends BaseResponse {
     this.projectId = this.getResponseProperty("ProjectId");
     this.serviceAccountId = this.getResponseProperty("ServiceAccountId");
     this.grantedServiceAccountId = this.getResponseProperty("GrantedServiceAccountId");
+    this.sendId = this.getResponseProperty("SendId");
+    this.accessRequestId = this.getResponseProperty("AccessRequestId");
+    this.accessLeaseId = this.getResponseProperty("AccessLeaseId");
   }
 }

@@ -217,6 +217,8 @@ describe("VaultPopupListFiltersService", () => {
           CipherType.Card,
           CipherType.BankAccount,
           CipherType.Identity,
+          CipherType.DriversLicense,
+          CipherType.Passport,
           CipherType.SecureNote,
           CipherType.SshKey,
         ]);
@@ -791,13 +793,11 @@ function createSeededVaultPopupListFiltersService(
   const collectionServiceMock = {
     decryptedCollections$: () => seededCollections$,
     getAllNested: () =>
-      seededCollections$.value.map(
-        (c): TreeNode<CollectionView> => ({
-          children: [],
-          node: c,
-          parent: null as any,
-        }),
-      ),
+      seededCollections$.value.map((c): TreeNode<CollectionView> => ({
+        children: [],
+        node: c,
+        parent: null as any,
+      })),
   } as any;
 
   const folderServiceMock = {

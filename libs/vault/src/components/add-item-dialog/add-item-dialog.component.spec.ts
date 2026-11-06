@@ -1,3 +1,4 @@
+import { signal } from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { By } from "@angular/platform-browser";
 import { NoopAnimationsModule } from "@angular/platform-browser/animations";
@@ -11,6 +12,7 @@ import {
 } from "@bitwarden/common/vault/services/restricted-item-types.service";
 import { DIALOG_DATA, DialogRef } from "@bitwarden/components";
 
+import { Vfo1TerminologyService } from "../../services/vfo1-terminology.service";
 import { AddItemGridComponent } from "../add-item-grid/add-item-grid.component";
 
 import {
@@ -40,6 +42,10 @@ describe("AddItemDialogComponent", () => {
         {
           provide: RestrictedItemTypesService,
           useValue: { restricted$ },
+        },
+        {
+          provide: Vfo1TerminologyService,
+          useValue: { iconClass: (icon: string) => icon, enabled: signal(false) },
         },
       ],
     }).compileComponents();
@@ -109,6 +115,11 @@ describe("AddItemDialogComponent", () => {
     });
 
     it('is "default" when the grid has fewer than 6 items', () => {
+      restricted$.next([
+        { cipherType: CipherType.Card, allowViewOrgIds: [] },
+        { cipherType: CipherType.DriversLicense, allowViewOrgIds: [] },
+        { cipherType: CipherType.Passport, allowViewOrgIds: [] },
+      ]);
       createComponent({
         canCreateFolder: false,
         canCreateCollection: false,
@@ -127,7 +138,11 @@ describe("AddItemDialogComponent", () => {
 
       expect(fixture.componentInstance["dialogSize"]()).toBe("large");
 
-      restricted$.next([{ cipherType: CipherType.Card, allowViewOrgIds: [] } as any]);
+      restricted$.next([
+        { cipherType: CipherType.Card, allowViewOrgIds: [] },
+        { cipherType: CipherType.DriversLicense, allowViewOrgIds: [] },
+        { cipherType: CipherType.Passport, allowViewOrgIds: [] },
+      ]);
       fixture.detectChanges();
 
       expect(fixture.componentInstance["dialogSize"]()).toBe("default");

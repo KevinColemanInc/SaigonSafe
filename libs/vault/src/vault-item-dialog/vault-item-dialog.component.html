@@ -4,7 +4,7 @@
   </span>
 
   @if (isCipherArchived && !params.isAdminConsoleAction) {
-    <span bitBadge bitDialogHeaderEnd> {{ "archived" | i18n }} </span>
+    <button type="button" bit-chip-action bitDialogHeaderEnd [label]="'archived' | i18n"></button>
   }
 
   <div bitDialogContent #dialogContent>
@@ -13,7 +13,18 @@
         [cipher]="cipher"
         [collections]="collections"
         [isAdminConsole]="formConfig.isAdminConsole"
-      ></app-cipher-view>
+      >
+        @if (shareItemEntryPoint) {
+          <div slot="button">
+            <ng-container
+              *ngComponentOutlet="
+                shareItemEntryPoint;
+                inputs: { cipher: cipher, skipPasswordPrompt: true }
+              "
+            ></ng-container>
+          </div>
+        }
+      </app-cipher-view>
     }
 
     @if (loadForm) {
@@ -106,7 +117,7 @@
             ></button>
           }
         }
-        @if (cipher) {
+        @if (showDeleteButton) {
           <button
             bitIconButton="bwi-trash"
             type="button"

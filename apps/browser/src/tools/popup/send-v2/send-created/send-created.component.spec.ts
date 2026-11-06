@@ -17,11 +17,13 @@ import { AuthType } from "@bitwarden/common/tools/send/types/auth-type";
 import { SendType } from "@bitwarden/common/tools/send/types/send-type";
 import { ButtonModule, I18nMockService, SvgModule, ToastService } from "@bitwarden/components";
 
+import BrowserPopupUtils from "../../../../platform/browser/browser-popup-utils";
 import { PopOutComponent } from "../../../../platform/popup/components/pop-out.component";
 import { PopupFooterComponent } from "../../../../platform/popup/layout/popup-footer.component";
 import { PopupHeaderComponent } from "../../../../platform/popup/layout/popup-header.component";
 import { PopupPageComponent } from "../../../../platform/popup/layout/popup-page.component";
 import { PopupRouterCacheService } from "../../../../platform/popup/view-cache/popup-router-cache.service";
+import { SendPopoutType } from "../../utils/send-popout-window";
 
 import { SendCreatedComponent } from "./send-created.component";
 
@@ -63,7 +65,13 @@ describe("SendCreatedComponent", () => {
 
     Object.defineProperty(environmentService, "environment$", {
       configurable: true,
-      get: () => of(new SelfHostedEnvironment({ webVault: "https://example.com" })),
+      get: () =>
+        of(
+          new SelfHostedEnvironment({
+            webVault: "https://example.com",
+            base: "https://example.com",
+          }),
+        ),
     });
 
     activatedRoute.snapshot = {
@@ -140,13 +148,6 @@ describe("SendCreatedComponent", () => {
     expect(component["hoursAvailable"]).toBe(168);
   });
 
-  it("should navigate back to the edit send form on close", async () => {
-    await component.goToEditSend();
-    expect(router.navigate).toHaveBeenCalledWith(["/edit-send"], {
-      queryParams: { sendId: "test-send-id", type: SendType.Text },
-    });
-  });
-
   describe("getHoursAvailable", () => {
     it("returns the correct number of hours", () => {
       sendViewsSubject.next([sendView]);
@@ -216,6 +217,41 @@ describe("SendCreatedComponent", () => {
 
       expect(fixture.nativeElement.textContent).toContain("createdSendSuccessfully");
       expect(fixture.nativeElement.textContent).toContain("Email-verified Send ready for");
+    });
+  });
+
+  describe("close", () => {
+    let inSingleActionPopoutSpy: jest.SpyInstance;
+    let closeSingleActionPopoutSpy: jest.SpyInstance;
+
+    beforeEach(() => {
+      inSingleActionPopoutSpy = jest.spyOn(BrowserPopupUtils, "inSingleActionPopout");
+      closeSingleActionPopoutSpy = jest
+        .spyOn(BrowserPopupUtils, "closeSingleActionPopout")
+        .mockResolvedValue(undefined);
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it("closes the popout the extension opened for the file Send flow", async () => {
+      inSingleActionPopoutSpy.mockReturnValue(true);
+
+      await component.close();
+
+      expect(inSingleActionPopoutSpy).toHaveBeenCalledWith(window, SendPopoutType.addFileSend);
+      expect(closeSingleActionPopoutSpy).toHaveBeenCalledWith(SendPopoutType.addFileSend);
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+
+    it("navigates back instead of closing a popout the user opened themselves", async () => {
+      inSingleActionPopoutSpy.mockReturnValue(false);
+
+      await component.close();
+
+      expect(closeSingleActionPopoutSpy).not.toHaveBeenCalled();
+      expect(router.navigate).toHaveBeenCalledWith(["/tabs/send"]);
     });
   });
 

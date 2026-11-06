@@ -76,6 +76,10 @@ async function main() {
     'export { SaigonSafeLogo as BitwardenLogo } from "./saigonsafe-logo";\n',
   );
   await save(
+    "libs/assets/src/svg/svgs/bitwarden-logo-beta.icon.ts",
+    'export { SaigonSafeLogo as BitwardenLogoBeta } from "./saigonsafe-logo";\n',
+  );
+  await save(
     "libs/assets/src/svg/svgs/bitwarden-icon.ts",
     'export { SaigonSafeIcon as BitwardenIcon } from "./saigonsafe-icon";\n',
   );

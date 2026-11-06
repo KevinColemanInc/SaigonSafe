@@ -4,10 +4,10 @@ import { LogService } from "@bitwarden/common/platform/abstractions/log.service"
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
 import { SdkLoadService } from "@bitwarden/common/platform/abstractions/sdk/sdk-load.service";
 import {
+  DESTINATION_UNREACHABLE_ERROR,
   IpcMessage,
   IpcService,
   isIpcMessage,
-  IpcSessionRepository,
 } from "@bitwarden/common/platform/ipc";
 import {
   IncomingMessage,
@@ -17,23 +17,38 @@ import {
   OutgoingMessage,
 } from "@bitwarden/sdk-internal";
 
+import { WebBrowserInteractionService } from "../../vault/services/web-browser-interaction.service";
+
 export class WebIpcService extends IpcService {
   private logService = inject(LogService);
   private platformUtilsService = inject(PlatformUtilsService);
-  private sessionRepository = inject(IpcSessionRepository);
+  private webBrowserInteractionService = inject(WebBrowserInteractionService);
   private communicationBackend?: IpcCommunicationBackend;
+  /** Whether the browser extension is installed. Until it is, nothing answers a send to it. */
+  private extensionInstalled = false;
 
   override async init() {
     try {
       // This function uses classes and functions defined in the SDK, so we need to wait for the SDK to load.
       await SdkLoadService.Ready;
 
+      this.webBrowserInteractionService.extensionInstalled$.subscribe((installed) => {
+        this.extensionInstalled = installed;
+      });
+
       this.communicationBackend = new IpcCommunicationBackend({
-        async send(message: OutgoingMessage): Promise<void> {
+        send: async (message: OutgoingMessage): Promise<void> => {
           if (
             typeof message.destination === "object" &&
             "BrowserBackground" in message.destination
           ) {
+            // Fail fast instead of posting into the void: the SDK would otherwise wait out its
+            // handshake timeout for a reply that never comes. The Firefox extension runs no web
+            // IPC, so it never answers even when installed.
+            if (!this.extensionInstalled || this.platformUtilsService.isFirefox()) {
+              throw new Error(DESTINATION_UNREACHABLE_ERROR);
+            }
+
             window.postMessage(
               {
                 type: "bitwarden-ipc-message",
@@ -79,15 +94,11 @@ export class WebIpcService extends IpcService {
         );
       });
 
-      await super.initWithClient(
-        IpcClient.newWithClientManagedSessions(this.communicationBackend, this.sessionRepository),
-      );
+      await super.initWithClient(IpcClient.newWithSdkInMemorySessions(this.communicationBackend));
 
-      if (this.platformUtilsService.isDev()) {
-        await ipcRegisterDiscoverHandler(this.client, {
-          version: await this.platformUtilsService.getApplicationVersion(),
-        });
-      }
+      await ipcRegisterDiscoverHandler(this.client, {
+        version: await this.platformUtilsService.getApplicationVersion(),
+      });
     } catch (e) {
       this.logService.error("[IPC] Initialization failed", e);
     }

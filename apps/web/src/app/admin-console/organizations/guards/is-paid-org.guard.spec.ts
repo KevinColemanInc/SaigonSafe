@@ -1,5 +1,3 @@
-// FIXME: Update this file to be type safe and remove this and next line
-// @ts-strict-ignore
 import { Component } from "@angular/core";
 import { TestBed } from "@angular/core/testing";
 import { provideRouter } from "@angular/router";
@@ -22,7 +20,7 @@ import { isPaidOrgGuard } from "./is-paid-org.guard";
 // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
 @Component({
   template: "<h1>This is the home screen!</h1>",
-  standalone: false,
+  standalone: true,
 })
 export class HomescreenComponent {}
 
@@ -30,7 +28,7 @@ export class HomescreenComponent {}
 // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
 @Component({
   template: "<h1>This component can only be accessed by a paid organization!</h1>",
-  standalone: false,
+  standalone: true,
 })
 export class PaidOrganizationOnlyComponent {}
 
@@ -38,7 +36,7 @@ export class PaidOrganizationOnlyComponent {}
 // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
 @Component({
   template: "<h1>This is the organization upgrade screen!</h1>",
-  standalone: false,
+  standalone: true,
 })
 export class OrganizationUpgradeScreenComponent {}
 
@@ -66,6 +64,11 @@ describe("Is Paid Org Guard", () => {
     accountService = mockAccountServiceWith(userId);
 
     TestBed.configureTestingModule({
+      imports: [
+        HomescreenComponent,
+        PaidOrganizationOnlyComponent,
+        OrganizationUpgradeScreenComponent,
+      ],
       providers: [
         { provide: OrganizationService, useValue: organizationService },
         { provide: DialogService, useValue: dialogService },

@@ -1,4 +1,5 @@
 import { AutofillExtensionMessageParam } from "../../../content/abstractions/autofill-init";
+import { AutofillMonitor } from "../../../content/abstractions/autofill-monitor";
 
 export type InlineMenuExtensionMessageHandlers = {
   [key: string]: CallableFunction;
@@ -6,11 +7,10 @@ export type InlineMenuExtensionMessageHandlers = {
   appendAutofillInlineMenuToDom: ({ message }: AutofillExtensionMessageParam) => Promise<void>;
 };
 
-export interface AutofillInlineMenuContentService {
+export interface AutofillInlineMenuContentService extends AutofillMonitor {
   messageHandlers: InlineMenuExtensionMessageHandlers;
-  isElementInlineMenu(element: HTMLElement): boolean;
-  getOwnedTagNames: () => string[];
-  getUnownedTopLayerItems: (includeCandidates?: boolean) => NodeListOf<Element>;
+  isElementInlineMenu(element: Element): boolean;
+  getUnownedTopLayerItems: (includeCandidates?: boolean) => Element[];
   refreshTopLayerPosition: () => void;
   destroy(): void;
 }

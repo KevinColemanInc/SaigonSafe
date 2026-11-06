@@ -1,8 +1,11 @@
 import { booleanAttribute, computed, Directive, input, model } from "@angular/core";
 import { toObservable, toSignal } from "@angular/core/rxjs-interop";
-import { debounce, interval } from "rxjs";
+import { debounce, interval, of } from "rxjs";
 
 import { ButtonType } from "./button-like.abstraction";
+
+/** Delay before a loading button shows its spinner, so quick actions don't flash one. */
+export const BUTTON_SPINNER_DELAY_MS = 75;
 
 export const focusRing = [
   "focus-visible:tw-ring-2",
@@ -229,9 +232,9 @@ export const getButtonColorStyles = ({
   ];
 
   const baseDisabledStyles = [
-    "aria-disabled:!tw-text-fg-disabled",
-    "hover:!tw-text-fg-disabled",
-    "aria-disabled:tw-cursor-not-allowed",
+    "aria-disabled:!tw-text-fg-inactive",
+    "hover:!tw-text-fg-inactive",
+    "aria-disabled:tw-cursor-default",
     "hover:tw-no-underline",
   ];
 
@@ -253,7 +256,7 @@ export const getButtonColorStyles = ({
     } else {
       baseStyles.push(
         ...baseDisabledStyles,
-        "aria-disabled:!tw-bg-bg-disabled",
+        "aria-disabled:!tw-bg-bg-inactive",
         "hover:tw-bg-bg-hover",
         "aria-disabled:tw-border-border-base",
         "aria-disabled:hover:tw-border-border-base",
@@ -323,6 +326,12 @@ export class BaseButtonDirective {
 
   readonly loading = model<boolean>(false);
 
+  /**
+   * Shows the spinner as soon as `loading` starts, skipping the debounce. For actions that block
+   * the main thread, e.g. a key derivation, where waiting for the debounce delays the action.
+   */
+  readonly instantSpinner = input(false, { transform: booleanAttribute });
+
   readonly disabled = model<boolean>(false);
 
   readonly disabledAttr = computed(() => {
@@ -345,7 +354,13 @@ export class BaseButtonDirective {
    * recommended. TODO -- find better way to use debounce with signals (CL-596)
    */
   readonly showLoadingStyle = toSignal(
-    toObservable(this.loading).pipe(debounce((isLoading) => interval(isLoading ? 75 : 0))),
+    toObservable(this.loading).pipe(
+      debounce((isLoading) =>
+        isLoading && this.instantSpinner()
+          ? of(true)
+          : interval(isLoading ? BUTTON_SPINNER_DELAY_MS : 0),
+      ),
+    ),
   );
 
   /**

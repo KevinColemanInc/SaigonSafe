@@ -1,5 +1,5 @@
 import { mock, MockProxy, mockReset } from "jest-mock-extended";
-import { BehaviorSubject, of } from "rxjs";
+import { BehaviorSubject, of, Subject } from "rxjs";
 import { map } from "rxjs/operators";
 
 import { PolicyService } from "@bitwarden/common/admin-console/abstractions/policy/policy.service.abstraction";
@@ -25,6 +25,11 @@ import {
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import { LogService } from "@bitwarden/common/platform/abstractions/log.service";
 import { ThemeType } from "@bitwarden/common/platform/enums";
+import {
+  IntraprocessMessageSender,
+  Message,
+  MessageListener,
+} from "@bitwarden/common/platform/messaging";
 import { Utils } from "@bitwarden/common/platform/misc/utils";
 import { CloudEnvironment } from "@bitwarden/common/platform/services/default-environment.service";
 import { Fido2ActiveRequestManager } from "@bitwarden/common/platform/services/fido2/fido2-active-request-manager";
@@ -46,6 +51,7 @@ import { GeneratedCredential, GeneratorHistoryService } from "@bitwarden/generat
 
 import { BrowserApi } from "../../platform/browser/browser-api";
 import { BrowserPlatformUtilsService } from "../../platform/services/platform-utils/browser-platform-utils.service";
+import { AutofillOutcome } from "../enums/autofill-outcome.enum";
 import {
   AutofillOverlayElement,
   AutofillOverlayPort,
@@ -65,6 +71,7 @@ import {
   createPortSpyMock,
 } from "../spec/autofill-mocks";
 import {
+  crossContextBoundary,
   flushPromises,
   sendMockExtensionMessage,
   sendPortMessage,
@@ -74,7 +81,15 @@ import {
   triggerWebNavigationOnCommittedEvent,
   triggerWebRequestOnCompletedEvent,
 } from "../spec/testing-utils";
+import { FillResult } from "../types/fill-result";
 
+import { AutofillOrchestrator } from "./abstractions/autofill-orchestrator";
+import {
+  ADD_TO_LOCKED_VAULT_PENDING_NOTIFICATIONS,
+  LockedVaultPendingNotificationsData,
+  RETRY_SENDER,
+  RETRY_WHEN_UNLOCK_COMPLETED,
+} from "./abstractions/notification.background";
 import { ModifyLoginCipherFormData } from "./abstractions/overlay-notifications.background";
 import {
   FocusedFieldData,
@@ -119,7 +134,12 @@ describe("OverlayBackground", () => {
   let totpService: MockProxy<TotpService>;
   let generatorService: MockProxy<CredentialGeneratorService>;
   let generatorHistoryService: MockProxy<GeneratorHistoryService>;
+  let autofillOrchestrator: MockProxy<AutofillOrchestrator>;
   let overlayBackground: OverlayBackground;
+  // A real channel rather than a mock: what is under test is that the class reads the
+  // channel's own messages, which no mocked listener would demonstrate.
+  let intraprocessMessageSender: IntraprocessMessageSender;
+  let externalMessages: Subject<Message<Record<string, unknown>>>;
   let portKeyForTabSpy: Record<number, string>;
   let pageDetailsForTabSpy: PageDetailsForTab;
   let subFrameOffsetsSpy: SubFrameOffsetsForTab;
@@ -159,6 +179,8 @@ describe("OverlayBackground", () => {
   }
 
   beforeEach(() => {
+    intraprocessMessageSender = new IntraprocessMessageSender();
+    externalMessages = new Subject<Message<Record<string, unknown>>>();
     configService = mock<ConfigService>();
     configService.getFeatureFlag$.mockReturnValue(of(true));
     accountService = mockAccountServiceWith(mockUserId);
@@ -172,6 +194,10 @@ describe("OverlayBackground", () => {
 
     const authServiceForDomain = mock<AuthService>();
     authServiceForDomain.authStatusFor$.mockReturnValue(of(AuthenticationStatus.Unlocked));
+
+    // fillAssistPolicy$ (feeding resolvedEnableFillAssist$) subscribes to
+    // policyService.policiesByType$; default the mock to an empty stream.
+    policyService.policiesByType$.mockReturnValue(of([]));
 
     domainSettingsService = new DefaultDomainSettingsService(
       fakeStateProvider,
@@ -231,6 +257,11 @@ describe("OverlayBackground", () => {
     );
     generatorHistoryService = mock<GeneratorHistoryService>();
     generatorHistoryService.track.mockResolvedValue(null);
+    autofillOrchestrator = mock<AutofillOrchestrator>();
+    autofillOrchestrator.collectPageDetails.mockResolvedValue([]);
+    // The overlay routes fills through the orchestrator; default to a filled-without-TOTP outcome so
+    // handlers that destructure the result do not choke on the mock's undefined default.
+    autofillOrchestrator.fillCipher.mockResolvedValue({ outcome: AutofillOutcome.Filled });
     overlayBackground = new OverlayBackground(
       logService,
       cipherService,
@@ -249,6 +280,11 @@ describe("OverlayBackground", () => {
       accountService,
       generatorHistoryService,
       generatorService,
+      autofillOrchestrator,
+      configService,
+      intraprocessMessageSender,
+      // Wired as `MainBackground` wires it, so ingest tagging is exercised rather than faked.
+      new MessageListener(intraprocessMessageSender.messages$({ external$: externalMessages })),
     );
     portKeyForTabSpy = overlayBackground["portKeyForTab"];
     pageDetailsForTabSpy = overlayBackground["pageDetailsForTab"];
@@ -419,6 +455,152 @@ describe("OverlayBackground", () => {
 
       expect(pageDetailsForTabSpy[tabId]).toBeUndefined();
       expect(portKeyForTabSpy[tabId]).toBeUndefined();
+    });
+  });
+
+  describe("inline menu list port init message", () => {
+    it.each([true, false])(
+      "includes useLitComponents as %s when LitInlineMenuComponents is %s",
+      async (enabled) => {
+        overlayBackground.useLitInlineMenuComponents$ = of(enabled);
+
+        await initOverlayElementPorts({ initList: true, initButton: false });
+
+        expect(listPortSpy.postMessage).toHaveBeenCalledWith(
+          expect.objectContaining({
+            command: "initAutofillInlineMenuList",
+            useLitComponents: enabled,
+          }),
+        );
+      },
+    );
+  });
+
+  describe("when enableFillAssist is turned off", () => {
+    const targetedTabId = 1;
+    const heuristicTabId = 2;
+
+    function seedPageDetailsEntry(tabId: number, frameId: number, isTargeted: boolean) {
+      const field = createAutofillFieldMock(isTargeted ? { targeted: true } : {});
+      const entry = {
+        frameId,
+        tab: createChromeTabMock({ id: tabId }),
+        details: createAutofillPageDetailsMock({ fields: [field] }),
+      };
+      const existing = pageDetailsForTabSpy[tabId];
+      if (existing) {
+        existing.set(frameId, entry);
+      } else {
+        pageDetailsForTabSpy[tabId] = new Map([[frameId, entry]]);
+      }
+    }
+
+    beforeEach(async () => {
+      // Initial state is `false`; flip to `true` so the subsequent toggle to
+      // `false` produces a `true` -> `false` transition the subscription will act on.
+      await domainSettingsService.setEnableFillAssist(true);
+    });
+
+    it("does not sweep or broadcast when the setting goes from default (false) to true", async () => {
+      // The outer `beforeEach` already toggled false→true. If the subscription
+      // weren't gated on a true→false transition, that flip would have swept
+      // the cache and broadcast to all tabs.
+      const tabsQuerySpy = jest
+        .spyOn(BrowserApi, "tabsQuery")
+        .mockResolvedValue([createChromeTabMock({ id: 11 })]);
+      seedPageDetailsEntry(targetedTabId, 0, true);
+      tabsSendMessageSpy.mockClear();
+
+      await flushPromises();
+
+      expect(tabsQuerySpy).not.toHaveBeenCalled();
+      expect(tabsSendMessageSpy).not.toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ command: "clearTargetingRulesCache" }),
+      );
+      expect(pageDetailsForTabSpy[targetedTabId]).toBeDefined();
+    });
+
+    it("removes cached page-detail entries that contain targeted fields", async () => {
+      seedPageDetailsEntry(targetedTabId, 0, true);
+
+      await domainSettingsService.setEnableFillAssist(false);
+      await flushPromises();
+
+      expect(pageDetailsForTabSpy[targetedTabId]).toBeUndefined();
+    });
+
+    it("leaves cached page-detail entries without targeted fields intact", async () => {
+      seedPageDetailsEntry(heuristicTabId, 0, false);
+
+      await domainSettingsService.setEnableFillAssist(false);
+      await flushPromises();
+
+      expect(pageDetailsForTabSpy[heuristicTabId]).toBeDefined();
+      expect(pageDetailsForTabSpy[heuristicTabId].size).toBe(1);
+    });
+
+    it("removes only the targeted frame from a tab that mixes targeted and heuristic frames", async () => {
+      const mixedTabId = 3;
+      seedPageDetailsEntry(mixedTabId, 0, true);
+      seedPageDetailsEntry(mixedTabId, 1, false);
+
+      await domainSettingsService.setEnableFillAssist(false);
+      await flushPromises();
+
+      expect(pageDetailsForTabSpy[mixedTabId]).toBeDefined();
+      expect(pageDetailsForTabSpy[mixedTabId].has(0)).toBe(false);
+      expect(pageDetailsForTabSpy[mixedTabId].has(1)).toBe(true);
+    });
+
+    it("does not sweep the cache when the setting transitions to true", async () => {
+      // Flip back to false first so transitioning to true is an actual change.
+      await domainSettingsService.setEnableFillAssist(false);
+      await flushPromises();
+      seedPageDetailsEntry(targetedTabId, 0, true);
+
+      await domainSettingsService.setEnableFillAssist(true);
+      await flushPromises();
+
+      expect(pageDetailsForTabSpy[targetedTabId]).toBeDefined();
+      expect(pageDetailsForTabSpy[targetedTabId].size).toBe(1);
+    });
+
+    it("broadcasts a targeting-rules cache invalidation message to every tab", async () => {
+      const tabs = [
+        createChromeTabMock({ id: 11 }),
+        createChromeTabMock({ id: 12 }),
+        createChromeTabMock({ id: 13 }),
+      ];
+      jest.spyOn(BrowserApi, "tabsQuery").mockResolvedValue(tabs);
+
+      await domainSettingsService.setEnableFillAssist(false);
+      await flushPromises();
+
+      for (const tab of tabs) {
+        expect(tabsSendMessageSpy).toHaveBeenCalledWith(tab, {
+          command: "clearTargetingRulesCache",
+        });
+      }
+    });
+
+    it("does not broadcast when the setting transitions to true", async () => {
+      const tabsQuerySpy = jest
+        .spyOn(BrowserApi, "tabsQuery")
+        .mockResolvedValue([createChromeTabMock({ id: 11 })]);
+      await domainSettingsService.setEnableFillAssist(false);
+      await flushPromises();
+      tabsQuerySpy.mockClear();
+      tabsSendMessageSpy.mockClear();
+
+      await domainSettingsService.setEnableFillAssist(true);
+      await flushPromises();
+
+      expect(tabsQuerySpy).not.toHaveBeenCalled();
+      expect(tabsSendMessageSpy).not.toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ command: "clearTargetingRulesCache" }),
+      );
     });
   });
 
@@ -740,6 +922,76 @@ describe("OverlayBackground", () => {
         });
       });
 
+      describe("updateInlineMenuPosition sub frame offsets", () => {
+        let rebuildSubFrameOffsetsNextSpy: jest.SpyInstance;
+        let startUpdateInlineMenuPositionNextSpy: jest.SpyInstance;
+        let startInlineMenuFadeInNextSpy: jest.SpyInstance;
+
+        beforeEach(async () => {
+          await initOverlayElementPorts();
+          // Port setup posts its own position update; only assert on calls made by the test.
+          jest.mocked(buttonPortSpy.postMessage).mockClear();
+          rebuildSubFrameOffsetsNextSpy = jest.spyOn(
+            overlayBackground["rebuildSubFrameOffsets$"],
+            "next",
+          );
+          startUpdateInlineMenuPositionNextSpy = jest.spyOn(
+            overlayBackground["startUpdateInlineMenuPosition$"],
+            "next",
+          );
+          startInlineMenuFadeInNextSpy = jest.spyOn(
+            overlayBackground["startInlineMenuFadeIn$"],
+            "next",
+          );
+        });
+
+        it("positions and fades in the inline menu for a top frame field when the tab only has offsets for other frames", async () => {
+          const topFrameSender = mock<chrome.runtime.MessageSender>({ tab, frameId: topFrameId });
+          overlayBackground["focusedFieldData"] = createFocusedFieldDataMock({
+            tabId,
+            frameId: topFrameId,
+          });
+          subFrameOffsetsSpy[tabId] = new Map([
+            [
+              middleFrameId,
+              { left: 2, top: 2, url: "https://middle-frame.com", parentFrameIds: [topFrameId] },
+            ],
+          ]);
+
+          await overlayBackground["updateInlineMenuPosition"](
+            topFrameSender,
+            AutofillOverlayElement.Button,
+          );
+
+          expect(rebuildSubFrameOffsetsNextSpy).not.toHaveBeenCalled();
+          expect(startUpdateInlineMenuPositionNextSpy).not.toHaveBeenCalled();
+          expect(buttonPortSpy.postMessage).toHaveBeenCalledWith(
+            expect.objectContaining({ command: "updateAutofillInlineMenuPosition" }),
+          );
+          expect(startInlineMenuFadeInNextSpy).toHaveBeenCalled();
+        });
+
+        it("rebuilds the sub frame offsets and retries when the focused frame's offsets are awaiting a rebuild", async () => {
+          overlayBackground["focusedFieldData"] = createFocusedFieldDataMock({
+            tabId,
+            frameId: middleFrameId,
+          });
+          subFrameOffsetsSpy[tabId].set(middleFrameId, null);
+
+          await overlayBackground["updateInlineMenuPosition"](
+            sender,
+            AutofillOverlayElement.Button,
+          );
+
+          expect(rebuildSubFrameOffsetsNextSpy).toHaveBeenCalledWith(sender);
+          expect(startUpdateInlineMenuPositionNextSpy).toHaveBeenCalledWith(sender);
+          expect(buttonPortSpy.postMessage).not.toHaveBeenCalledWith(
+            expect.objectContaining({ command: "updateAutofillInlineMenuPosition" }),
+          );
+          expect(startInlineMenuFadeInNextSpy).not.toHaveBeenCalled();
+        });
+      });
+
       describe("triggerSubFrameFocusInRebuild", () => {
         it("triggers a rebuild of the sub frame and updates the inline menu position", async () => {
           const rebuildSubFrameOffsetsSpy = jest.spyOn(
@@ -892,6 +1144,7 @@ describe("OverlayBackground", () => {
       expect(cipherService.getAllDecryptedForUrl).toHaveBeenCalledWith(url, mockUserId, [
         CipherType.Card,
         CipherType.Identity,
+        CipherType.SshKey,
       ]);
       expect(cipherService.sortCiphersByLastUsedThenName).toHaveBeenCalled();
       expect(overlayBackground["inlineMenuCiphers"]).toStrictEqual(
@@ -934,6 +1187,7 @@ describe("OverlayBackground", () => {
       expect(cipherService.getAllDecryptedForUrl).toHaveBeenCalledWith(url, mockUserId, [
         CipherType.Card,
         CipherType.Identity,
+        CipherType.SshKey,
       ]);
       expect(cipherService.sortCiphersByLastUsedThenName).toHaveBeenCalled();
       expect(overlayBackground["inlineMenuCiphers"]).toStrictEqual(
@@ -981,6 +1235,59 @@ describe("OverlayBackground", () => {
         ],
       });
     });
+
+    it.each([
+      {
+        description: "for the standard inline menu path",
+        focusedFieldData: createFocusedFieldDataMock({ tabId: tab.id }),
+        ciphersForUrl: [loginCipher1],
+        expectedShowInlineMenuAccountCreation: false,
+      },
+      {
+        description: "for the account creation path",
+        focusedFieldData: createFocusedFieldDataMock({
+          tabId: tab.id,
+          accountCreationFieldType: "text",
+          inlineMenuFillType: InlineMenuFillTypes.AccountCreationUsername,
+        }),
+        ciphersForUrl: [loginCipher1, identityCipher],
+        expectedShowInlineMenuAccountCreation: true,
+      },
+    ])(
+      "uses current environment icons URL when updating ciphers $description",
+      async ({ focusedFieldData, ciphersForUrl, expectedShowInlineMenuAccountCreation }) => {
+        environmentMock$.next(
+          new CloudEnvironment({
+            key: Region.EU,
+            domain: "example.com",
+            urls: { icons: "https://icons-secondary.example.com/" },
+          }),
+        );
+
+        overlayBackground["focusedFieldData"] = focusedFieldData;
+        cipherService.getAllDecryptedForUrl.mockResolvedValue(ciphersForUrl);
+        cipherService.sortCiphersByLastUsedThenName.mockReturnValue(-1);
+        getTabFromCurrentWindowIdSpy.mockResolvedValueOnce(tab);
+
+        await overlayBackground.updateOverlayCiphers();
+        await flushPromises();
+
+        expect(listPortSpy.postMessage).toHaveBeenLastCalledWith(
+          expect.objectContaining({
+            command: "updateAutofillInlineMenuListCiphers",
+            showInlineMenuAccountCreation: expectedShowInlineMenuAccountCreation,
+            ciphers: expect.arrayContaining([
+              expect.objectContaining({
+                type: CipherType.Login,
+                icon: expect.objectContaining({
+                  image: "https://icons-secondary.example.com//jest-testing-website.com/icon.png",
+                }),
+              }),
+            ]),
+          }),
+        );
+      },
+    );
 
     it("updates the inline menu list with card ciphers", async () => {
       overlayBackground["focusedFieldData"] = createFocusedFieldDataMock({
@@ -1618,6 +1925,23 @@ describe("OverlayBackground", () => {
         expect(openAddEditVaultItemPopoutSpy).toHaveBeenCalled();
       });
 
+      it("creates a blank SSH key cipher without captured page data", async () => {
+        overlayBackground["currentAddNewItemData"].addNewCipherType = CipherType.SshKey;
+
+        sendMockExtensionMessage(
+          {
+            command: "autofillOverlayAddNewVaultItem",
+            addNewCipherType: CipherType.SshKey,
+          },
+          sender,
+        );
+        jest.advanceTimersByTime(100);
+        await flushPromises();
+
+        expect(cipherService.setAddEditCipherInfo).toHaveBeenCalled();
+        expect(openAddEditVaultItemPopoutSpy).toHaveBeenCalled();
+      });
+
       describe("creating a new identity cipher", () => {
         beforeEach(() => {
           overlayBackground["currentAddNewItemData"].addNewCipherType = CipherType.Identity;
@@ -2157,6 +2481,54 @@ describe("OverlayBackground", () => {
 
         it("shows the save login menu when the focused field type is for a login cipher and the field is filled", async () => {
           focusedFieldData.inlineMenuFillType = CipherType.Login;
+
+          sendMockExtensionMessage(
+            { command: "updateFocusedFieldData", focusedFieldData, focusedFieldHasValue: true },
+            sender,
+          );
+          await flushPromises();
+
+          expect(listPortSpy.postMessage).toHaveBeenCalledWith({
+            command: "showSaveLoginInlineMenuList",
+          });
+        });
+
+        it("does not show the save login menu on a password-generation field when only the current-password field has a value", async () => {
+          focusedFieldData.inlineMenuFillType = InlineMenuFillTypes.PasswordGeneration;
+          formData.password = "current-password";
+          formData.newPassword = "";
+
+          sendMockExtensionMessage(
+            { command: "updateFocusedFieldData", focusedFieldData, focusedFieldHasValue: true },
+            sender,
+          );
+          await flushPromises();
+
+          expect(listPortSpy.postMessage).not.toHaveBeenCalledWith({
+            command: "showSaveLoginInlineMenuList",
+          });
+        });
+
+        it("shows the save login menu on a password-generation field once the new-password field has a value", async () => {
+          focusedFieldData.inlineMenuFillType = InlineMenuFillTypes.PasswordGeneration;
+          formData.password = "";
+          formData.newPassword = "generated";
+
+          sendMockExtensionMessage(
+            { command: "updateFocusedFieldData", focusedFieldData, focusedFieldHasValue: true },
+            sender,
+          );
+          await flushPromises();
+
+          expect(listPortSpy.postMessage).toHaveBeenCalledWith({
+            command: "showSaveLoginInlineMenuList",
+          });
+        });
+
+        it("shows the save login menu on an account-creation field when only the current-password field has a value", async () => {
+          focusedFieldData.inlineMenuFillType = CipherType.Login;
+          formData.password = "current-password";
+          formData.newPassword = "";
 
           sendMockExtensionMessage(
             { command: "updateFocusedFieldData", focusedFieldData, focusedFieldHasValue: true },
@@ -2789,7 +3161,7 @@ describe("OverlayBackground", () => {
       });
 
       it("updates the inline menu button auth status", async () => {
-        sendMockExtensionMessage({ command: "unlockCompleted" });
+        intraprocessMessageSender.send(RETRY_WHEN_UNLOCK_COMPLETED, { data: undefined as any });
         await flushPromises();
 
         expect(buttonPortSpy.postMessage).toHaveBeenCalledWith({
@@ -2800,26 +3172,83 @@ describe("OverlayBackground", () => {
 
       it("updates the overlay ciphers", async () => {
         const updateInlineMenuCiphersSpy = jest.spyOn(overlayBackground, "updateOverlayCiphers");
-        sendMockExtensionMessage({ command: "unlockCompleted" });
+        intraprocessMessageSender.send(RETRY_WHEN_UNLOCK_COMPLETED, { data: undefined as any });
         await flushPromises();
 
         expect(updateInlineMenuCiphersSpy).toHaveBeenCalled();
       });
 
-      it("focuses the most recently focused field if a retry command is present in the message", async () => {
+      it("focuses the most recently focused field if the retained command is a retry", async () => {
         activeAccountStatusMock$.next(AuthenticationStatus.Unlocked);
         getTabFromCurrentWindowIdSpy.mockResolvedValueOnce(createChromeTabMock({ id: 1 }));
-        sendMockExtensionMessage({
-          command: "unlockCompleted",
+        intraprocessMessageSender.send(RETRY_WHEN_UNLOCK_COMPLETED, {
           data: {
-            commandToRetry: { message: { command: "openAutofillInlineMenu" } },
-          },
+            commandToRetry: {
+              message: { command: "openAutofillInlineMenu" },
+              [RETRY_SENDER]: { tab: createChromeTabMock({ id: 1 }) },
+            },
+          } as LockedVaultPendingNotificationsData,
         });
         await flushPromises();
 
         expect(tabsSendMessageSpy).toHaveBeenCalledWith(expect.any(Object), {
           command: "focusMostRecentlyFocusedField",
         });
+      });
+
+      it("security: opens no inline menu when the sender did not survive leaving this context", async () => {
+        // The inline menu resolves its tab from the active window, so without a retained sender
+        // to focus first it would refocus a field on whichever tab happens to be active.
+        activeAccountStatusMock$.next(AuthenticationStatus.Unlocked);
+        getTabFromCurrentWindowIdSpy.mockResolvedValueOnce(createChromeTabMock({ id: 1 }));
+        const data = crossContextBoundary({
+          commandToRetry: {
+            message: { command: "openAutofillInlineMenu" },
+            [RETRY_SENDER]: { tab: createChromeTabMock({ id: 1 }) },
+          },
+          target: "overlay.background",
+        });
+
+        intraprocessMessageSender.send(RETRY_WHEN_UNLOCK_COMPLETED, { data });
+        await flushPromises();
+
+        expect(tabsSendMessageSpy).not.toHaveBeenCalledWith(expect.any(Object), {
+          command: "focusMostRecentlyFocusedField",
+        });
+      });
+
+      it("still refreshes when the sender did not survive leaving this context", async () => {
+        // The only consumer that acts on a retry it cannot target: the auth status and cipher
+        // list are stale either way.
+        activeAccountStatusMock$.next(AuthenticationStatus.Unlocked);
+        getTabFromCurrentWindowIdSpy.mockResolvedValueOnce(createChromeTabMock({ id: 1 }));
+        const updateInlineMenuCiphersSpy = jest.spyOn(overlayBackground, "updateOverlayCiphers");
+        const data = crossContextBoundary({
+          commandToRetry: {
+            message: { command: "openAutofillInlineMenu" },
+            [RETRY_SENDER]: { tab: createChromeTabMock({ id: 1 }) },
+          },
+          target: "overlay.background",
+        });
+
+        intraprocessMessageSender.send(RETRY_WHEN_UNLOCK_COMPLETED, { data });
+        await flushPromises();
+
+        expect(updateInlineMenuCiphersSpy).toHaveBeenCalledWith(true, false);
+      });
+
+      it("security: ignores a retry that arrived from another context", async () => {
+        const updateInlineMenuCiphersSpy = jest.spyOn(overlayBackground, "updateOverlayCiphers");
+
+        externalMessages.next({
+          command: RETRY_WHEN_UNLOCK_COMPLETED.command,
+          data: {
+            commandToRetry: { message: { command: "openAutofillInlineMenu" } },
+          },
+        } as unknown as Message<Record<string, unknown>>);
+        await flushPromises();
+
+        expect(updateInlineMenuCiphersSpy).not.toHaveBeenCalled();
       });
     });
 
@@ -2860,6 +3289,154 @@ describe("OverlayBackground", () => {
         sendMockExtensionMessage({ command: "fido2AbortRequest" }, sender);
 
         expect(updateOverlayCiphersSpy).toHaveBeenCalledWith(false);
+      });
+    });
+
+    describe("routeTargetedFieldsToFrame", () => {
+      const tab = mock<chrome.tabs.Tab>({ id: 10 });
+      const sender = mock<chrome.runtime.MessageSender>({ tab });
+      const iframeTargetedFields = [{ selector: "#username", fieldType: "username" }];
+
+      beforeEach(() => {
+        jest.spyOn(BrowserApi, "getAllFrameDetails").mockResolvedValue([
+          mock<chrome.webNavigation.GetAllFrameResultDetails>({
+            frameId: 5,
+            url: "https://example.com/iframe",
+          }),
+          mock<chrome.webNavigation.GetAllFrameResultDetails>({
+            frameId: 6,
+            url: "https://example.com/other",
+          }),
+        ]);
+      });
+
+      it("sends applyTargetedFields to the matching frame", async () => {
+        sendMockExtensionMessage(
+          {
+            command: "routeTargetedFieldsToFrame",
+            iframeSrc: "https://example.com/iframe",
+            iframeTargetedFields,
+          },
+          sender,
+        );
+        await flushPromises();
+
+        expect(tabsSendMessageSpy).toHaveBeenCalledWith(
+          tab,
+          { command: "applyTargetedFields", iframeTargetedFields },
+          { frameId: 5 },
+        );
+      });
+
+      it("does nothing when no frame matches iframeSrc", async () => {
+        sendMockExtensionMessage(
+          {
+            command: "routeTargetedFieldsToFrame",
+            iframeSrc: "https://example.com/nonexistent",
+            iframeTargetedFields,
+          },
+          sender,
+        );
+        await flushPromises();
+
+        expect(tabsSendMessageSpy).not.toHaveBeenCalledWith(
+          tab,
+          expect.objectContaining({ command: "applyTargetedFields" }),
+          expect.anything(),
+        );
+      });
+
+      it("does nothing when iframeSrc is missing", async () => {
+        sendMockExtensionMessage(
+          { command: "routeTargetedFieldsToFrame", iframeTargetedFields },
+          sender,
+        );
+        await flushPromises();
+
+        expect(BrowserApi.getAllFrameDetails).not.toHaveBeenCalled();
+      });
+
+      it("does nothing when iframeTargetedFields is empty", async () => {
+        sendMockExtensionMessage(
+          {
+            command: "routeTargetedFieldsToFrame",
+            iframeSrc: "https://example.com/iframe",
+            iframeTargetedFields: [],
+          },
+          sender,
+        );
+        await flushPromises();
+
+        expect(BrowserApi.getAllFrameDetails).not.toHaveBeenCalled();
+      });
+
+      it("matches a frame whose URL drops a trailing slash present in iframeSrc", async () => {
+        jest.spyOn(BrowserApi, "getAllFrameDetails").mockResolvedValue([
+          mock<chrome.webNavigation.GetAllFrameResultDetails>({
+            frameId: 7,
+            url: "https://example.com/iframe",
+          }),
+        ]);
+
+        sendMockExtensionMessage(
+          {
+            command: "routeTargetedFieldsToFrame",
+            iframeSrc: "https://example.com/iframe/",
+            iframeTargetedFields,
+          },
+          sender,
+        );
+        await flushPromises();
+
+        expect(tabsSendMessageSpy).toHaveBeenCalledWith(
+          tab,
+          { command: "applyTargetedFields", iframeTargetedFields },
+          { frameId: 7 },
+        );
+      });
+
+      it("does not send when multiple frames match the same iframeSrc (ambiguous)", async () => {
+        jest.spyOn(BrowserApi, "getAllFrameDetails").mockResolvedValue([
+          mock<chrome.webNavigation.GetAllFrameResultDetails>({
+            frameId: 5,
+            url: "https://example.com/iframe",
+          }),
+          mock<chrome.webNavigation.GetAllFrameResultDetails>({
+            frameId: 8,
+            url: "https://example.com/iframe",
+          }),
+        ]);
+
+        sendMockExtensionMessage(
+          {
+            command: "routeTargetedFieldsToFrame",
+            iframeSrc: "https://example.com/iframe",
+            iframeTargetedFields,
+          },
+          sender,
+        );
+        await flushPromises();
+
+        expect(tabsSendMessageSpy).not.toHaveBeenCalledWith(
+          tab,
+          expect.objectContaining({ command: "applyTargetedFields" }),
+          expect.anything(),
+        );
+      });
+
+      it("does not throw when tabSendMessage rejects (e.g. sandboxed iframe)", async () => {
+        tabsSendMessageSpy.mockRejectedValueOnce(new Error("Could not establish connection"));
+
+        sendMockExtensionMessage(
+          {
+            command: "routeTargetedFieldsToFrame",
+            iframeSrc: "https://example.com/iframe",
+            iframeTargetedFields,
+          },
+          sender,
+        );
+
+        await expect(flushPromises()).resolves.not.toThrow();
       });
     });
   });
@@ -2911,10 +3488,25 @@ describe("OverlayBackground", () => {
           { command: "closeAutofillInlineMenu", overlayElement: undefined },
           { frameId: 0 },
         );
-        expect(openUnlockPopoutSpy).toHaveBeenCalledWith(sender.tab, {
-          commandToRetry: { message: { command: "openAutofillInlineMenu" }, sender },
-          target: "overlay.background",
-        });
+        // The retry is queued by the callback `openUnlockPopout` runs once the popout exists,
+        // so invoking it here is what proves the payload reaches the intraprocess channel.
+        expect(openUnlockPopoutSpy).toHaveBeenCalledWith(sender.tab, expect.any(Function));
+        const queued: unknown[] = [];
+        intraprocessMessageSender.messages$().subscribe((published) => queued.push(published));
+        openUnlockPopoutSpy.mock.calls[0][1]();
+
+        expect(queued).toEqual([
+          {
+            command: ADD_TO_LOCKED_VAULT_PENDING_NOTIFICATIONS.command,
+            data: {
+              commandToRetry: {
+                message: { command: "openAutofillInlineMenu" },
+                [RETRY_SENDER]: sender,
+              },
+              target: "overlay.background",
+            },
+          },
+        ]);
       });
 
       it("opens the inline menu if the user auth status is unlocked", async () => {
@@ -2963,19 +3555,19 @@ describe("OverlayBackground", () => {
           },
         });
 
-        const buttonPostion = overlayBackground["getInlineMenuButtonPosition"](subframe);
-        const menuPostion = overlayBackground["getInlineMenuListPosition"](subframe);
+        const buttonPosition = overlayBackground["getInlineMenuButtonPosition"](subframe);
+        const menuPosition = overlayBackground["getInlineMenuListPosition"](subframe);
 
-        expect(menuPostion).toEqual({
+        expect(menuPosition).toEqual({
           width: "49px",
           top: "366px",
           left: "1271px",
         });
-        expect(buttonPostion).toEqual({
-          width: "34px",
-          height: "34px",
-          top: "317px",
-          left: "1271px",
+        expect(buttonPosition).toEqual({
+          width: "23px",
+          height: "23px",
+          top: "311px",
+          left: "1289px",
         });
       });
       it("sets button and menu width and position when multi-input totp field is focused", async () => {
@@ -3048,18 +3640,18 @@ describe("OverlayBackground", () => {
         jest.spyOn(overlayBackground as any, "isTotpFieldForCurrentField").mockReturnValue(true);
         jest.spyOn(overlayBackground as any, "getTotpFields").mockReturnValue(totpFields);
 
-        const buttonPostion = overlayBackground["getInlineMenuButtonPosition"](subframe);
-        const menuPostion = overlayBackground["getInlineMenuListPosition"](subframe);
-        expect(menuPostion).toEqual({
+        const buttonPosition = overlayBackground["getInlineMenuButtonPosition"](subframe);
+        const menuPosition = overlayBackground["getInlineMenuListPosition"](subframe);
+        expect(menuPosition).toEqual({
           width: "1164px",
           top: "366px",
           left: "1042px",
         });
-        expect(buttonPostion).toEqual({
-          width: "34px",
-          height: "34px",
-          top: "292px",
-          left: "2187px",
+        expect(buttonPosition).toEqual({
+          width: "23px",
+          height: "23px",
+          top: "286px",
+          left: "2204px",
         });
       });
     });
@@ -3243,7 +3835,7 @@ describe("OverlayBackground", () => {
         await flushPromises();
 
         expect(autofillService.isPasswordRepromptRequired).not.toHaveBeenCalled();
-        expect(autofillService.doAutoFill).not.toHaveBeenCalled();
+        expect(autofillOrchestrator.fillCipher).not.toHaveBeenCalled();
       });
 
       it("ignores the fill request if the tab does not contain any identified page details", async () => {
@@ -3255,7 +3847,7 @@ describe("OverlayBackground", () => {
         await flushPromises();
 
         expect(autofillService.isPasswordRepromptRequired).not.toHaveBeenCalled();
-        expect(autofillService.doAutoFill).not.toHaveBeenCalled();
+        expect(autofillOrchestrator.fillCipher).not.toHaveBeenCalled();
       });
 
       it("ignores the fill request if a master password reprompt is required", async () => {
@@ -3277,7 +3869,7 @@ describe("OverlayBackground", () => {
         await flushPromises();
 
         expect(autofillService.isPasswordRepromptRequired).toHaveBeenCalledWith(cipher, sender.tab);
-        expect(autofillService.doAutoFill).not.toHaveBeenCalled();
+        expect(autofillOrchestrator.fillCipher).not.toHaveBeenCalled();
       });
 
       it("autofills the selected cipher and moves it to the top of the front of the ciphers map", async () => {
@@ -3306,11 +3898,16 @@ describe("OverlayBackground", () => {
         });
         await flushPromises();
 
+        // The collect is routed through the orchestrator, not sent directly.
+        expect(autofillOrchestrator.collectPageDetails).toHaveBeenCalledWith(
+          sender.tab,
+          overlayBackground["focusedFieldData"]?.frameId,
+        );
         expect(autofillService.isPasswordRepromptRequired).toHaveBeenCalledWith(
           cipher2,
           sender.tab,
         );
-        expect(autofillService.doAutoFill).toHaveBeenCalledWith({
+        expect(autofillOrchestrator.fillCipher).toHaveBeenCalledWith({
           tab: sender.tab,
           cipher: cipher2,
           pageDetails: [pageDetailsForTab],
@@ -3329,6 +3926,39 @@ describe("OverlayBackground", () => {
         );
       });
 
+      it("does not record last-used (reorder the ciphers map) when no fill occurs", async () => {
+        const cipher1 = mock<CipherView>({ id: "inline-menu-cipher-1" });
+        const cipher2 = mock<CipherView>({ id: "inline-menu-cipher-2" });
+        const cipher3 = mock<CipherView>({ id: "inline-menu-cipher-3" });
+        overlayBackground["inlineMenuCiphers"] = new Map([
+          ["inline-menu-cipher-1", cipher1],
+          ["inline-menu-cipher-2", cipher2],
+          ["inline-menu-cipher-3", cipher3],
+        ]);
+        overlayBackground["pageDetailsForTab"][sender.tab.id] = new Map([
+          [sender.frameId, { frameId: sender.frameId, tab: sender.tab, details: pageDetails }],
+        ]);
+        autofillService.isPasswordRepromptRequired.mockResolvedValue(false);
+        autofillOrchestrator.fillCipher.mockResolvedValue({ outcome: AutofillOutcome.Absent });
+
+        sendPortMessage(listMessageConnectorSpy, {
+          command: "fillAutofillInlineMenuCipher",
+          inlineMenuCipherId: "inline-menu-cipher-2",
+          portKey,
+        });
+        await flushPromises();
+
+        // The fill was attempted, but a no-fill must not mark the cipher last-used, so order is kept.
+        expect(autofillOrchestrator.fillCipher).toHaveBeenCalled();
+        expect(overlayBackground["inlineMenuCiphers"].entries()).toStrictEqual(
+          new Map([
+            ["inline-menu-cipher-1", cipher1],
+            ["inline-menu-cipher-2", cipher2],
+            ["inline-menu-cipher-3", cipher3],
+          ]).entries(),
+        );
+      });
+
       it("copies the cipher's totp code to the clipboard after filling", async () => {
         const cipher2 = mock<CipherView>({ id: "inline-menu-cipher-2" });
         overlayBackground["inlineMenuCiphers"] = new Map([["inline-menu-cipher-2", cipher2]]);
@@ -3339,7 +3969,11 @@ describe("OverlayBackground", () => {
         const copyToClipboardSpy = jest
           .spyOn(overlayBackground["platformUtilsService"], "copyToClipboard")
           .mockImplementation();
-        autofillService.doAutoFill.mockResolvedValue("totp-code");
+        autofillOrchestrator.fillCipher.mockResolvedValue({
+          outcome: AutofillOutcome.Filled,
+          totp: "totp-code",
+          canAutoCopyTotp: true,
+        });
 
         sendPortMessage(listMessageConnectorSpy, {
           command: "fillAutofillInlineMenuCipher",
@@ -3349,6 +3983,119 @@ describe("OverlayBackground", () => {
         await flushPromises();
 
         expect(copyToClipboardSpy).toHaveBeenCalledWith("totp-code");
+      });
+
+      it("mitigates an absent fill by copying the cipher's totp code", async () => {
+        const cipher2 = mock<CipherView>({ id: "inline-menu-cipher-2" });
+        overlayBackground["inlineMenuCiphers"] = new Map([["inline-menu-cipher-2", cipher2]]);
+        overlayBackground["pageDetailsForTab"][sender.tab.id] = new Map([
+          [sender.frameId, { frameId: sender.frameId, tab: sender.tab, details: pageDetails }],
+        ]);
+        autofillService.isPasswordRepromptRequired.mockResolvedValue(false);
+        const copyToClipboardSpy = jest
+          .spyOn(overlayBackground["platformUtilsService"], "copyToClipboard")
+          .mockImplementation();
+        const updateLastUsedSpy = jest.spyOn(
+          overlayBackground as any,
+          "updateLastUsedInlineMenuCipher",
+        );
+        // An absent fill is a failure the user's explicit choice of cipher lets us mitigate: the
+        // attempt still releases the code, so the request goes on to copy it.
+        autofillOrchestrator.fillCipher.mockResolvedValue({
+          outcome: AutofillOutcome.Absent,
+          totp: "hidden-field-totp",
+          canAutoCopyTotp: true,
+        });
+
+        sendPortMessage(listMessageConnectorSpy, {
+          command: "fillAutofillInlineMenuCipher",
+          inlineMenuCipherId: "inline-menu-cipher-2",
+          portKey,
+        });
+        await flushPromises();
+
+        expect(copyToClipboardSpy).toHaveBeenCalledWith("hidden-field-totp");
+        // Last-used records a credential that was placed, and this attempt placed none.
+        expect(updateLastUsedSpy).not.toHaveBeenCalled();
+      });
+
+      it("copies nothing when the user's preference withholds auto-copy", async () => {
+        const cipher2 = mock<CipherView>({ id: "inline-menu-cipher-2" });
+        overlayBackground["inlineMenuCiphers"] = new Map([["inline-menu-cipher-2", cipher2]]);
+        overlayBackground["pageDetailsForTab"][sender.tab.id] = new Map([
+          [sender.frameId, { frameId: sender.frameId, tab: sender.tab, details: pageDetails }],
+        ]);
+        autofillService.isPasswordRepromptRequired.mockResolvedValue(false);
+        const copyToClipboardSpy = jest
+          .spyOn(overlayBackground["platformUtilsService"], "copyToClipboard")
+          .mockImplementation();
+        // A released code is not licence to copy it: the preference decides, so reading `totp`
+        // directly rather than asking would copy against the user's wishes.
+        autofillOrchestrator.fillCipher.mockResolvedValue({
+          outcome: AutofillOutcome.Filled,
+          totp: "withheld-totp",
+          canAutoCopyTotp: false,
+        });
+
+        sendPortMessage(listMessageConnectorSpy, {
+          command: "fillAutofillInlineMenuCipher",
+          inlineMenuCipherId: "inline-menu-cipher-2",
+          portKey,
+        });
+        await flushPromises();
+
+        expect(copyToClipboardSpy).not.toHaveBeenCalled();
+      });
+
+      it("security: copies nothing when the orchestrator denies the fill", async () => {
+        const cipher2 = mock<CipherView>({ id: "inline-menu-cipher-2" });
+        overlayBackground["inlineMenuCiphers"] = new Map([["inline-menu-cipher-2", cipher2]]);
+        overlayBackground["pageDetailsForTab"][sender.tab.id] = new Map([
+          [sender.frameId, { frameId: sender.frameId, tab: sender.tab, details: pageDetails }],
+        ]);
+        autofillService.isPasswordRepromptRequired.mockResolvedValue(false);
+        const copyToClipboardSpy = jest
+          .spyOn(overlayBackground["platformUtilsService"], "copyToClipboard")
+          .mockImplementation();
+        // A denial terminates the request. The type gives the denied arm no `totp`, so this forces
+        // the shape the type forbids to prove the check is a runtime backstop and not only a
+        // compile-time one.
+        autofillOrchestrator.fillCipher.mockResolvedValue({
+          outcome: AutofillOutcome.Denied,
+          totp: "must-not-copy",
+          canAutoCopyTotp: true,
+        } as unknown as FillResult);
+
+        sendPortMessage(listMessageConnectorSpy, {
+          command: "fillAutofillInlineMenuCipher",
+          inlineMenuCipherId: "inline-menu-cipher-2",
+          portKey,
+        });
+        await flushPromises();
+
+        expect(copyToClipboardSpy).not.toHaveBeenCalled();
+      });
+
+      it("copies nothing when the attempt released no totp", async () => {
+        const cipher2 = mock<CipherView>({ id: "inline-menu-cipher-2" });
+        overlayBackground["inlineMenuCiphers"] = new Map([["inline-menu-cipher-2", cipher2]]);
+        overlayBackground["pageDetailsForTab"][sender.tab.id] = new Map([
+          [sender.frameId, { frameId: sender.frameId, tab: sender.tab, details: pageDetails }],
+        ]);
+        autofillService.isPasswordRepromptRequired.mockResolvedValue(false);
+        const copyToClipboardSpy = jest
+          .spyOn(overlayBackground["platformUtilsService"], "copyToClipboard")
+          .mockImplementation();
+        autofillOrchestrator.fillCipher.mockResolvedValue({ outcome: AutofillOutcome.Filled });
+
+        sendPortMessage(listMessageConnectorSpy, {
+          command: "fillAutofillInlineMenuCipher",
+          inlineMenuCipherId: "inline-menu-cipher-2",
+          portKey,
+        });
+        await flushPromises();
+
+        expect(copyToClipboardSpy).not.toHaveBeenCalled();
       });
 
       describe("triggering passkey authentication", () => {
@@ -3446,7 +4193,9 @@ describe("OverlayBackground", () => {
       });
 
       it("fills the current password fields exclusively when filling for a current password update", async () => {
-        globalThis.structuredClone = jest.fn((value) => value);
+        // JSON stands in for the real boundary because `structuredClone` is absent from this Jest environment.
+        // FIXME: Once the environment includes `structuredClone`, remove this assignment.
+        globalThis.structuredClone = jest.fn((value) => JSON.parse(JSON.stringify(value)));
         sendMockExtensionMessage(
           {
             command: "updateFocusedFieldData",
@@ -3488,7 +4237,7 @@ describe("OverlayBackground", () => {
         await flushPromises();
 
         pageDetails.fields = [currentPasswordField];
-        expect(autofillService.doAutoFill).toHaveBeenCalledWith(
+        expect(autofillOrchestrator.fillCipher).toHaveBeenCalledWith(
           expect.objectContaining({
             pageDetails: [expect.objectContaining({ details: pageDetails })],
           }),
@@ -3690,7 +4439,7 @@ describe("OverlayBackground", () => {
 
           sendPortMessage(listMessageConnectorSpy, { command: "fillGeneratedPassword", portKey });
 
-          expect(autofillService.doAutoFill).not.toHaveBeenCalled();
+          expect(autofillOrchestrator.fillCipher).not.toHaveBeenCalled();
         });
 
         it("skips filling when the page details for the tab are not set", () => {
@@ -3698,7 +4447,7 @@ describe("OverlayBackground", () => {
 
           sendPortMessage(listMessageConnectorSpy, { command: "fillGeneratedPassword", portKey });
 
-          expect(autofillService.doAutoFill).not.toHaveBeenCalled();
+          expect(autofillOrchestrator.fillCipher).not.toHaveBeenCalled();
         });
 
         it("skips filling when the page details for the tab does not contain a value", () => {
@@ -3706,7 +4455,7 @@ describe("OverlayBackground", () => {
 
           sendPortMessage(listMessageConnectorSpy, { command: "fillGeneratedPassword", portKey });
 
-          expect(autofillService.doAutoFill).not.toHaveBeenCalled();
+          expect(autofillOrchestrator.fillCipher).not.toHaveBeenCalled();
         });
       });
 
@@ -3726,7 +4475,7 @@ describe("OverlayBackground", () => {
         sendPortMessage(listMessageConnectorSpy, { command: "fillGeneratedPassword", portKey });
         await flushPromises();
 
-        expect(autofillService.doAutoFill).toHaveBeenCalledWith({
+        expect(autofillOrchestrator.fillCipher).toHaveBeenCalledWith({
           tab: sender.tab,
           cipher: expect.any(Object),
           pageDetails: [overlayBackground["pageDetailsForTab"][sender.tab.id].get(sender.frameId)],
@@ -3736,6 +4485,44 @@ describe("OverlayBackground", () => {
           focusedFieldOpid: undefined,
           inlineMenuFillType: InlineMenuFillTypes.PasswordGeneration,
         });
+      });
+
+      it("keeps targeted newPassword fields that would fail the heuristic isNewPasswordField check", async () => {
+        const newPasswordField = createAutofillFieldMock({
+          opid: "targeted_field_0_newPassword_0",
+          type: "password",
+          htmlName: "newPassword",
+          targeted: true,
+          fieldQualifier: "newPassword",
+        });
+        // `confirmPassword` is one token, so the keyword "confirm password" (with a space)
+        // misses it via the heuristic; the targeted flag must override that.
+        const confirmPasswordField = createAutofillFieldMock({
+          opid: "targeted_field_0_newPassword_1",
+          type: "password",
+          htmlName: "confirmPassword",
+          targeted: true,
+          fieldQualifier: "newPassword",
+        });
+        const pageDetail = createPageDetailMock({
+          details: createAutofillPageDetailsMock({
+            fields: [newPasswordField, confirmPasswordField],
+          }),
+        });
+        overlayBackground["pageDetailsForTab"][sender.tab!.id!]!.set(sender.frameId!, pageDetail);
+
+        sendPortMessage(listMessageConnectorSpy, { command: "fillGeneratedPassword", portKey });
+        await flushPromises();
+
+        const passedPageDetails = (autofillOrchestrator.fillCipher as jest.Mock).mock.calls[0][0]
+          .pageDetails;
+        const filteredOpids = passedPageDetails[0].details.fields
+          .map((f: { opid: string }) => f.opid)
+          .sort();
+        expect(filteredOpids).toEqual([
+          "targeted_field_0_newPassword_0",
+          "targeted_field_0_newPassword_1",
+        ]);
       });
     });
   });

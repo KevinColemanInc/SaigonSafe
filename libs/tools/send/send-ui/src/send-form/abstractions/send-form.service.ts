@@ -1,4 +1,4 @@
-import { Signal } from "@angular/core";
+import { signal, Signal } from "@angular/core";
 import { FormGroup } from "@angular/forms";
 import { Observable } from "rxjs";
 
@@ -13,6 +13,9 @@ import { SendFormConfig } from "./send-form-config.service";
  * Service to save the send using the correct endpoint(s) and encapsulating the logic for decrypting the send.
  */
 export abstract class SendFormService {
+  constructor() {
+    this.originalSendView = signal(null);
+  }
   /**
    * Helper to decrypt a send and avoid the need to call the send service directly.
    * (useful for mocking tests/storybook).
@@ -30,7 +33,10 @@ export abstract class SendFormService {
   sendFormConfig?: SendFormConfig;
 
   /** The original SendView of the Send the form displays */
-  originalSendView?: SendView;
+  readonly originalSendView: Signal<SendView | null> = signal(null);
+
+  /** The updated state of the SendView shown in the form */
+  readonly updatedSendView: Signal<SendView | null> = signal(null);
 
   /**
    * Registers a child form group with the parent form group. Used by child components to add their form groups to
@@ -55,10 +61,19 @@ export abstract class SendFormService {
   abstract initializeSendForm(sendFormConfig: SendFormConfig): Promise<void>;
 
   /**
-   * Submits the Send form. Returns `undefined` if the form has an
-   * error or the service encounters a network error on submission
+   * Submits the Send form. This will return `undefined` if the Send form had errors preventing
+   * its submission, and throw any errors it receives from encryption, decryption, or the API call.
+   *
+   * If `abortPendingSubmission()` is called after a file Send's content has already been
+   * uploaded, the created Send is rolled back and this resolves to `undefined` rather than
+   * throwing.
    */
   abstract submitSendForm(): Promise<SendView>;
+
+  /**
+   * Aborts an in-flight `submitSendForm()` call, if any. A no-op if no submission is in progress.
+   */
+  abstract abortPendingSubmission(): void;
 
   /** Returns whether the Send form currently has edits */
   abstract sendFormHasEdits(): boolean;
@@ -71,4 +86,10 @@ export abstract class SendFormService {
    * not want to save the edits or there are no edits to save.
    */
   abstract promptForUnsavedEdits(): Promise<boolean>;
+
+  /** A function that removes the password from a Send, or returns immediately if
+   * the Send is not protected by password. Returns a boolean indicating whether
+   * the password was removed successfully or not
+   */
+  abstract removeSendPassword(): Promise<boolean>;
 }

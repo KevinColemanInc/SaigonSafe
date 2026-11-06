@@ -8,6 +8,7 @@ import { Organization } from "@bitwarden/common/admin-console/models/domain/orga
 import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
 import { getUserId } from "@bitwarden/common/auth/services/account.service";
 import { ProductTierType } from "@bitwarden/common/billing/enums";
+import { GovModeService } from "@bitwarden/common/platform/abstractions/gov-mode.service";
 
 interface EnterpriseOrgStatus {
   isFreeFamilyPolicyEnabled: boolean;
@@ -21,6 +22,7 @@ export class FreeFamiliesPolicyService {
     private policyService: PolicyService,
     private organizationService: OrganizationService,
     private accountService: AccountService,
+    private govModeService: GovModeService,
   ) {}
 
   organizations$ = this.accountService.activeAccount$.pipe(
@@ -34,7 +36,11 @@ export class FreeFamiliesPolicyService {
   );
 
   get showFreeFamilies$(): Observable<boolean> {
-    return this.getFreeFamiliesVisibility$();
+    return this.accountService.activeAccount$.pipe(
+      getUserId,
+      switchMap((userId) => this.govModeService.isGovMode$(userId)),
+      switchMap((isGovMode) => (isGovMode ? of(false) : this.getFreeFamiliesVisibility$())),
+    );
   }
 
   /**
@@ -51,17 +57,23 @@ export class FreeFamiliesPolicyService {
       getUserId,
       switchMap((userId) => {
         const policies$ = this.policyService.policiesByType$(
-          PolicyType.FreeFamiliesSponsorshipPolicy,
+          PolicyType.FreeFamiliesSponsorship,
           userId,
         );
 
-        return combineLatest([enterpriseOrganization$, organization, policies$]).pipe(
-          map(([isEnterprise, org, policies]) => {
+        return combineLatest([
+          enterpriseOrganization$,
+          organization,
+          policies$,
+          this.govModeService.isGovMode$(userId),
+        ]).pipe(
+          map(([isEnterprise, org, policies, isGovMode]) => {
             const familiesFeatureDisabled = policies.some(
               (policy) => policy.organizationId === org.id && policy.enabled,
             );
 
             return (
+              !isGovMode &&
               isEnterprise &&
               !familiesFeatureDisabled &&
               org.useAdminSponsoredFamilies &&
@@ -125,7 +137,7 @@ export class FreeFamiliesPolicyService {
     return this.accountService.activeAccount$.pipe(
       getUserId,
       switchMap((userId) =>
-        this.policyService.policiesByType$(PolicyType.FreeFamiliesSponsorshipPolicy, userId),
+        this.policyService.policiesByType$(PolicyType.FreeFamiliesSponsorship, userId),
       ),
       map((policies) => ({
         isFreeFamilyPolicyEnabled: enterpriseOrgIds.every((orgId) =>

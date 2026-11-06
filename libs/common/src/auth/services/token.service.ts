@@ -5,22 +5,27 @@ import { Opaque } from "type-fest";
 
 // This import has been flagged as unallowed for this class. It may be involved in a circular dependency loop.
 // eslint-disable-next-line no-restricted-imports
-import { LogoutReason, decodeJwtTokenToJson } from "@bitwarden/auth/common";
+import { decodeJwtTokenToJson } from "@bitwarden/auth/common";
+// eslint-disable-next-line no-restricted-imports
+import {
+  EncryptedString,
+  EncryptService,
+  EncString,
+  SymmetricCryptoKey,
+} from "@bitwarden/legacy-crypto";
+import { PureCrypto } from "@bitwarden/sdk-internal";
 
-import { KeyGenerationService } from "../../key-management/crypto";
-import { EncryptService } from "../../key-management/crypto/abstractions/encrypt.service";
-import { EncString, EncryptedString } from "../../key-management/crypto/models/enc-string";
 import {
   VaultTimeout,
   VaultTimeoutAction,
   VaultTimeoutStringType,
 } from "../../key-management/vault-timeout";
 import { LogService } from "../../platform/abstractions/log.service";
+import { SdkLoadService } from "../../platform/abstractions/sdk/sdk-load.service";
 import { AbstractStorageService } from "../../platform/abstractions/storage.service";
 import { StorageLocation } from "../../platform/enums";
 import { Utils } from "../../platform/misc/utils";
 import { StorageOptions } from "../../platform/models/domain/storage-options";
-import { SymmetricCryptoKey } from "../../platform/models/domain/symmetric-crypto-key";
 import {
   GlobalState,
   GlobalStateProvider,
@@ -29,6 +34,7 @@ import {
 } from "../../platform/state";
 import { UserId } from "../../types/guid";
 import { TokenService as TokenServiceAbstraction } from "../abstractions/token.service";
+import { LogoutReason } from "../logout";
 import { SetTokensResult } from "../models/domain/set-tokens-result";
 
 import { ACCOUNT_ACTIVE_ACCOUNT_ID } from "./account.service";
@@ -140,7 +146,6 @@ export class TokenService implements TokenServiceAbstraction {
     private globalStateProvider: GlobalStateProvider,
     private readonly platformSupportsSecureStorage: boolean,
     private secureStorageService: AbstractStorageService,
-    private keyGenerationService: KeyGenerationService,
     private encryptService: EncryptService,
     private logService: LogService,
     private logoutCallback: (logoutReason: LogoutReason, userId?: string) => Promise<void>,
@@ -242,7 +247,10 @@ export class TokenService implements TokenServiceAbstraction {
   }
 
   private async createAndSaveAccessTokenKey(userId: UserId): Promise<AccessTokenKey> {
-    const newAccessTokenKey = (await this.keyGenerationService.createKey(512)) as AccessTokenKey;
+    await SdkLoadService.Ready;
+    const newAccessTokenKey = SymmetricCryptoKey.fromSdk(
+      PureCrypto.make_aes256_cbc_hmac_key(),
+    ) as AccessTokenKey;
 
     await this.secureStorageService.save<AccessTokenKey>(
       `${userId}${this.accessTokenKeySecureStorageKey}`,
@@ -379,7 +387,7 @@ export class TokenService implements TokenServiceAbstraction {
             error,
           );
 
-          // Fall back to disk storage for unecrypted access token
+          // Fall back to disk storage for unencrypted access token
           decryptedAccessToken = await this.singleUserStateProvider
             .get(userId, ACCESS_TOKEN_DISK)
             .update((_) => accessToken, {

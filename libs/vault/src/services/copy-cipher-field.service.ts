@@ -14,7 +14,8 @@ import {
   CipherViewLikeUtils,
 } from "@bitwarden/common/vault/utils/cipher-view-like-utils";
 import { ToastService } from "@bitwarden/components";
-import { PasswordRepromptService } from "@bitwarden/vault";
+
+import { PasswordRepromptService } from "./password-reprompt.service";
 
 /**
  * The types of fields that can be copied from a cipher.
@@ -33,10 +34,21 @@ export type CopyAction =
   | "privateKey"
   | "publicKey"
   | "keyFingerprint"
+  | "nameOnAccount"
   | "accountNumber"
   | "routingNumber"
+  | "branchNumber"
   | "pin"
-  | "iban";
+  | "iban"
+  | "swiftCode"
+  | "firstNameLicense"
+  | "middleNameLicense"
+  | "lastNameLicense"
+  | "licenseNumber"
+  | "passportNumber"
+  | "nationalIdentificationNumber"
+  | "givenName"
+  | "surname";
 
 /**
  * Copy actions that can be used with the appCopyField directive.
@@ -68,7 +80,7 @@ const CopyActions: Record<CopyAction, CopyActionInfo> = {
     protected: true,
     event: EventType.Cipher_ClientCopiedPassword,
   },
-  totp: { typeI18nKey: "verificationCodeTotp", protected: true },
+  totp: { typeI18nKey: "verificationCode", protected: true },
   cardNumber: { typeI18nKey: "number", protected: true },
   securityCode: {
     typeI18nKey: "securityCode",
@@ -78,18 +90,45 @@ const CopyActions: Record<CopyAction, CopyActionInfo> = {
   email: { typeI18nKey: "email", protected: true },
   phone: { typeI18nKey: "phone", protected: true },
   address: { typeI18nKey: "address", protected: true },
-  secureNote: { typeI18nKey: "note", protected: true },
+  secureNote: { typeI18nKey: "typeSecureNote", protected: true },
   privateKey: { typeI18nKey: "sshPrivateKey", protected: true },
   publicKey: { typeI18nKey: "sshPublicKey", protected: true },
   keyFingerprint: { typeI18nKey: "sshFingerprint", protected: true },
+  nameOnAccount: { typeI18nKey: "nameOnAccount", protected: false },
   accountNumber: {
     typeI18nKey: "accountNumber",
     protected: true,
     event: EventType.Cipher_ClientCopiedBankAccountNumber,
   },
   routingNumber: { typeI18nKey: "bankRoutingNumber", protected: false },
+  branchNumber: { typeI18nKey: "branchNumber", protected: false },
   pin: { typeI18nKey: "pin", protected: true, event: EventType.Cipher_ClientCopiedBankAccountPin },
-  iban: { typeI18nKey: "iban", protected: true },
+  iban: { typeI18nKey: "iban", protected: true, event: EventType.Cipher_ClientCopiedIban },
+  swiftCode: {
+    typeI18nKey: "swiftCode",
+    protected: true,
+    event: EventType.Cipher_ClientCopiedSwiftCode,
+  },
+  firstNameLicense: { typeI18nKey: "firstName", protected: false },
+  middleNameLicense: { typeI18nKey: "middleName", protected: false },
+  lastNameLicense: { typeI18nKey: "lastName", protected: false },
+  licenseNumber: {
+    typeI18nKey: "licenseNumber",
+    protected: true,
+    event: EventType.Cipher_ClientCopiedLicenseNumber,
+  },
+  passportNumber: {
+    typeI18nKey: "passportNumber",
+    protected: true,
+    event: EventType.Cipher_ClientCopiedPassportNumber,
+  },
+  nationalIdentificationNumber: {
+    typeI18nKey: "nationalIdentificationNumber",
+    protected: true,
+    event: EventType.Cipher_ClientCopiedNationalIdentificationNumber,
+  },
+  givenName: { typeI18nKey: "firstName", protected: false },
+  surname: { typeI18nKey: "lastName", protected: false },
   hiddenField: {
     typeI18nKey: "value",
     protected: true,
@@ -127,6 +166,12 @@ export class CopyCipherFieldService {
     cipher: CipherViewLike,
     skipReprompt: boolean = false,
   ): Promise<boolean> {
+    // Ciphers saved with empty strings can still report the field as copyable,
+    // so avoid prompting, copying, and showing a success toast when there is nothing to copy.
+    if (!valueToCopy) {
+      return false;
+    }
+
     const action = CopyActions[actionType];
     if (
       !skipReprompt &&
@@ -134,10 +179,6 @@ export class CopyCipherFieldService {
       action.protected &&
       !(await this.passwordRepromptService.showPasswordPrompt())
     ) {
-      return false;
-    }
-
-    if (valueToCopy == null) {
       return false;
     }
 
@@ -182,12 +223,7 @@ export class CopyCipherFieldService {
 
     const login = CipherViewLikeUtils.getLogin(cipher);
 
-    return (
-      !!login?.totp &&
-      (cipher.organizationUseTotp ||
-        (await firstValueFrom(
-          this.billingAccountProfileStateService.hasPremiumFromAnySource$(activeAccount.id),
-        )))
-    );
+    // Local generation does not require a server subscription.
+    return !!login?.totp;
   }
 }

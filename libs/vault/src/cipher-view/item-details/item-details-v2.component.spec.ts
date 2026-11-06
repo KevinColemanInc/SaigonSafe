@@ -1,29 +1,47 @@
-import { ComponentRef } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ComponentRef,
+  input,
+  signal,
+  WritableSignal,
+} from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { By } from "@angular/platform-browser";
-import { mock, MockProxy } from "jest-mock-extended";
-import { BehaviorSubject, of } from "rxjs";
+import { mock } from "jest-mock-extended";
+import { of } from "rxjs";
 
 import { CollectionView } from "@bitwarden/common/admin-console/models/collections";
 import { Organization } from "@bitwarden/common/admin-console/models/domain/organization";
 import { DomainSettingsService } from "@bitwarden/common/autofill/services/domain-settings.service";
-import { ClientType } from "@bitwarden/common/enums";
-import { FeatureFlag } from "@bitwarden/common/enums/feature-flag.enum";
 import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { EnvironmentService } from "@bitwarden/common/platform/abstractions/environment.service";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
-import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
+import { CollectionId, OrganizationId } from "@bitwarden/common/types/guid";
 import { CipherView } from "@bitwarden/common/vault/models/view/cipher.view";
 import { FolderView } from "@bitwarden/common/vault/models/view/folder.view";
+import { LogService } from "@bitwarden/logging";
+
+import { Vfo1TerminologyService } from "../../services/vfo1-terminology.service";
+import { ITEM_DETAILS_BADGE } from "../../tokens/item-details-badge.token";
 
 import { ItemDetailsV2Component } from "./item-details-v2.component";
+
+@Component({
+  selector: "app-stub-state-badge",
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `<span data-testid="stub-state-badge">{{ cipher().name }}</span>`,
+})
+class StubStateBadgeComponent {
+  readonly cipher = input.required<CipherView>();
+  readonly isAdminConsole = input(false);
+}
 
 describe("ItemDetailsV2Component", () => {
   let component: ItemDetailsV2Component;
   let fixture: ComponentFixture<ItemDetailsV2Component>;
   let componentRef: ComponentRef<ItemDetailsV2Component>;
-  let mockPlatformUtilsService: MockProxy<PlatformUtilsService>;
-  let desktopMilestone3Flag$: BehaviorSubject<boolean>;
+  let mockVfo1Enabled: WritableSignal<boolean>;
 
   const cipher = {
     id: "cipher1",
@@ -54,29 +72,22 @@ describe("ItemDetailsV2Component", () => {
   } as FolderView;
 
   beforeEach(async () => {
-    mockPlatformUtilsService = mock<PlatformUtilsService>();
-    mockPlatformUtilsService.getClientType.mockReturnValue(ClientType.Web);
-    desktopMilestone3Flag$ = new BehaviorSubject<boolean>(false);
-
+    mockVfo1Enabled = signal(false);
     await TestBed.configureTestingModule({
       imports: [ItemDetailsV2Component],
       providers: [
-        { provide: I18nService, useValue: { t: (key: string) => key } },
-        { provide: PlatformUtilsService, useValue: mockPlatformUtilsService },
+        { provide: LogService, useValue: mock<LogService>() },
         {
-          provide: ConfigService,
-          useValue: {
-            getFeatureFlag$: (flag: FeatureFlag) =>
-              flag === FeatureFlag.DesktopUiMigrationMilestone3
-                ? desktopMilestone3Flag$.asObservable()
-                : of(false),
-          },
+          provide: I18nService,
+          useValue: { t: (key: string, p1?: string) => (p1 ? `${key} ${p1}` : key) },
         },
+        { provide: ConfigService, useValue: { getFeatureFlag$: () => of(false) } },
         {
           provide: EnvironmentService,
           useValue: { environment$: of({ getIconsUrl: () => "https://icons.example.com" }) },
         },
         { provide: DomainSettingsService, useValue: { showFavicons$: of(true) } },
+        { provide: Vfo1TerminologyService, useFactory: () => ({ enabled: mockVfo1Enabled }) },
       ],
     }).compileComponents();
   });
@@ -107,6 +118,27 @@ describe("ItemDetailsV2Component", () => {
     expect(itemDetailsList[3].nativeElement.textContent.trim()).toContain(folder.name);
   });
 
+  describe("getAriaLabel", () => {
+    it("separates the label and name with a space for organizations", () => {
+      const org = Object.assign(new Organization(), { name: "Organization 1" });
+      expect(component.getAriaLabel(org)).toBe("ownerAriaLabel Organization 1");
+    });
+
+    it("separates the label and name with a space for collections", () => {
+      const col = new CollectionView({
+        id: "col1" as CollectionId,
+        organizationId: "org1" as OrganizationId,
+        name: "Collection 1",
+      });
+      expect(component.getAriaLabel(col)).toBe("collectionAriaLabel Collection 1");
+    });
+
+    it("separates the label and name with a space for folders", () => {
+      const folderView = Object.assign(new FolderView(), { name: "Folder 1" });
+      expect(component.getAriaLabel(folderView)).toBe("folderAriaLabel Folder 1");
+    });
+  });
+
   it("does not render owner when `hideOwner` is true", () => {
     componentRef.setInput("hideOwner", true);
     fixture.detectChanges();
@@ -115,37 +147,128 @@ describe("ItemDetailsV2Component", () => {
     expect(owner).toBeNull();
   });
 
-  describe("showArchiveBadge", () => {
-    it("is true when cipher is archived on Desktop and DesktopUiMigrationMilestone3 is off", () => {
-      mockPlatformUtilsService.getClientType.mockReturnValue(ClientType.Desktop);
-      desktopMilestone3Flag$.next(false);
-      componentRef.setInput("cipher", { ...cipher, isArchived: true });
-
-      expect((component as any).showArchiveBadge()).toBe(true);
+  describe("when VFO1Foundation flag is enabled", () => {
+    beforeEach(() => {
+      mockVfo1Enabled.set(true);
     });
 
-    it("is false when DesktopUiMigrationMilestone3 is on (dialog renders its own badge)", () => {
-      mockPlatformUtilsService.getClientType.mockReturnValue(ClientType.Desktop);
-      desktopMilestone3Flag$.next(true);
-      componentRef.setInput("cipher", { ...cipher, isArchived: true });
+    it("uses 'vault' i18n key for the org item aria-label", () => {
+      const orgInstance = Object.assign(new Organization(), {
+        id: "org1",
+        name: "Organization 1",
+      });
+      componentRef.setInput("organization", orgInstance);
+      fixture.detectChanges();
 
-      expect((component as any).showArchiveBadge()).toBe(false);
+      const itemDetailsList = fixture.debugElement.queryAll(
+        By.css('[data-testid="item-details-list"]'),
+      );
+      const orgItem = itemDetailsList.find((el) =>
+        el.nativeElement.getAttribute("aria-label")?.includes(orgInstance.name),
+      );
+
+      expect(orgItem).toBeDefined();
+      expect(orgItem!.nativeElement.getAttribute("aria-label")).toBe(
+        `vaultAriaLabel ${orgInstance.name}`,
+      );
     });
 
-    it("is false when cipher is not archived", () => {
-      mockPlatformUtilsService.getClientType.mockReturnValue(ClientType.Desktop);
-      desktopMilestone3Flag$.next(false);
-      componentRef.setInput("cipher", { ...cipher, isArchived: false });
+    it("shows personal vault chip when cipher has no organizationId", () => {
+      componentRef.setInput("cipher", {
+        ...cipher,
+        organizationId: null,
+        collectionIds: [],
+      } as unknown as CipherView);
+      fixture.detectChanges();
 
-      expect((component as any).showArchiveBadge()).toBe(false);
+      const itemDetailsList = fixture.debugElement.queryAll(
+        By.css('[data-testid="item-details-list"]'),
+      );
+      const personalVaultChip = itemDetailsList.find(
+        (el) => el.nativeElement.getAttribute("aria-label") === "myVault",
+      );
+
+      expect(personalVaultChip).toBeDefined();
+      expect(personalVaultChip!.nativeElement.textContent.trim()).toContain("myVault");
     });
 
-    it("is false when client is not Desktop", () => {
-      mockPlatformUtilsService.getClientType.mockReturnValue(ClientType.Web);
-      desktopMilestone3Flag$.next(false);
-      componentRef.setInput("cipher", { ...cipher, isArchived: true });
+    it("does not show personal vault chip when cipher has an organizationId", () => {
+      fixture.detectChanges();
 
-      expect((component as any).showArchiveBadge()).toBe(false);
+      const itemDetailsList = fixture.debugElement.queryAll(
+        By.css('[data-testid="item-details-list"]'),
+      );
+      const personalVaultChip = itemDetailsList.find(
+        (el) => el.nativeElement.getAttribute("aria-label") === "myVault",
+      );
+
+      expect(personalVaultChip).toBeUndefined();
     });
+  });
+});
+
+describe("ItemDetailsV2Component badge seam (ITEM_DETAILS_BADGE)", () => {
+  const cipher = { id: "cipher1", name: "cipher name", collectionIds: [] } as unknown as CipherView;
+
+  async function render(badge: typeof StubStateBadgeComponent | null, isAdminConsole = false) {
+    await TestBed.configureTestingModule({
+      imports: [ItemDetailsV2Component],
+      providers: [
+        { provide: LogService, useValue: mock<LogService>() },
+        {
+          provide: I18nService,
+          useValue: { t: (key: string, p1?: string) => (p1 ? `${key} ${p1}` : key) },
+        },
+        { provide: ConfigService, useValue: { getFeatureFlag$: () => of(false) } },
+        {
+          provide: EnvironmentService,
+          useValue: { environment$: of({ getIconsUrl: () => "https://icons.example.com" }) },
+        },
+        { provide: DomainSettingsService, useValue: { showFavicons$: of(true) } },
+        { provide: Vfo1TerminologyService, useFactory: () => ({ enabled: signal(false) }) },
+        ...(badge == null ? [] : [{ provide: ITEM_DETAILS_BADGE, useValue: badge }]),
+      ],
+    }).compileComponents();
+
+    const fixture = TestBed.createComponent(ItemDetailsV2Component);
+    fixture.componentRef.setInput("cipher", cipher);
+    fixture.componentRef.setInput("isAdminConsole", isAdminConsole);
+    fixture.detectChanges();
+    return fixture;
+  }
+
+  afterEach(() => TestBed.resetTestingModule());
+
+  function nameRow(fixture: ComponentFixture<ItemDetailsV2Component>): HTMLElement {
+    return fixture.debugElement.query(By.css('[data-testid="item-name"]')).nativeElement
+      .parentElement;
+  }
+
+  it("adds nothing to the name row when no host provides the token", async () => {
+    const fixture = await render(null);
+
+    const row = nameRow(fixture);
+    expect(fixture.debugElement.query(By.css("app-stub-state-badge"))).toBeNull();
+    expect(row.lastElementChild).toBe(row.querySelector('[data-testid="item-name"]'));
+  });
+
+  it("renders the provided badge on the name row, after the item name", async () => {
+    const fixture = await render(StubStateBadgeComponent);
+
+    const badge = fixture.debugElement.query(By.css('[data-testid="stub-state-badge"]'));
+    expect(badge).not.toBeNull();
+    expect(badge.nativeElement.textContent.trim()).toBe(cipher.name);
+
+    const row = nameRow(fixture);
+    expect(row.lastElementChild?.contains(badge.nativeElement)).toBe(true);
+  });
+
+  it("hands the badge the cipher and isAdminConsole", async () => {
+    const fixture = await render(StubStateBadgeComponent, true);
+
+    const badge = fixture.debugElement.query(By.directive(StubStateBadgeComponent))
+      .componentInstance as StubStateBadgeComponent;
+    expect(badge.cipher()).toBe(cipher);
+    expect(badge.isAdminConsole()).toBe(true);
   });
 });

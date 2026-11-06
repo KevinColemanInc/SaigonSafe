@@ -18,6 +18,7 @@
       block
       [bitTooltip]="biometricUnavailabilityReason"
       (click)="unlockViaBiometrics()"
+      data-testid="lock-biometric-unlock-button"
     >
       <span> {{ biometricUnlockBtnText | i18n }}</span>
     </button>
@@ -31,7 +32,7 @@
           bitButton
           buttonType="secondary"
           block
-          (click)="activeUnlockOption = UnlockOption.Pin"
+          (click)="swapUnlockOption(UnlockOption.Pin)"
         >
           {{ "unlockWithPin" | i18n }}
         </button>
@@ -43,7 +44,7 @@
           bitButton
           buttonType="secondary"
           block
-          (click)="activeUnlockOption = UnlockOption.MasterPassword"
+          (click)="swapUnlockOption(UnlockOption.MasterPassword)"
         >
           {{ "unlockWithMasterPassword" | i18n }}
         </button>
@@ -68,9 +69,11 @@
           bitInput
           appAutofocus
           name="pin"
+          data-testid="lock-pin-input"
           class="tw-font-mono"
           required
           appInputVerbatim
+          data-testid="lock-pin-input"
         />
         <button
           type="button"
@@ -82,7 +85,14 @@
       </bit-form-field>
 
       <div class="tw-flex tw-flex-col tw-space-y-3">
-        <button type="submit" bitButton bitFormButton buttonType="primary" block>
+        <button
+          type="submit"
+          bitButton
+          bitFormButton
+          buttonType="primary"
+          block
+          data-testid="lock-pin-unlock-button"
+        >
           {{ "unlock" | i18n }}
         </button>
 
@@ -96,7 +106,8 @@
             buttonType="secondary"
             [disabled]="!biometricsAvailable"
             block
-            (click)="activeUnlockOption = UnlockOption.Biometrics"
+            (click)="swapUnlockOption(UnlockOption.Biometrics)"
+            data-testid="lock-biometric-swap-button"
           >
             <span> {{ biometricUnlockBtnText | i18n }}</span>
           </button>
@@ -109,7 +120,7 @@
             bitFormButton
             buttonType="secondary"
             block
-            (click)="activeUnlockOption = UnlockOption.MasterPassword"
+            (click)="swapUnlockOption(UnlockOption.MasterPassword)"
           >
             {{ "unlockWithMasterPassword" | i18n }}
           </button>
@@ -130,10 +141,11 @@
   <!-- MP Unlock -->
   @if (unlockOptions.masterPassword.enabled && activeUnlockOption === UnlockOption.MasterPassword) {
     <bit-master-password-lock
-      [(activeUnlockOption)]="activeUnlockOption"
       [unlockOptions]="unlockOptions"
       [biometricUnlockBtnText]="biometricUnlockBtnText"
       (successfulUnlock)="successfulMasterPasswordUnlock($event)"
+      (swapToBiometrics)="swapUnlockOption(UnlockOption.Biometrics)"
+      (swapToPin)="swapUnlockOption(UnlockOption.Pin)"
       (prfUnlockSuccess)="onPrfUnlockSuccess($event)"
       (logOut)="logOut()"
     ></bit-master-password-lock>

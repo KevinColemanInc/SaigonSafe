@@ -1,6 +1,5 @@
-import { Component, Signal } from "@angular/core";
+import { Component } from "@angular/core";
 
-import { Integration } from "@bitwarden/bit-common/dirt/organization-integrations/models/integration";
 import { IntegrationStateService } from "@bitwarden/bit-common/dirt/organization-integrations/shared/integration-state.service";
 import { IntegrationType } from "@bitwarden/common/enums";
 
@@ -99,7 +98,7 @@ export class IntegrationsComponent {
       },
       {
         name: "Terraform Provider",
-        linkURL: "https://registry.terraform.io/providers/bitwarden/bitwarden-secrets/latest",
+        linkURL: "https://registry.terraform.io/providers/bitwarden/bitwarden-secrets/latest/docs",
         image: "../../../../../../../images/secrets-manager/integrations/terraform.svg",
         type: IntegrationType.Integration,
         newBadgeExpiration: "2025-12-12", // December 12, 2025
@@ -107,14 +106,5 @@ export class IntegrationsComponent {
     ];
 
     this.state.setIntegrations(integrations);
-  }
-
-  get integrations(): Signal<Integration[]> {
-    return this.state.integrations;
-  }
-
-  // use in the view
-  get IntegrationType(): typeof IntegrationType {
-    return IntegrationType;
   }
 }

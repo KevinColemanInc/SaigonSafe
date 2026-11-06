@@ -7,8 +7,9 @@ import { UrlType } from "@bitwarden/common/platform/misc/safe-urls";
 import { LogService } from "@bitwarden/logging";
 
 import { SafeShell } from "../platform/main/safe-shell.main";
-import { isAppImage, isDev, isMacAppStore, isWindowsPortable, isWindowsStore } from "../utils";
+import { isDev } from "../utils";
 
+import { isMacAppStore, isWindowsPortable, isWindowsStore } from "./platform-utils.main";
 import { WindowMain } from "./window.main";
 
 const UpdaterCheckInitialDelay = 5 * 1000; // 5 seconds
@@ -43,9 +44,15 @@ export class UpdaterMain {
 
     this.originalRolloutFunction = autoUpdater.isUserWithinRollout;
 
-    const linuxCanUpdate = process.platform === "linux" && isAppImage();
+    // AppImage auto update was recently disabled. There is some infra work
+    // we need to do to properly support this. Due to capacity, we decided to
+    // temporarily disable AppImage auto updates. See PM-41518.
+    const linuxCanUpdate = false;
     const windowsCanUpdate =
-      process.platform === "win32" && !isWindowsStore() && !isWindowsPortable();
+      process.platform === "win32" &&
+      !isWindowsStore() &&
+      !isWindowsPortable() &&
+      process.arch !== "ia32"; // ia32 unsupported from Electron 44+
     const macCanUpdate = process.platform === "darwin" && !isMacAppStore();
     this.canUpdate =
       !this.userDisabledUpdates() && (linuxCanUpdate || windowsCanUpdate || macCanUpdate);
@@ -267,7 +274,10 @@ export class UpdaterMain {
       if (arg != null && arg.toUpperCase().indexOf("--ELECTRON_NO_UPDATER=1") > -1) {
         return true;
       }
+      if (arg != null && arg.toUpperCase().indexOf("--BITWARDEN_NO_UPDATER=1") > -1) {
+        return true;
+      }
     }
-    return process.env.ELECTRON_NO_UPDATER === "1";
+    return process.env.ELECTRON_NO_UPDATER === "1" || process.env.BITWARDEN_NO_UPDATER === "1";
   }
 }

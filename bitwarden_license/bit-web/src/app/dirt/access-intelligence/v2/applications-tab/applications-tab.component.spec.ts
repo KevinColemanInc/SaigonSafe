@@ -72,7 +72,7 @@ describe("ApplicationsTabComponent", () => {
     };
 
     mockDrawerStateService = {
-      openDrawer: jest.fn(),
+      toggleDrawer: jest.fn(),
       closeDrawer: jest.fn(),
       drawerState: signal(null) as any,
     } as any;
@@ -154,15 +154,6 @@ describe("ApplicationsTabComponent", () => {
 
       mockDataService.loading$.next(false);
       expect(testAccess(component).loading()).toBe(false);
-    });
-
-    it("should convert ciphers$ to signal", () => {
-      const cipher = new CipherView();
-      cipher.id = "cipher-1";
-      mockDataService.ciphers$.next([cipher]);
-
-      expect(testAccess(component).ciphers()).toHaveLength(1);
-      expect(testAccess(component).ciphers()[0].id).toBe("cipher-1");
     });
   });
 
@@ -343,10 +334,10 @@ describe("ApplicationsTabComponent", () => {
   // ==================== showAppAtRiskMembers ====================
 
   describe("showAppAtRiskMembers()", () => {
-    it("should call drawerStateService.openDrawer with AppAtRiskMembers type and app name", async () => {
+    it("should call drawerStateService.toggleDrawer with AppAtRiskMembers type and app name", async () => {
       await component.showAppAtRiskMembers("github.com");
 
-      expect(mockDrawerStateService.openDrawer).toHaveBeenCalledWith(
+      expect(mockDrawerStateService.toggleDrawer).toHaveBeenCalledWith(
         DrawerType.AppAtRiskMembers,
         "github.com",
       );

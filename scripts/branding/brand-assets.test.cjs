@@ -55,3 +55,16 @@ test("unrelated images and other browsers keep their original assets", () => {
     bytes,
   );
 });
+
+test("stable and beta wordmarks use SaigonSafe artwork", () => {
+  for (const filename of ["bitwarden-logo.icon.ts", "bitwarden-logo-beta.icon.ts"]) {
+    const source = fs.readFileSync(path.join(root, "libs/assets/src/svg/svgs", filename), "utf8");
+    assert.match(source, /SaigonSafeLogo/);
+    assert.doesNotMatch(source, /<path|<svg/);
+  }
+  const messages = JSON.parse(
+    fs.readFileSync(path.join(root, "apps/browser/src/_locales/en/messages.json")),
+  );
+  assert.match(messages.extName.message, /SaigonSafe/);
+  assert.match(messages.extNameBeta.message, /SaigonSafe/);
+});

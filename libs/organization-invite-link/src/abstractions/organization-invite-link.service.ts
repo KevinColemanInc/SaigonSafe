@@ -2,40 +2,58 @@ import { Observable } from "rxjs";
 
 import { OrganizationId, UserId } from "@bitwarden/common/types/guid";
 
-import { OrganizationInviteLinkResponseModel } from "../models/responses/organization-invite-link.response";
+import { OrganizationInviteLinkView } from "../models/organization-invite-link.view";
 
 export abstract class OrganizationInviteLinkService {
   /** Observable stream of the cached invite link for the given user */
-  abstract inviteLink$(userId: UserId): Observable<OrganizationInviteLinkResponseModel | undefined>;
-
-  /**
-   * Create a new invite link for the organization.
-   * Emits the shareable URL once, then completes.
-   */
-  abstract createInviteLink(
+  abstract inviteLink$(
     userId: UserId,
     orgId: OrganizationId,
-    domains: string[],
-  ): Promise<string>;
+  ): Observable<OrganizationInviteLinkView | undefined>;
 
   /**
-   * Refresh the invite link using cached allowed domains.
-   * Emits the shareable URL once, then completes.
+   * Create a new invite link for the organization. Resolves once the SDK key generation,
+   * API call, and local state update have all succeeded.
    */
-  abstract refreshInviteLink(userId: UserId, orgId: OrganizationId): Promise<string>;
+  abstract create(
+    userId: UserId,
+    orgId: OrganizationId,
+    allowedDomains: string[],
+    supportsConfirmation: boolean,
+  ): Promise<void>;
 
   /**
-   * Reconstruct the shareable URL from the server-stored invite link.
-   * Emits the URL (or undefined when none exists), then completes.
+   * Update the allowed domains on an existing invite link.
    */
-  abstract reconstructUrl(userId: UserId, orgId: OrganizationId): Promise<string | undefined>;
+  abstract updateAllowedDomains(
+    userId: UserId,
+    orgId: OrganizationId,
+    allowedDomain: string[],
+  ): Promise<void>;
 
-  /** Persist an invite link response to local state */
-  abstract upsert(userId: UserId, data: OrganizationInviteLinkResponseModel): Promise<void>;
+  /**
+   * Change whether the existing invite link supports confirmation, i.e. whether invitees
+   * self-confirm (`true`) or an admin must confirm them out of band (`false`).
+   *
+   * Only the confirmation setting changes — the link's code and secret are preserved, so
+   * already-distributed links keep working. Rejects when the organization has no invite link.
+   */
+  abstract setInviteConfirmation(
+    userId: UserId,
+    orgId: OrganizationId,
+    supportsConfirmation: boolean,
+  ): Promise<void>;
 
-  /** Delete (revoke) the invite link via the API and clear local cached state */
+  /**
+   * Refresh the invite link via the server endpoint. Resolves once the SDK key generation,
+   * API call, and local state update have all succeeded.
+   */
+  abstract refresh(
+    userId: UserId,
+    orgId: OrganizationId,
+    supportsConfirmation: boolean,
+  ): Promise<void>;
+
+  /** Delete (revoke) the invite link via the SDK and clear local cached state */
   abstract delete(userId: UserId, orgId: OrganizationId): Promise<void>;
-
-  /** Clear local cached invite link state for the user without calling the API */
-  abstract clear(userId: UserId): Promise<void>;
 }

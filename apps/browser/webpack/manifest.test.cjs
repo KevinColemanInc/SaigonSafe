@@ -36,3 +36,30 @@ test("handles nested arrays, primitive entries, and null overrides", () => {
     entries: [[null, "value", {}]],
   });
 });
+
+test("MV3 uses the appropriate background mechanism for each browser", () => {
+  const template = fs.readFileSync(path.join(__dirname, "../src/manifest.v3.json"));
+  assert.deepEqual(JSON.parse(transform("chrome")(template)).background, {
+    service_worker: "background.js",
+  });
+  assert.deepEqual(JSON.parse(transform("firefox")(template)).background, {
+    scripts: ["background.js"],
+  });
+});
+
+test("beta manifests retain SaigonSafe identity", () => {
+  const previousChannel = process.env.CHANNEL;
+  process.env.CHANNEL = "beta";
+  try {
+    for (const filename of ["manifest.json", "manifest.v3.json"]) {
+      const template = fs.readFileSync(path.join(__dirname, "../src", filename));
+      const output = JSON.parse(transform("chrome")(template));
+      assert.equal(output.short_name, "SaigonSafe Beta");
+      assert.equal((output.action || output.browser_action).default_title, "SaigonSafe Beta");
+      assert.equal(output.name, "__MSG_extNameBeta__");
+    }
+  } finally {
+    if (previousChannel === undefined) delete process.env.CHANNEL;
+    else process.env.CHANNEL = previousChannel;
+  }
+});

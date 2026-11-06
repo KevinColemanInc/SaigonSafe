@@ -1,5 +1,7 @@
 // FIXME: Update this file to be type safe and remove this and next line
 // @ts-strict-ignore
+import * as path from "path";
+
 import { filter, firstValueFrom, map, switchMap } from "rxjs";
 
 import { CollectionService } from "@bitwarden/admin-console/common";
@@ -13,16 +15,17 @@ import { getUserId } from "@bitwarden/common/auth/services/account.service";
 import { BillingAccountProfileStateService } from "@bitwarden/common/billing/abstractions/account/billing-account-profile-state.service";
 import { EventCollectionService, EventType } from "@bitwarden/common/dirt/event-logs";
 import { FeatureFlag } from "@bitwarden/common/enums/feature-flag.enum";
-import { EncryptService } from "@bitwarden/common/key-management/crypto/abstractions/encrypt.service";
 import { BankAccountExport } from "@bitwarden/common/models/export/bank-account.export";
 import { CardExport } from "@bitwarden/common/models/export/card.export";
 import { CipherExport } from "@bitwarden/common/models/export/cipher.export";
 import { CollectionExport } from "@bitwarden/common/models/export/collection.export";
+import { DriversLicenseExport } from "@bitwarden/common/models/export/drivers-license.export";
 import { FieldExport } from "@bitwarden/common/models/export/field.export";
 import { FolderExport } from "@bitwarden/common/models/export/folder.export";
 import { IdentityExport } from "@bitwarden/common/models/export/identity.export";
 import { LoginUriExport } from "@bitwarden/common/models/export/login-uri.export";
 import { LoginExport } from "@bitwarden/common/models/export/login.export";
+import { PassportExport } from "@bitwarden/common/models/export/passport.export";
 import { SecureNoteExport } from "@bitwarden/common/models/export/secure-note.export";
 import { ErrorResponse } from "@bitwarden/common/models/response/error.response";
 import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
@@ -37,6 +40,8 @@ import { CipherType } from "@bitwarden/common/vault/enums";
 import { CipherView } from "@bitwarden/common/vault/models/view/cipher.view";
 import { FolderView } from "@bitwarden/common/vault/models/view/folder.view";
 import { KeyService } from "@bitwarden/key-management";
+// eslint-disable-next-line no-restricted-imports
+import { EncryptService, LegacyCompatKeyService } from "@bitwarden/legacy-crypto";
 
 import { OrganizationCollectionRequest } from "../admin-console/models/request/organization-collection.request";
 import { CollectionResponse } from "../admin-console/models/response/collection.response";
@@ -61,6 +66,7 @@ export class GetCommand extends DownloadCommand {
     private totpService: TotpService,
     private auditService: AuditService,
     private keyService: KeyService,
+    private legacyCompatKeyService: LegacyCompatKeyService,
     encryptService: EncryptService,
     private searchService: SearchService,
     protected apiService: ApiService,
@@ -98,10 +104,13 @@ export class GetCommand extends DownloadCommand {
       case "attachment":
         return await this.getAttachment(id, normalizedOptions);
       case "folder":
+      case "my-folder":
         return await this.getFolder(id);
       case "collection":
+      case "shared-folder":
         return await this.getCollection(id);
       case "org-collection":
+      case "org-shared-folder":
         return await this.getOrganizationCollection(id, normalizedOptions);
       case "organization":
         return await this.getOrganization(id);
@@ -413,7 +422,7 @@ export class GetCommand extends DownloadCommand {
 
     return await this.saveAttachmentToFile(
       url,
-      attachments[0].fileName,
+      path.basename(attachments[0].fileName ?? `BitwardenAttachment-${Date.now()}`),
       decryptBufferFn,
       options.output,
     );
@@ -442,7 +451,10 @@ export class GetCommand extends DownloadCommand {
     if (decFolder == null) {
       return Response.notFound();
     }
-    const res = new FolderResponse(decFolder);
+    const useSharedFoldersTerm = await this.configService.getFeatureFlag(
+      FeatureFlag.VFO1Foundation,
+    );
+    const res = new FolderResponse(decFolder, useSharedFoldersTerm);
     return Response.success(res);
   }
 
@@ -478,7 +490,10 @@ export class GetCommand extends DownloadCommand {
     if (decCollection == null) {
       return Response.notFound();
     }
-    const res = new CollectionResponse(decCollection);
+    const useSharedFoldersTerm = await this.configService.getFeatureFlag(
+      FeatureFlag.VFO1Foundation,
+    );
+    const res = new CollectionResponse(decCollection, useSharedFoldersTerm);
     return Response.success(res);
   }
 
@@ -522,7 +537,15 @@ export class GetCommand extends DownloadCommand {
           : response.users.map(
               (g) => new SelectionReadOnly(g.id, g.readOnly, g.hidePasswords, g.manage),
             );
-      const res = new OrganizationCollectionResponse(decCollection, groups, users);
+      const useSharedFoldersTerm = await this.configService.getFeatureFlag(
+        FeatureFlag.VFO1Foundation,
+      );
+      const res = new OrganizationCollectionResponse(
+        decCollection,
+        groups,
+        users,
+        useSharedFoldersTerm,
+      );
       return Response.success(res);
     } catch (e) {
       return Response.error(e);
@@ -593,16 +616,40 @@ export class GetCommand extends DownloadCommand {
         template = BankAccountExport.template();
         break;
       }
+      case "item.driverslicense": {
+        const newItemTypesEnabled = await firstValueFrom(
+          this.configService.getFeatureFlag$(FeatureFlag.PM32009NewItemTypes),
+        );
+        if (!newItemTypesEnabled) {
+          return Response.badRequest("Driver's license item type is not available.");
+        }
+        template = DriversLicenseExport.template();
+        break;
+      }
+      case "item.passport": {
+        const newItemTypesEnabled = await firstValueFrom(
+          this.configService.getFeatureFlag$(FeatureFlag.PM32009NewItemTypes),
+        );
+        if (!newItemTypesEnabled) {
+          return Response.badRequest("Passport item type is not available.");
+        }
+        template = PassportExport.template();
+        break;
+      }
       case "folder":
+      case "my-folder":
         template = FolderExport.template();
         break;
       case "collection":
+      case "shared-folder":
         template = CollectionExport.template();
         break;
       case "item-collections":
+      case "item-shared-folders":
         template = ["collection-id1", "collection-id2"];
         break;
       case "org-collection":
+      case "org-shared-folder":
         template = OrganizationCollectionRequest.template();
         break;
       case "send.file":
@@ -627,12 +674,12 @@ export class GetCommand extends DownloadCommand {
       if (publicKey == null) {
         return Response.error("No public key available for the active user.");
       }
-      fingerprint = await this.keyService.getFingerprint(activeUserId, publicKey);
+      fingerprint = await this.legacyCompatKeyService.getFingerprint(activeUserId, publicKey);
     } else if (Utils.isGuid(id)) {
       try {
         const response = await this.apiService.getUserPublicKey(id);
         const pubKey = Utils.fromB64ToArray(response.publicKey);
-        fingerprint = await this.keyService.getFingerprint(id, pubKey);
+        fingerprint = await this.legacyCompatKeyService.getFingerprint(id, pubKey);
       } catch {
         // empty - handled by the null check below
       }

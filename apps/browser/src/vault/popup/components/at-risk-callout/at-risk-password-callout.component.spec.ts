@@ -5,6 +5,7 @@ import { mock } from "jest-mock-extended";
 import { BehaviorSubject, of } from "rxjs";
 
 import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
+import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import { UserId } from "@bitwarden/common/types/guid";
 import { SecurityTask, SecurityTaskType } from "@bitwarden/common/vault/tasks";
@@ -34,6 +35,7 @@ describe("AtRiskPasswordCalloutComponent", () => {
       providers: [
         { provide: AccountService, useValue: mockAccountService },
         { provide: I18nService, useValue: mock<I18nService>() },
+        { provide: ConfigService, useValue: { getFeatureFlag$: () => of(false) } },
       ],
     })
       .overrideComponent(AtRiskPasswordCalloutComponent, {
@@ -59,7 +61,7 @@ describe("AtRiskPasswordCalloutComponent", () => {
 
   describe("currentPendingTasks$", () => {
     it("should not display warning banner when no pending tasks", () => {
-      const banner = fixture.debugElement.query(By.css("bit-banner[bannerType='warning']"));
+      const banner = fixture.debugElement.query(By.css("bit-banner[variant='warning']"));
       expect(banner).toBeNull();
     });
 
@@ -78,14 +80,14 @@ describe("AtRiskPasswordCalloutComponent", () => {
       component = fixture.componentInstance;
       fixture.detectChanges();
 
-      const banner = fixture.debugElement.query(By.css("bit-banner[bannerType='warning']"));
+      const banner = fixture.debugElement.query(By.css("bit-banner[variant='warning']"));
       expect(banner).toBeTruthy();
     });
   });
 
   describe("showCompletedTasksBanner$", () => {
     it("should not display info banner when showCompletedTasksBanner is false", () => {
-      const banner = fixture.debugElement.query(By.css("bit-banner[bannerType='info']"));
+      const banner = fixture.debugElement.query(By.css("bit-banner[variant='primary']"));
       expect(banner).toBeNull();
     });
 
@@ -96,7 +98,7 @@ describe("AtRiskPasswordCalloutComponent", () => {
       component = fixture.componentInstance;
       fixture.detectChanges();
 
-      const banner = fixture.debugElement.query(By.css("bit-banner[bannerType='info']"));
+      const banner = fixture.debugElement.query(By.css("bit-banner[variant='primary']"));
       expect(banner).toBeTruthy();
     });
   });

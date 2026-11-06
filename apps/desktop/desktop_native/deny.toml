@@ -5,9 +5,10 @@ unmaintained = "workspace"
 ignore = [
   # Vulnerability in `rsa` crate: https://rustsec.org/advisories/RUSTSEC-2023-0071.html
   { id = "RUSTSEC-2023-0071", reason = "There is no fix available yet." },
-  # rand 0.8.5 pulled transitively by num-bigint-dig (via rsa, ssh-key, oo7). No updated version available.
-  # Not affected: no custom log::Log logger uses rand in this codebase.
-  { id = "RUSTSEC-2026-0097", reason = "Transitive dep via num-bigint-dig; no fix available. Not exploitable: no custom logger uses rand." },
+  # crypto-bigint constant-time fix: https://rustsec.org/advisories/RUSTSEC-2026-0387
+  # crypto-bigint 0.5.x has no patched release; it is pulled via ssh-key 0.6 -> p256/p384/p521 -> elliptic-curve 0.13 (ssh_agent).
+  # This entry stays until ssh-key is upgraded to 0.7 (elliptic-curve 0.14 / crypto-bigint 0.7).
+  { id = "RUSTSEC-2026-0387", reason = "crypto-bigint 0.5.x has no fix (reachable via ssh-key 0.6 ECDSA in ssh_agent)." },
 ]
 
 # https://embarkstudios.github.io/cargo-deny/checks/licenses/cfg.html
@@ -19,6 +20,8 @@ allow = [
   "BSD-2-Clause",
   "BSD-3-Clause",
   "BSL-1.0",
+  # Necesarry for webpki-roots
+  "CDLA-Permissive-2.0",
   "ISC",
   "MIT",
   "MPL-2.0",
@@ -33,6 +36,9 @@ allow = [
 # To see how to mark a crate as unpublished (to the official registry),
 # visit https://doc.rust-lang.org/cargo/reference/manifest.html#the-publish-field.
 ignore = true
+# First-party Bitwarden crates pulled from sdk-internal ship without license
+# metadata, so treat that git source as private and skip license checking.
+ignore-sources = ["https://github.com/bitwarden/sdk-internal"]
 
 # This section is considered when running `cargo deny check bans`.
 # More documentation about the 'bans' section can be found here:

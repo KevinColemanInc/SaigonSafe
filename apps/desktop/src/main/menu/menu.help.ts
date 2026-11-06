@@ -1,11 +1,12 @@
 import { MenuItemConstructorOptions, app } from "electron";
 
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
+import { MessagingService } from "@bitwarden/common/platform/abstractions/messaging.service";
 import { UrlType } from "@bitwarden/common/platform/misc/safe-urls";
 
 import { SafeShell } from "../../platform/main/safe-shell.main";
 import { DesktopSettingsService } from "../../platform/services/desktop-settings.service";
-import { isMacAppStore, isWindowsStore } from "../../utils";
+import { isMacAppStore, isWindowsStore } from "../platform-utils.main";
 
 import { AboutMenu } from "./menu.about";
 import { IMenubarMenu } from "./menubar";
@@ -41,6 +42,7 @@ export class HelpMenu implements IMenubarMenu {
 
   constructor(
     private i18nService: I18nService,
+    private messagingService: MessagingService,
     private desktopSettingsService: DesktopSettingsService,
     private webVaultUrl: string,
     private hardwareAccelerationEnabled: boolean,
@@ -257,6 +259,11 @@ export class HelpMenu implements IMenubarMenu {
           }
           app.exit();
         },
+      },
+      {
+        id: "downloadDiagnosticReport",
+        label: this.localize("downloadDiagnosticReport"),
+        click: () => this.messagingService.send("openTroubleshootingDialog"),
       },
     ];
   }

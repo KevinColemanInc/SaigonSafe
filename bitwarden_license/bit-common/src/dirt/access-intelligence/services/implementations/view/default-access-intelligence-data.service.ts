@@ -1,6 +1,7 @@
 import {
   BehaviorSubject,
   catchError,
+  first,
   forkJoin,
   from,
   map,
@@ -16,7 +17,11 @@ import {
   OrganizationUserApiService,
   OrganizationUserUserDetailsResponse,
 } from "@bitwarden/admin-console/common";
+import { ApiService } from "@bitwarden/common/abstractions/api.service";
+import { CollectionAccessDetailsResponse } from "@bitwarden/common/admin-console/models/collections";
+import { FeatureFlag } from "@bitwarden/common/enums/feature-flag.enum";
 import type { ListResponse } from "@bitwarden/common/models/response/list.response";
+import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { OrganizationId } from "@bitwarden/common/types/guid";
 import { CipherService } from "@bitwarden/common/vault/abstractions/cipher.service";
 import { CipherView } from "@bitwarden/common/vault/models/view/cipher.view";
@@ -24,6 +29,7 @@ import { LogService } from "@bitwarden/logging";
 
 import { ReportProgress } from "../../../../reports/risk-insights/models/report-models";
 import { AccessReportView } from "../../../models";
+import { measureFlowStep } from "../../../utils/measure-flow-step.operator";
 import { AccessIntelligenceDataService } from "../../abstractions/access-intelligence-data.service";
 import {
   CollectionAccessDetails,
@@ -53,11 +59,13 @@ export class DefaultAccessIntelligenceDataService extends AccessIntelligenceData
   readonly reportProgress$ = this._reportProgress.asObservable();
 
   constructor(
+    private apiService: ApiService,
     private cipherService: CipherService,
     private organizationUserApiService: OrganizationUserApiService,
     private reportGenerationService: ReportGenerationService,
     private reportPersistenceService: ReportPersistenceService,
     private logService: LogService,
+    private configService: ConfigService,
   ) {
     super();
   }
@@ -77,54 +85,84 @@ export class DefaultAccessIntelligenceDataService extends AccessIntelligenceData
     this._currentOrgId.next(orgId);
     this._loading.next(true);
     this._error.next(null);
+    this.logService.mark("[AccessReportFlow]: page open");
 
-    return this.reportPersistenceService.loadReport$(orgId).pipe(
-      switchMap((result) => {
-        if (!result) {
-          return of(null);
-        }
+    return this.configService
+      .getFeatureFlag$(FeatureFlag.AccessIntelligencePerformanceAtScale)
+      .pipe(
+        first(),
+        switchMap((performanceAtScaleEnabled) =>
+          forkJoin({
+            reportResult: this.reportPersistenceService.loadLastReport$(orgId),
+            // With the flag on, ciphers are deferred until we know no report exists
+            ciphers: performanceAtScaleEnabled ? of(null) : this.loadCiphersOnly$(orgId),
+          }),
+        ),
+        switchMap(({ reportResult, ciphers }) => {
+          if (ciphers) {
+            this._ciphers.next(ciphers);
+          }
 
-        const { report, hadLegacyBlobs } = result;
+          // handle no report found and existing report without any logins
+          if (!reportResult || reportResult.report.reports.length === 0) {
+            if (ciphers) {
+              return of(null);
+            }
+            return this.loadCiphersOnly$(orgId).pipe(
+              tap((loadedCiphers) => this._ciphers.next(loadedCiphers)),
+              map((): AccessReportView | null => null),
+            );
+          }
 
-        if (hadLegacyBlobs) {
-          this.logService.info(
-            "[DefaultAccessIntelligenceDataService] Legacy blobs detected, re-saving in current format",
+          const { report, hadLegacyBlobs } = reportResult;
+
+          if (hadLegacyBlobs) {
+            this.logService.info(
+              "[DefaultAccessIntelligenceDataService] Legacy blobs detected, re-saving in current format",
+            );
+            return this.reportPersistenceService.saveReport$(report, orgId).pipe(
+              tap(({ id, contentEncryptionKey }) => {
+                report.id = id;
+                report.contentEncryptionKey = contentEncryptionKey;
+                this.logService.info(
+                  "[DefaultAccessIntelligenceDataService] Legacy blobs re-saved in current format",
+                );
+              }),
+              map(() => report),
+            );
+          }
+
+          return of(report);
+        }),
+        switchMap((report) => {
+          if (report) {
+            this.logService.debug("[DefaultAccessIntelligenceDataService] Report loaded");
+          } else {
+            this.logService.debug("[DefaultAccessIntelligenceDataService] No reports found");
+          }
+          this._report.next(report);
+          this._loading.next(false);
+          return of(undefined as void);
+        }),
+        measureFlowStep(this.logService, "Load: page initialized", () => {
+          const report = this._report.value;
+          return [
+            ["itemCount", this._ciphers.value.length],
+            ["memberCount", report ? Object.keys(report.memberRegistry).length : 0],
+            ["applicationCount", report?.reports.length ?? 0],
+          ];
+        }),
+        catchError((error: unknown) => {
+          this.logService.error(
+            "[DefaultAccessIntelligenceDataService] Initialization failed",
+            error,
           );
-          return this.reportPersistenceService.saveReport$(report, orgId).pipe(
-            tap(({ id, contentEncryptionKey }) => {
-              report.id = id;
-              report.contentEncryptionKey = contentEncryptionKey;
-              this.logService.info(
-                "[DefaultAccessIntelligenceDataService] Legacy blobs re-saved in current format",
-              );
-            }),
-            map(() => report),
-          );
-        }
-
-        return of(report);
-      }),
-      switchMap((report) => {
-        if (report) {
-          this.logService.debug("[DefaultAccessIntelligenceDataService] Report loaded");
-        } else {
-          this.logService.debug("[DefaultAccessIntelligenceDataService] No reports found");
-        }
-        this._report.next(report);
-        this._loading.next(false);
-        return of(undefined as void);
-      }),
-      catchError((error: unknown) => {
-        this.logService.error(
-          "[DefaultAccessIntelligenceDataService] Initialization failed",
-          error,
-        );
-        this._error.next("Failed to initialize");
-        this._loading.next(false);
-        this._report.next(null);
-        return of(undefined as void);
-      }),
-    );
+          this._error.next("Failed to initialize");
+          this._loading.next(false);
+          this._report.next(null);
+          return of(undefined as void);
+        }),
+      );
   }
 
   generateNewReport$(orgId: OrganizationId): Observable<void> {
@@ -149,6 +187,7 @@ export class DefaultAccessIntelligenceDataService extends AccessIntelligenceData
         // Transform API users to members, collection access, group memberships
         const { members, collectionAccess, groupMemberships } = this.transformOrganizationUserData(
           orgData.apiUsers.data,
+          orgData.collections.data,
         );
 
         this.logService.debug(
@@ -167,7 +206,7 @@ export class DefaultAccessIntelligenceDataService extends AccessIntelligenceData
 
         // Generate report
         return this.reportGenerationService
-          .generateReport(
+          .generateReport$(
             orgData.ciphers,
             members,
             collectionAccess,
@@ -227,7 +266,7 @@ export class DefaultAccessIntelligenceDataService extends AccessIntelligenceData
     this._loading.next(true);
     this._error.next(null);
 
-    return this.reportPersistenceService.loadReport$(orgId).pipe(
+    return this.reportPersistenceService.loadLastReport$(orgId).pipe(
       tap((result) => {
         this._report.next(result?.report ?? null);
         this._loading.next(false);
@@ -429,21 +468,82 @@ export class DefaultAccessIntelligenceDataService extends AccessIntelligenceData
     );
   }
 
+  private loadCiphersOnly$(orgId: OrganizationId): Observable<CipherView[]> {
+    return this.fetchOrgLogins$(orgId, "page open").pipe(
+      catchError((err: unknown) => {
+        this.logService.error("[DefaultAccessIntelligenceDataService] Cipher load failed", err);
+        return of([] as CipherView[]);
+      }),
+    );
+  }
+
+  private fetchOrgLogins$(
+    orgId: OrganizationId,
+    trigger: "page open" | "generate",
+  ): Observable<CipherView[]> {
+    return this.configService
+      .getFeatureFlag$(FeatureFlag.AccessIntelligencePerformanceAtScale)
+      .pipe(
+        first(),
+        switchMap((useLoginOnlyEndpoint) => {
+          const ciphers$ = useLoginOnlyEndpoint
+            ? from(this.cipherService.getCiphersOrganizationLogins(orgId)).pipe(
+                map(({ successes, failures }) => {
+                  if (failures.length > 0) {
+                    this.logService.error(
+                      `[DefaultAccessIntelligenceDataService] ${failures.length} ciphers failed to decrypt`,
+                    );
+                  }
+                  return successes;
+                }),
+              )
+            : from(this.cipherService.getAllFromApiForOrganization(orgId, true));
+
+          return ciphers$.pipe(
+            measureFlowStep(
+              this.logService,
+              `Load: org ciphers fetched (${trigger}, ${useLoginOnlyEndpoint ? "logins-only" : "legacy"})`,
+              (ciphers) => [["itemCount", ciphers.length]],
+            ),
+          );
+        }),
+      );
+  }
   /**
    * Load organization data in parallel (ciphers and users with collections/groups)
    */
   private loadOrganizationData$(orgId: OrganizationId): Observable<{
     ciphers: CipherView[];
     apiUsers: ListResponse<OrganizationUserUserDetailsResponse>;
+    collections: ListResponse<CollectionAccessDetailsResponse>;
   }> {
     return forkJoin({
-      ciphers: from(this.cipherService.getAllFromApiForOrganization(orgId)),
+      ciphers: this.fetchOrgLogins$(orgId, "generate"),
       apiUsers: from(
         this.organizationUserApiService.getAllUsers(orgId, {
-          includeCollections: true,
           includeGroups: true,
         }),
+      ).pipe(
+        measureFlowStep(this.logService, "Load: org members fetched", (apiUsers) => [
+          ["orgMemberCount", apiUsers.data.length],
+        ]),
       ),
+      collections: this.configService
+        .getFeatureFlag$(FeatureFlag.AccessIntelligencePerformanceAtScale)
+        .pipe(
+          first(),
+          switchMap((useNewEndpoint) =>
+            from(
+              useNewEndpoint
+                ? this.apiService.getManyCollectionsWithOrganizationDetails(orgId)
+                : this.apiService.getManyCollectionsWithAccessDetails(orgId),
+            ).pipe(
+              measureFlowStep(this.logService, "Load: org collections fetched", (collections) => [
+                ["collectionCount", collections.data.length],
+              ]),
+            ),
+          ),
+        ),
     });
   }
 
@@ -453,7 +553,10 @@ export class DefaultAccessIntelligenceDataService extends AccessIntelligenceData
    * Inverts user→collections/groups mappings to collection→users and group→users
    * for use by MemberCipherMappingService.
    */
-  private transformOrganizationUserData(apiUsers: OrganizationUserUserDetailsResponse[]): {
+  private transformOrganizationUserData(
+    apiUsers: OrganizationUserUserDetailsResponse[],
+    collections: CollectionAccessDetailsResponse[],
+  ): {
     members: OrganizationUserView[];
     collectionAccess: CollectionAccessDetails[];
     groupMemberships: GroupMembershipDetails[];
@@ -461,34 +564,16 @@ export class DefaultAccessIntelligenceDataService extends AccessIntelligenceData
     // 1. Extract members (simple mapping)
     const members: OrganizationUserView[] = apiUsers.map((user) => ({
       id: user.id,
-      name: user.name,
+      name: user.name ?? null,
       email: user.email,
     }));
 
-    // 2. Invert user→collections to collection→users/groups
-    const collectionMap = new Map<string, { users: Set<string>; groups: Set<string> }>();
-
-    apiUsers.forEach((user) => {
-      // For each collection the user has access to, add the user
-      user.collections?.forEach((collection: { id: string }) => {
-        if (!collectionMap.has(collection.id)) {
-          collectionMap.set(collection.id, { users: new Set(), groups: new Set() });
-        }
-        collectionMap.get(collection.id)!.users.add(user.id);
-      });
-    });
-
-    // Note: Groups that grant collection access are handled implicitly:
-    // If a user is in a group that has collection access, the user.collections
-    // array already includes those collections (server-side expansion)
-
-    const collectionAccess: CollectionAccessDetails[] = Array.from(collectionMap.entries()).map(
-      ([collectionId, access]) => ({
-        collectionId,
-        users: access.users,
-        groups: access.groups, // May be empty if server expands groups to users
-      }),
-    );
+    // 2. Get collection access by users and groups
+    const collectionAccess: CollectionAccessDetails[] = collections.map((collection) => ({
+      collectionId: collection.id,
+      users: new Set(collection.users.map((u) => u.id)),
+      groups: new Set(collection.groups.map((g) => g.id)),
+    }));
 
     // 3. Invert user→groups to group→users
     const groupMap = new Map<string, Set<string>>();

@@ -1,10 +1,8 @@
-import {
-  CollectionType,
-  CollectionTypes,
-} from "@bitwarden/common/admin-console/models/collections";
-import { SelectionReadOnlyResponse } from "@bitwarden/common/admin-console/models/response/selection-read-only.response";
-import { BaseResponse } from "@bitwarden/common/models/response/base.response";
-import { CollectionId, OrganizationId } from "@bitwarden/common/types/guid";
+import { BaseResponse } from "../../../models/response/base.response";
+import { CollectionId, OrganizationId } from "../../../types/guid";
+import { SelectionReadOnlyResponse } from "../response/selection-read-only.response";
+
+import { CollectionType, CollectionTypes } from ".";
 
 export class CollectionResponse extends BaseResponse {
   id: CollectionId;
@@ -29,6 +27,8 @@ export class CollectionDetailsResponse extends CollectionResponse {
   readOnly: boolean;
   manage: boolean;
   hidePasswords: boolean;
+  /** True when an enabled PAM access rule gates the collection's items. Derived by the server. */
+  hasEnabledAccessRule: boolean;
 
   /**
    * Flag indicating the user has been explicitly assigned to this Collection
@@ -40,6 +40,7 @@ export class CollectionDetailsResponse extends CollectionResponse {
     this.readOnly = this.getResponseProperty("ReadOnly") || false;
     this.manage = this.getResponseProperty("Manage") || false;
     this.hidePasswords = this.getResponseProperty("HidePasswords") || false;
+    this.hasEnabledAccessRule = this.getResponseProperty("HasEnabledAccessRule") || false;
 
     // Temporary until the API is updated to return this property in AC-2084
     // For now, we can assume that if the object is 'collectionDetails' then the user is assigned

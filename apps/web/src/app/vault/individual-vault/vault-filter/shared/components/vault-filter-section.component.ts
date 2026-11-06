@@ -1,8 +1,17 @@
 // FIXME: Update this file to be type safe and remove this and next line
 // @ts-strict-ignore
-import { Component, computed, inject, input, InjectionToken, Injector, Input } from "@angular/core";
+import {
+  Component,
+  computed,
+  inject,
+  input,
+  InjectionToken,
+  Injector,
+  Input,
+  Type,
+} from "@angular/core";
 import { toObservable, toSignal } from "@angular/core/rxjs-interop";
-import { firstValueFrom, Observable } from "rxjs";
+import { firstValueFrom, Observable, of } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
 
 import { Organization } from "@bitwarden/common/admin-console/models/domain/organization";
@@ -14,9 +23,18 @@ import {
   VaultFilterSection,
   VaultFilterType,
   VaultFilter,
+  CoachmarkService,
 } from "@bitwarden/vault";
 
-import { CoachmarkService } from "../../../../components/coachmark";
+import {
+  VAULT_CONTROLLED_ACCESS_FILTER,
+  VaultControlledAccessFilter,
+} from "../../../vault-controlled-access-filter.token";
+
+import {
+  VAULT_FILTER_GATED_COLLECTION_INDICATOR,
+  VaultFilterGatedCollectionIndicator,
+} from "./pam/vault-filter-gated-collection-indicator.token";
 
 // FIXME(https://bitwarden.atlassian.net/browse/CL-764): Migrate to OnPush
 // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
@@ -39,6 +57,20 @@ export class VaultFilterSectionComponent {
 
   protected readonly coachmarkService = inject(CoachmarkService);
 
+  protected readonly gatedCollectionIndicator: Type<VaultFilterGatedCollectionIndicator> | null =
+    inject(VAULT_FILTER_GATED_COLLECTION_INDICATOR, { optional: true });
+
+  private readonly controlledAccessFilter: VaultControlledAccessFilter | null = inject(
+    VAULT_CONTROLLED_ACCESS_FILTER,
+    { optional: true },
+  );
+
+  private readonly offeredControlledAccessIds = toSignal(
+    this.controlledAccessFilter?.options$.pipe(map((options) => options.map(({ id }) => id))) ??
+      of<string[]>([]),
+    { initialValue: [] as string[] },
+  );
+
   /** Computed signal for collections coachmark open state */
   protected readonly collectionsCoachmarkOpen = computed(
     () => this.coachmarkService.activeStepId() === "shareWithCollections",
@@ -51,6 +83,24 @@ export class VaultFilterSectionComponent {
     initialValue: new Set<string>(),
   });
 
+  protected readonly headerNode = computed(() => this.data()!);
+  protected readonly headerInfo = computed(() => this.section().header);
+  protected readonly filters = computed(() => this.data()?.children);
+  protected readonly isOrganizationFilter = computed(
+    () => this.data()?.node instanceof Organization,
+  );
+  protected readonly isAllVaultsSelected = computed(
+    () => this.isOrganizationFilter() && !this.activeFilter.selectedOrganizationNode,
+  );
+  protected readonly editInfo = computed(() => this.section().edit);
+  protected readonly addInfo = computed(() => this.section().add);
+  protected readonly showAddLink = computed(() => !!this.section().add?.route);
+  protected readonly optionsInfo = computed(() => this.section().options);
+  protected readonly premiumFeature = computed(
+    () => this.section().premiumOptions?.showBadgeForNonPremium,
+  );
+  protected readonly divider = computed(() => this.section().divider);
+
   private injectors = new Map<string, Injector>();
 
   constructor(
@@ -59,39 +109,35 @@ export class VaultFilterSectionComponent {
     private accountService: AccountService,
   ) {}
 
-  get headerNode() {
-    return this.data()!;
-  }
-
-  get headerInfo() {
-    return this.section().header;
-  }
-
-  get filters() {
-    return this.data()?.children;
-  }
-
-  get isOrganizationFilter() {
-    return this.data()?.node instanceof Organization;
-  }
-
-  get isAllVaultsSelected() {
-    return this.isOrganizationFilter && !this.activeFilter.selectedOrganizationNode;
-  }
-
   isNodeSelected(filterNode: TreeNode<VaultFilterType>) {
-    const { organizationId, cipherTypeId, folderId, collectionId, isCollectionSelected } =
-      this.activeFilter;
+    const {
+      organizationId,
+      cipherTypeId,
+      folderId,
+      collectionId,
+      controlledAccessId,
+      isCollectionSelected,
+    } = this.activeFilter;
 
     const collectionStatus =
       filterNode?.node.id === "AllCollections" &&
       (isCollectionSelected || collectionId === "AllCollections");
 
+    // An id the host no longer offers draws no row and narrows nothing, so "All items" carries
+    // the selection instead.
+    const strandedControlledAccess =
+      filterNode?.node.id === "AllItems" &&
+      cipherTypeId == null &&
+      controlledAccessId != null &&
+      !this.offeredControlledAccessIds().includes(controlledAccessId);
+
     return (
       organizationId === filterNode?.node.id ||
       cipherTypeId === filterNode?.node.id ||
       folderId === filterNode?.node.id ||
-      collectionStatus
+      controlledAccessId === filterNode?.node.id ||
+      collectionStatus ||
+      strandedControlledAccess
     );
   }
 
@@ -104,36 +150,12 @@ export class VaultFilterSectionComponent {
     await this.section().action(filterNode);
   }
 
-  get editInfo() {
-    return this.section().edit;
-  }
-
   onEdit(filterNode: TreeNode<VaultFilterType>) {
     this.section().edit?.action(filterNode.node);
   }
 
-  get addInfo() {
-    return this.section().add;
-  }
-
-  get showAddLink() {
-    return this.section().add && this.section().add.route;
-  }
-
   async onAdd() {
     this.section().add?.action();
-  }
-
-  get optionsInfo() {
-    return this.section().options;
-  }
-
-  get premiumFeature() {
-    return this.section().premiumOptions?.showBadgeForNonPremium;
-  }
-
-  get divider() {
-    return this.section().divider;
   }
 
   isCollapsed(node: ITreeNodeObject) {

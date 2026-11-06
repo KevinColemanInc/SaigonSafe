@@ -1,8 +1,7 @@
-import { mock } from "jest-mock-extended";
 import { Jsonify } from "type-fest";
 
-import { SymmetricCryptoKey } from "@bitwarden/common/platform/models/domain/symmetric-crypto-key";
-import { MockProxy } from "@bitwarden/common/platform/spec/mock-deep";
+// eslint-disable-next-line no-restricted-imports
+import { EncString } from "@bitwarden/legacy-crypto";
 import {
   CipherType as SdkCipherType,
   UriMatchType,
@@ -12,18 +11,9 @@ import {
   EncString as SdkEncString,
 } from "@bitwarden/sdk-internal";
 
-import {
-  makeStaticByteArray,
-  mockContainerService,
-  mockEnc,
-  mockFromJson,
-} from "../../../../spec/utils";
-import { EncryptService } from "../../../key-management/crypto/abstractions/encrypt.service";
-import { EncString } from "../../../key-management/crypto/models/enc-string";
+import { mockFromJson } from "../../../../spec/utils";
 import { UriMatchStrategy } from "../../../models/domain/domain-service";
 import { InitializerKey } from "../../../platform/services/cryptography/initializer-key";
-import { UserId } from "../../../types/guid";
-import { CipherService } from "../../abstractions/cipher.service";
 import { FieldType, LoginLinkedId, SecureNoteType } from "../../enums";
 import { CipherRepromptType } from "../../enums/cipher-reprompt-type";
 import { CipherType } from "../../enums/cipher-type";
@@ -36,21 +26,9 @@ import { Identity } from "../../models/domain/identity";
 import { Login } from "../../models/domain/login";
 import { Password } from "../../models/domain/password";
 import { SecureNote } from "../../models/domain/secure-note";
-import { CardView } from "../../models/view/card.view";
-import { IdentityView } from "../../models/view/identity.view";
-import { LoginView } from "../../models/view/login.view";
 import { CipherPermissionsApi } from "../api/cipher-permissions.api";
 
-const mockSymmetricKey = new SymmetricCryptoKey(makeStaticByteArray(64));
-
 describe("Cipher DTO", () => {
-  let encryptService: MockProxy<EncryptService>;
-
-  beforeEach(() => {
-    const containerService = mockContainerService();
-    encryptService = containerService.encryptService;
-  });
-
   it("Convert from empty CipherData", () => {
     const data = new CipherData();
     const cipher = new Cipher(data);
@@ -77,67 +55,6 @@ describe("Cipher DTO", () => {
     expect(cipher.key).toBeUndefined();
     expect(cipher.permissions).toBeUndefined();
     expect(cipher.archivedDate).toBeUndefined();
-  });
-
-  it("Decrypt should handle cipher key error", async () => {
-    const cipher = new Cipher();
-    cipher.id = "id";
-    cipher.organizationId = "orgId";
-    cipher.folderId = "folderId";
-    cipher.edit = true;
-    cipher.viewPassword = true;
-    cipher.organizationUseTotp = true;
-    cipher.favorite = false;
-    cipher.revisionDate = new Date("2022-01-31T12:00:00.000Z");
-    cipher.type = CipherType.Login;
-    cipher.name = mockEnc("EncryptedString");
-    cipher.notes = mockEnc("EncryptedString");
-    cipher.creationDate = new Date("2022-01-01T12:00:00.000Z");
-    cipher.deletedDate = undefined;
-    cipher.reprompt = CipherRepromptType.None;
-    cipher.key = mockEnc("EncKey");
-    cipher.permissions = new CipherPermissionsApi();
-
-    const loginView = new LoginView();
-    loginView.username = "username";
-    loginView.password = "password";
-
-    const login = mock<Login>();
-    login.decrypt.mockResolvedValue(loginView);
-    cipher.login = login;
-
-    const cipherService = mock<CipherService>();
-
-    encryptService.unwrapSymmetricKey.mockRejectedValue(new Error("Failed to unwrap key"));
-    cipherService.getKeyForCipherKeyDecryption.mockResolvedValue(
-      new SymmetricCryptoKey(makeStaticByteArray(64)),
-    );
-
-    const cipherView = await cipher.decrypt(
-      await cipherService.getKeyForCipherKeyDecryption(cipher, mockUserId),
-    );
-
-    expect(cipherView).toMatchObject({
-      id: "id",
-      organizationId: "orgId",
-      folderId: "folderId",
-      name: "[error: cannot decrypt]",
-      type: 1,
-      favorite: false,
-      organizationUseTotp: true,
-      edit: true,
-      viewPassword: true,
-      decryptionFailure: true,
-      collectionIds: [],
-      revisionDate: new Date("2022-01-31T12:00:00.000Z"),
-      creationDate: new Date("2022-01-01T12:00:00.000Z"),
-      deletedDate: undefined,
-      reprompt: 0,
-      localData: undefined,
-      permissions: new CipherPermissionsApi(),
-    });
-
-    expect(login.decrypt).not.toHaveBeenCalled();
   });
 
   describe("LoginCipher", () => {
@@ -298,66 +215,6 @@ describe("Cipher DTO", () => {
       const cipher = new Cipher(cipherData);
       expect(cipher.toCipherData()).toEqual(cipherData);
     });
-
-    it("Decrypt", async () => {
-      const cipher = new Cipher();
-      cipher.id = "id";
-      cipher.organizationId = "orgId";
-      cipher.folderId = "folderId";
-      cipher.edit = true;
-      cipher.viewPassword = true;
-      cipher.organizationUseTotp = true;
-      cipher.favorite = false;
-      cipher.revisionDate = new Date("2022-01-31T12:00:00.000Z");
-      cipher.type = CipherType.Login;
-      cipher.name = mockEnc("EncryptedString");
-      cipher.notes = mockEnc("EncryptedString");
-      cipher.creationDate = new Date("2022-01-01T12:00:00.000Z");
-      cipher.deletedDate = undefined;
-      cipher.reprompt = CipherRepromptType.None;
-      cipher.key = mockEnc("EncKey");
-      cipher.permissions = new CipherPermissionsApi();
-      cipher.archivedDate = undefined;
-
-      const loginView = new LoginView();
-      loginView.username = "username";
-      loginView.password = "password";
-
-      const login = mock<Login>();
-      login.decrypt.mockResolvedValue(loginView);
-      cipher.login = login;
-
-      encryptService.unwrapSymmetricKey.mockResolvedValue(
-        new SymmetricCryptoKey(makeStaticByteArray(64)),
-      );
-
-      const cipherView = await cipher.decrypt(mockSymmetricKey);
-
-      expect(cipherView).toMatchObject({
-        id: "id",
-        organizationId: "orgId",
-        folderId: "folderId",
-        name: "EncryptedString",
-        notes: "EncryptedString",
-        type: 1,
-        favorite: false,
-        organizationUseTotp: true,
-        edit: true,
-        viewPassword: true,
-        login: loginView,
-        attachments: [],
-        fields: [],
-        passwordHistory: [],
-        collectionIds: [],
-        revisionDate: new Date("2022-01-31T12:00:00.000Z"),
-        creationDate: new Date("2022-01-01T12:00:00.000Z"),
-        deletedDate: undefined,
-        reprompt: 0,
-        localData: undefined,
-        permissions: new CipherPermissionsApi(),
-        archivedDate: undefined,
-      });
-    });
   });
 
   describe("SecureNoteCipher", () => {
@@ -423,60 +280,6 @@ describe("Cipher DTO", () => {
     it("toCipherData", () => {
       const cipher = new Cipher(cipherData);
       expect(cipher.toCipherData()).toEqual(cipherData);
-    });
-
-    it("Decrypt", async () => {
-      const cipher = new Cipher();
-      cipher.id = "id";
-      cipher.organizationId = "orgId";
-      cipher.folderId = "folderId";
-      cipher.edit = true;
-      cipher.viewPassword = true;
-      cipher.organizationUseTotp = true;
-      cipher.favorite = false;
-      cipher.revisionDate = new Date("2022-01-31T12:00:00.000Z");
-      cipher.type = CipherType.SecureNote;
-      cipher.name = mockEnc("EncryptedString");
-      cipher.notes = mockEnc("EncryptedString");
-      cipher.creationDate = new Date("2022-01-01T12:00:00.000Z");
-      cipher.deletedDate = undefined;
-      cipher.reprompt = CipherRepromptType.None;
-      cipher.secureNote = new SecureNote();
-      cipher.secureNote.type = SecureNoteType.Generic;
-      cipher.key = mockEnc("EncKey");
-      cipher.permissions = new CipherPermissionsApi();
-      cipher.archivedDate = undefined;
-
-      encryptService.unwrapSymmetricKey.mockResolvedValue(
-        new SymmetricCryptoKey(makeStaticByteArray(64)),
-      );
-
-      const cipherView = await cipher.decrypt(mockSymmetricKey);
-
-      expect(cipherView).toMatchObject({
-        id: "id",
-        organizationId: "orgId",
-        folderId: "folderId",
-        name: "EncryptedString",
-        notes: "EncryptedString",
-        type: 2,
-        favorite: false,
-        organizationUseTotp: true,
-        edit: true,
-        viewPassword: true,
-        secureNote: { type: 0 },
-        attachments: [],
-        fields: [],
-        passwordHistory: [],
-        collectionIds: [],
-        revisionDate: new Date("2022-01-31T12:00:00.000Z"),
-        creationDate: new Date("2022-01-01T12:00:00.000Z"),
-        deletedDate: undefined,
-        reprompt: 0,
-        localData: undefined,
-        permissions: new CipherPermissionsApi(),
-        archivedDate: undefined,
-      });
     });
   });
 
@@ -555,66 +358,6 @@ describe("Cipher DTO", () => {
     it("toCipherData", () => {
       const cipher = new Cipher(cipherData);
       expect(cipher.toCipherData()).toEqual(cipherData);
-    });
-
-    it("Decrypt", async () => {
-      const cipher = new Cipher();
-      cipher.id = "id";
-      cipher.organizationId = "orgId";
-      cipher.folderId = "folderId";
-      cipher.edit = true;
-      cipher.viewPassword = true;
-      cipher.organizationUseTotp = true;
-      cipher.favorite = false;
-      cipher.revisionDate = new Date("2022-01-31T12:00:00.000Z");
-      cipher.type = CipherType.Card;
-      cipher.name = mockEnc("EncryptedString");
-      cipher.notes = mockEnc("EncryptedString");
-      cipher.creationDate = new Date("2022-01-01T12:00:00.000Z");
-      cipher.deletedDate = undefined;
-      cipher.reprompt = CipherRepromptType.None;
-      cipher.key = mockEnc("EncKey");
-      cipher.permissions = new CipherPermissionsApi();
-      cipher.archivedDate = undefined;
-
-      const cardView = new CardView();
-      cardView.cardholderName = "cardholderName";
-      cardView.number = "4111111111111111";
-
-      const card = mock<Card>();
-      card.decrypt.mockResolvedValue(cardView);
-      cipher.card = card;
-
-      encryptService.unwrapSymmetricKey.mockResolvedValue(
-        new SymmetricCryptoKey(makeStaticByteArray(64)),
-      );
-
-      const cipherView = await cipher.decrypt(mockSymmetricKey);
-
-      expect(cipherView).toMatchObject({
-        id: "id",
-        organizationId: "orgId",
-        folderId: "folderId",
-        name: "EncryptedString",
-        notes: "EncryptedString",
-        type: 3,
-        favorite: false,
-        organizationUseTotp: true,
-        edit: true,
-        viewPassword: true,
-        card: cardView,
-        attachments: [],
-        fields: [],
-        passwordHistory: [],
-        collectionIds: [],
-        revisionDate: new Date("2022-01-31T12:00:00.000Z"),
-        creationDate: new Date("2022-01-01T12:00:00.000Z"),
-        deletedDate: undefined,
-        reprompt: 0,
-        localData: undefined,
-        permissions: new CipherPermissionsApi(),
-        archivedDate: undefined,
-      });
     });
   });
 
@@ -717,66 +460,6 @@ describe("Cipher DTO", () => {
     it("toCipherData", () => {
       const cipher = new Cipher(cipherData);
       expect(cipher.toCipherData()).toEqual(cipherData);
-    });
-
-    it("Decrypt", async () => {
-      const cipher = new Cipher();
-      cipher.id = "id";
-      cipher.organizationId = "orgId";
-      cipher.folderId = "folderId";
-      cipher.edit = true;
-      cipher.viewPassword = true;
-      cipher.organizationUseTotp = true;
-      cipher.favorite = false;
-      cipher.revisionDate = new Date("2022-01-31T12:00:00.000Z");
-      cipher.type = CipherType.Identity;
-      cipher.name = mockEnc("EncryptedString");
-      cipher.notes = mockEnc("EncryptedString");
-      cipher.creationDate = new Date("2022-01-01T12:00:00.000Z");
-      cipher.deletedDate = undefined;
-      cipher.reprompt = CipherRepromptType.None;
-      cipher.key = mockEnc("EncKey");
-      cipher.permissions = new CipherPermissionsApi();
-      cipher.archivedDate = undefined;
-
-      const identityView = new IdentityView();
-      identityView.firstName = "firstName";
-      identityView.lastName = "lastName";
-
-      const identity = mock<Identity>();
-      identity.decrypt.mockResolvedValue(identityView);
-      cipher.identity = identity;
-
-      encryptService.unwrapSymmetricKey.mockResolvedValue(
-        new SymmetricCryptoKey(makeStaticByteArray(64)),
-      );
-
-      const cipherView = await cipher.decrypt(mockSymmetricKey);
-
-      expect(cipherView).toMatchObject({
-        id: "id",
-        organizationId: "orgId",
-        folderId: "folderId",
-        name: "EncryptedString",
-        notes: "EncryptedString",
-        type: 4,
-        favorite: false,
-        organizationUseTotp: true,
-        edit: true,
-        viewPassword: true,
-        identity: identityView,
-        attachments: [],
-        fields: [],
-        passwordHistory: [],
-        collectionIds: [],
-        revisionDate: new Date("2022-01-31T12:00:00.000Z"),
-        creationDate: new Date("2022-01-01T12:00:00.000Z"),
-        deletedDate: undefined,
-        reprompt: 0,
-        localData: undefined,
-        permissions: new CipherPermissionsApi(),
-        archivedDate: undefined,
-      });
     });
   });
 
@@ -1203,6 +886,152 @@ describe("Cipher DTO", () => {
       expect(cipher).toEqual(expectedCipher);
     });
   });
-});
 
-const mockUserId = "TestUserId" as UserId;
+  describe("blob-encrypted ciphers (data field)", () => {
+    const blobPayload = "BLOB_BASE64_CBOR_PAYLOAD";
+
+    it("preserves data when constructing a Cipher from CipherData", () => {
+      const cipherData = new CipherData();
+      cipherData.id = "id";
+      cipherData.type = CipherType.Login;
+      cipherData.name = "EncryptedString";
+      cipherData.creationDate = "2022-01-01T12:00:00.000Z";
+      cipherData.revisionDate = "2022-01-31T12:00:00.000Z";
+      cipherData.data = blobPayload;
+
+      const cipher = new Cipher(cipherData);
+
+      expect(cipher.data).toEqual(blobPayload);
+    });
+
+    it("preserves data through toCipherData round-trip", () => {
+      const cipher = new Cipher();
+      cipher.id = "id";
+      cipher.type = CipherType.Login;
+      cipher.name = new EncString("EncryptedString");
+      cipher.creationDate = new Date("2022-01-01T12:00:00.000Z");
+      cipher.revisionDate = new Date("2022-01-31T12:00:00.000Z");
+      cipher.data = blobPayload;
+
+      const result = cipher.toCipherData();
+
+      expect(result.data).toEqual(blobPayload);
+    });
+
+    it("forwards data to the SDK cipher in toSdkCipher", () => {
+      const cipher = new Cipher();
+      cipher.id = "2afb03fd-0d8e-4c08-a316-18b2f0efa618";
+      cipher.type = CipherType.Login;
+      cipher.name = new EncString("EncryptedString");
+      cipher.creationDate = new Date("2022-01-01T12:00:00.000Z");
+      cipher.revisionDate = new Date("2022-01-31T12:00:00.000Z");
+      cipher.data = blobPayload;
+
+      const sdkCipher = cipher.toSdkCipher();
+
+      expect(sdkCipher.data).toEqual(blobPayload);
+    });
+
+    it("reads data from the SDK cipher in fromSdkCipher", () => {
+      const sdkCipher = {
+        id: "id" as any,
+        collectionIds: [],
+        name: "EncryptedString" as SdkEncString,
+        type: SdkCipherType.Login,
+        favorite: false,
+        reprompt: SdkCipherRepromptType.None,
+        organizationUseTotp: false,
+        edit: false,
+        viewPassword: true,
+        creationDate: "2022-01-01T12:00:00.000Z",
+        revisionDate: "2022-01-31T12:00:00.000Z",
+        data: blobPayload,
+      } as unknown as SdkCipher;
+
+      const cipher = Cipher.fromSdkCipher(sdkCipher);
+
+      expect(cipher?.data).toEqual(blobPayload);
+    });
+
+    it("survives a full round-trip: SdkCipher -> Cipher -> CipherData -> Cipher -> SdkCipher", () => {
+      const sdkCipher = {
+        id: "2afb03fd-0d8e-4c08-a316-18b2f0efa618" as any,
+        collectionIds: [],
+        name: "EncryptedString" as SdkEncString,
+        type: SdkCipherType.Login,
+        favorite: false,
+        reprompt: SdkCipherRepromptType.None,
+        organizationUseTotp: false,
+        edit: false,
+        viewPassword: true,
+        creationDate: "2022-01-01T12:00:00.000Z",
+        revisionDate: "2022-01-31T12:00:00.000Z",
+        data: blobPayload,
+      } as unknown as SdkCipher;
+
+      const cipherData = Cipher.fromSdkCipher(sdkCipher)!.toCipherData();
+      const finalSdkCipher = new Cipher(cipherData).toSdkCipher();
+
+      expect(cipherData.data).toEqual(blobPayload);
+      expect(finalSdkCipher.data).toEqual(blobPayload);
+    });
+
+    it("does not construct per-type domain field when CipherData omits it (blob cipher)", () => {
+      const cipherData = new CipherData();
+      cipherData.id = "id";
+      cipherData.type = CipherType.Login;
+      cipherData.name = "EncryptedString";
+      cipherData.creationDate = "2022-01-01T12:00:00.000Z";
+      cipherData.revisionDate = "2022-01-31T12:00:00.000Z";
+      cipherData.data = blobPayload;
+      // login intentionally omitted — blob carries the per-type content
+
+      const cipher = new Cipher(cipherData);
+
+      expect(cipher.login).toBeUndefined();
+    });
+
+    it("does not construct per-type data field when CipherResponse omits it (blob cipher)", () => {
+      const response = {
+        id: "id",
+        type: CipherType.Login,
+        name: "EncryptedString",
+        creationDate: "2022-01-01T12:00:00.000Z",
+        revisionDate: "2022-01-31T12:00:00.000Z",
+        data: blobPayload,
+        // login intentionally omitted
+      } as unknown as import("../../models/response/cipher.response").CipherResponse;
+
+      const cipherData = new CipherData(response);
+
+      expect(cipherData.login).toBeUndefined();
+      expect(cipherData.data).toEqual(blobPayload);
+    });
+
+    it("still populates attachments for a blob cipher", () => {
+      const cipherData = new CipherData();
+      cipherData.id = "id";
+      cipherData.type = CipherType.Login;
+      cipherData.name = "EncryptedString";
+      cipherData.creationDate = "2022-01-01T12:00:00.000Z";
+      cipherData.revisionDate = "2022-01-31T12:00:00.000Z";
+      cipherData.data = blobPayload;
+      cipherData.attachments = [
+        {
+          id: "a1",
+          url: "url",
+          size: "1100",
+          sizeName: "1.1 KB",
+          fileName: "file",
+          key: "EncKey",
+        },
+      ];
+
+      const cipher = new Cipher(cipherData);
+
+      expect(cipher.login).toBeUndefined();
+      expect(cipher.attachments).toHaveLength(1);
+      expect(cipher.attachments?.[0].id).toEqual("a1");
+    });
+  });
+});

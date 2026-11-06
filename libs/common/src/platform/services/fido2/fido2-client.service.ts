@@ -3,8 +3,6 @@
 import { firstValueFrom, Subscription } from "rxjs";
 import { parse } from "tldts";
 
-import { FeatureFlag } from "@bitwarden/common/enums/feature-flag.enum";
-
 import { AuthService } from "../../../auth/abstractions/auth.service";
 import { AuthenticationStatus } from "../../../auth/enums/authentication-status";
 import { DomainSettingsService } from "../../../autofill/services/domain-settings.service";
@@ -64,9 +62,6 @@ export class Fido2ClientService<
       MAX: 600000,
     },
   };
-  protected readonly relatedOriginChecksEnabled$ = this.configService.getFeatureFlag$(
-    FeatureFlag.WebAuthnRelatedOrigins,
-  );
 
   constructor(
     private authenticator: Fido2AuthenticatorService<ParentWindowReference>,
@@ -87,6 +82,14 @@ export class Fido2ClientService<
     const isUserLoggedIn =
       (await this.authService.getAuthStatus()) !== AuthenticationStatus.LoggedOut;
     if (!isUserLoggedIn) {
+      return false;
+    }
+
+    const blockedInteractionsUris = await firstValueFrom(
+      this.domainSettingsService.blockedInteractionsUris$,
+    );
+    const isBlockedDomain = blockedInteractionsUris != null && hostname in blockedInteractionsUris;
+    if (isBlockedDomain) {
       return false;
     }
 
@@ -147,13 +150,7 @@ export class Fido2ClientService<
       throw new DOMException("'origin' is not a valid https origin", "SecurityError");
     }
 
-    if (
-      !(await isValidRpId(
-        params.rp.id,
-        params.origin,
-        await firstValueFrom(this.relatedOriginChecksEnabled$),
-      ))
-    ) {
+    if (!(await isValidRpId(params.rp.id, params.origin))) {
       this.logService?.warning(
         `[Fido2Client] 'rp.id' cannot be used with the current origin: rp.id = ${params.rp.id}; origin = ${params.origin}`,
       );
@@ -292,13 +289,7 @@ export class Fido2ClientService<
       throw new DOMException("'origin' is not a valid https origin", "SecurityError");
     }
 
-    if (
-      !(await isValidRpId(
-        params.rpId,
-        params.origin,
-        await firstValueFrom(this.relatedOriginChecksEnabled$),
-      ))
-    ) {
+    if (!(await isValidRpId(params.rpId, params.origin))) {
       this.logService?.warning(
         `[Fido2Client] 'rp.id' cannot be used with the current origin: rp.id = ${params.rpId}; origin = ${params.origin}`,
       );
@@ -325,6 +316,25 @@ export class Fido2ClientService<
     }
 
     const clientDataHash = await crypto.subtle.digest({ name: "SHA-256" }, clientDataJSONBytes);
+    if (
+      params.allowedCredentials.length > 0 &&
+      params.allowedCredentials.every(
+        (c) =>
+          c.transports != null && c.transports.length > 0 && !c.transports.includes("internal"),
+      )
+    ) {
+      // Spec reference: https://www.w3.org/TR/webauthn-3/#sctn-discover-from-external-source step 20.
+      // The spec says the client should determine if "no authenticator will become available" by
+      // examining transports. Since Bitwarden is an internal-only authenticator, if all
+      // allowCredentials entries specify only non-internal transports, we cannot satisfy the
+      // request. We throw FallbackRequestedError (instead of the spec's NotAllowedError) to let
+      // the browser's native WebAuthn handler contact the hardware authenticator.
+      this.logService?.info(
+        `[Fido2Client] All allowCredentials entries specify non-internal transports only — falling back to browser.`,
+      );
+      throw new FallbackRequestedError();
+    }
+
     const getAssertionParams = mapToGetAssertionParams({ params, clientDataHash });
 
     if (abortController.signal.aborted) {
@@ -413,8 +423,8 @@ export class Fido2ClientService<
         break;
       }
 
-      params.allowedCredentialIds = [
-        Fido2Utils.arrayToString(guidToRawFormat(requestResult.credentialId)),
+      params.allowedCredentials = [
+        { id: Fido2Utils.arrayToString(guidToRawFormat(requestResult.credentialId)) },
       ];
       assumeUserPresence = true;
 
@@ -546,8 +556,8 @@ function mapToGetAssertionParams({
   assumeUserPresence?: boolean;
 }): Fido2AuthenticatorGetAssertionParams {
   const allowCredentialDescriptorList: PublicKeyCredentialDescriptor[] =
-    params.allowedCredentialIds.map((id) => ({
-      id: Fido2Utils.stringToArray(id),
+    params.allowedCredentials.map((c) => ({
+      id: Fido2Utils.stringToArray(c.id),
       type: "public-key",
     }));
 

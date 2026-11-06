@@ -72,7 +72,7 @@ export class ProjectDialogComponent implements OnInit {
   }
 
   get title() {
-    return this.data.operation === OperationType.Add ? "newProject" : "editProject";
+    return this.data.operation === OperationType.Add ? "addProject" : "editProject";
   }
 
   submit = async () => {

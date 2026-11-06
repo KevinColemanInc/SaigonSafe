@@ -1,11 +1,20 @@
-import { Component, computed, effect, ElementRef, inject, input, model } from "@angular/core";
+import {
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  inject,
+  input,
+  model,
+  untracked,
+} from "@angular/core";
 
 import { AriaDisableDirective } from "../a11y";
 import { setA11yTitleAndAriaLabel } from "../a11y/set-a11y-title-and-aria-label";
 import { BaseButtonDirective } from "../shared/base-button.directive";
 import { ButtonLikeAbstraction, ButtonType } from "../shared/button-like.abstraction";
 import { FocusableElement } from "../shared/focusable-element";
-import { SpinnerComponent } from "../spinner";
+import { SpinnerComponent, SpinnerSize } from "../spinner";
 import { TooltipDirective } from "../tooltip";
 import { ariaDisableElement } from "../utils";
 
@@ -40,7 +49,7 @@ type IconButtonSize = "default" | "xsmall" | "small" | "large";
   },
   hostDirectives: [
     AriaDisableDirective,
-    { directive: TooltipDirective, inputs: ["tooltipPosition"] },
+    { directive: TooltipDirective, inputs: ["tooltipPosition", "bitTooltip"] },
     {
       directive: BaseButtonDirective,
       inputs: ["loading", "disabled"],
@@ -91,6 +100,10 @@ export class BitIconButtonComponent implements ButtonLikeAbstraction, FocusableE
     return classes.join(" ");
   });
 
+  protected readonly spinnerSize = computed<SpinnerSize>(() =>
+    this.size() === "small" ? "sm" : "md",
+  );
+
   getFocusTarget() {
     return this.elementRef.nativeElement;
   }
@@ -103,6 +116,7 @@ export class BitIconButtonComponent implements ButtonLikeAbstraction, FocusableE
     ariaDisableElement(element, this.baseButton.disabledAttr);
 
     const originalTitle = element.getAttribute("title");
+    let appliedFromLabel: string | undefined;
 
     effect(() => {
       setA11yTitleAndAriaLabel({
@@ -112,9 +126,11 @@ export class BitIconButtonComponent implements ButtonLikeAbstraction, FocusableE
       });
 
       const tooltipContent: string = originalTitle || this.label();
+      const current = untracked(() => this.tooltip?.tooltipContent());
 
-      if (tooltipContent) {
+      if (tooltipContent && (!current || current === appliedFromLabel)) {
         this.tooltip?.tooltipContent.set(tooltipContent);
+        appliedFromLabel = tooltipContent;
       }
     });
   }

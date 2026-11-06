@@ -1,6 +1,7 @@
 import { DeepMockProxy, mockDeep } from "jest-mock-extended";
 import { BehaviorSubject, of } from "rxjs";
 
+import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
 import { AuthenticationStatus } from "@bitwarden/common/auth/enums/authentication-status";
 import { UserId } from "@bitwarden/common/types/guid";
 
@@ -28,14 +29,15 @@ describe("MainBackground logout", () => {
   beforeEach(() => {
     // Exercise the real logout method without bootstrapping the browser background.
     background = mockDeep<MainBackground>();
-    background.accountService.activeAccount$ = of({
+    const accountService: AccountService = background.accountService;
+    accountService.activeAccount$ = of({
       id: activeUserId,
       email: "active@example.com",
       emailVerified: true,
       name: undefined,
       creationDate: undefined,
     });
-    background.accountService.accounts$ = of({
+    accountService.accounts$ = of({
       [activeUserId]: {
         email: "active@example.com",
         emailVerified: true,
@@ -49,7 +51,7 @@ describe("MainBackground logout", () => {
         creationDate: undefined,
       },
     });
-    background.accountService.nextUpAccount$ = of(null);
+    accountService.nextUpAccount$ = of(null);
     authStatus = new BehaviorSubject(AuthenticationStatus.Locked);
     background.authService.authStatusFor$.mockReturnValue(authStatus);
     background.tokenService.clearTokens.mockImplementation(async () => {
@@ -88,7 +90,8 @@ describe("MainBackground logout", () => {
   );
 
   it("completes logout when the account no longer has an email", async () => {
-    background.accountService.accounts$ = of({});
+    const accountService: AccountService = background.accountService;
+    accountService.accounts$ = of({});
 
     await MainBackground.prototype.logout.call(background, "sessionExpired", activeUserId);
 

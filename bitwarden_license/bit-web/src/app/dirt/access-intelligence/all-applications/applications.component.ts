@@ -28,14 +28,12 @@ import {
   ButtonModule,
   IconButtonModule,
   LinkModule,
-  NoItemsModule,
   SearchModule,
   TableDataSource,
   ToastService,
   TooltipDirective,
   TypographyModule,
   ChipFilterComponent,
-  IconComponent,
   ChipFilterOption,
 } from "@bitwarden/components";
 import { ExportHelper } from "@bitwarden/vault-export-core";
@@ -68,7 +66,6 @@ export type ApplicationFilterOption =
     LinkModule,
     SearchModule,
     PipesModule,
-    NoItemsModule,
     SharedModule,
     AppTableRowScrollableM11Component,
     IconButtonModule,
@@ -76,7 +73,6 @@ export type ApplicationFilterOption =
     ButtonModule,
     ReactiveFormsModule,
     ChipFilterComponent,
-    IconComponent,
     TooltipDirective,
   ],
 })

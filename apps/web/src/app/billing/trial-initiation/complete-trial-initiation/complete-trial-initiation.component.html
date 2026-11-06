@@ -13,7 +13,6 @@
       [flow]="inputPasswordFlow"
       [email]="email"
       [loading]="submitting"
-      [masterPasswordPolicyOptions]="enforcedPolicyOptions"
       (onPasswordFormSubmit)="handlePasswordSubmit($event)"
       [primaryButtonText]="{ key: 'createAccount' }"
     ></auth-input-password>
@@ -25,19 +24,28 @@
           [flow]="inputPasswordFlow"
           [email]="email"
           [loading]="submitting"
-          [masterPasswordPolicyOptions]="enforcedPolicyOptions"
           (onPasswordFormSubmit)="handlePasswordSubmit($event)"
           [primaryButtonText]="{ key: 'createAccount' }"
         ></auth-input-password>
       </app-vertical-step>
       <app-vertical-step label="Organization Information" [subLabel]="orgInfoSubLabel">
+        @if (includesPrivilegedControls && trialLength > 0) {
+          <bit-callout
+            type="info"
+            [title]="null"
+            [accessibleName]="'privilegedControls' | i18n"
+            class="tw-mb-3 tw-block"
+          >
+            {{ "trialIncludesPrivilegedControls" | i18n }}
+          </bit-callout>
+        }
         <app-org-info [nameOnly]="true" [formGroup]="orgInfoFormGroup"></app-org-info>
         <button
           type="button"
           bitButton
           buttonType="primary"
           [disabled]="orgInfoFormGroup.controls.name.invalid"
-          [loading]="loading && !paymentOptional"
+          [loading]="loading"
           (click)="orgNameEntrySubmit()"
         >
           {{ paymentOptional && trialLength > 0 ? ("startTrial" | i18n) : ("next" | i18n) }}
@@ -58,6 +66,7 @@
           [orgLabel]="orgLabel"
           [product]="this.product"
           [trialLength]="trialLength"
+          [includesPrivilegedControls]="includesPrivilegedControls"
         ></app-trial-confirmation-details>
         <div class="tw-mb-3 tw-flex">
           <a

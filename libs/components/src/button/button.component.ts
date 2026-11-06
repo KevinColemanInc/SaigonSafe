@@ -4,7 +4,7 @@ import { AriaDisableDirective } from "../a11y";
 import { BaseButtonDirective } from "../shared/base-button.directive";
 import { ButtonLikeAbstraction } from "../shared/button-like.abstraction";
 import { BitwardenIcon } from "../shared/icon";
-import { SpinnerComponent } from "../spinner";
+import { SpinnerComponent, SpinnerSize } from "../spinner";
 import { ariaDisableElement } from "../utils";
 
 export type ButtonSize = "default" | "small" | "large";
@@ -23,7 +23,7 @@ export type ButtonSize = "default" | "small" | "large";
     AriaDisableDirective,
     {
       directive: BaseButtonDirective,
-      inputs: ["loading", "disabled", "buttonType", "block"],
+      inputs: ["loading", "disabled", "buttonType", "block", "instantSpinner"],
     },
   ],
 })
@@ -55,6 +55,10 @@ export class ButtonComponent implements ButtonLikeAbstraction {
   readonly endIconClasses = computed(() => {
     return ["bwi", this.endIcon()];
   });
+
+  protected readonly spinnerSize = computed<SpinnerSize>(() =>
+    this.size() === "small" ? "sm" : "md",
+  );
 
   protected get showLoadingStyle() {
     return this.baseButton.showLoadingStyle;

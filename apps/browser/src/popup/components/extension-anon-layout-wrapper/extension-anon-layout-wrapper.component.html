@@ -1,6 +1,8 @@
 <popup-page [disablePadding]="true">
+  <!-- The hero titles these pages, so the title bar would be empty. -->
   <popup-header
     slot="header"
+    hideTitleBar
     [background]="'alt'"
     [showBackButton]="showBackButton"
     [pageTitle]="''"
@@ -14,7 +16,10 @@
       <app-current-account *ngIf="showAcctSwitcher && hasLoggedInAccount"></app-current-account>
     </ng-container>
   </popup-header>
+
+  <!-- The landing pieces paint their own background; clear it so the page's shows through. -->
   <auth-anon-layout
+    class="[&_bit-landing-header>header]:tw-bg-transparent [&_bit-landing-content>div]:tw-bg-transparent [&_bit-landing-footer>footer]:tw-bg-transparent"
     [title]="pageTitle"
     [subtitle]="pageSubtitle"
     [icon]="pageIcon"
@@ -23,9 +28,20 @@
     [maxWidth]="maxWidth"
     [hideFooter]="hideFooter"
     [hideCardWrapper]="hideCardWrapper"
+    [hidePageIcon]="hidePageIcon"
+    [contentVerticalPadding]="contentVerticalPadding"
+    [footerVerticalPadding]="footerVerticalPadding"
+    [heroTextAlignment]="heroTextAlignment"
+    [secondaryContentLocation]="secondaryContentLocation"
   >
     <router-outlet></router-outlet>
-    <router-outlet slot="secondary" name="secondary"></router-outlet>
+    <!-- The shared layout exposes two distinct slot selectors. We pick which one -->
+    <!-- to project into based on the route-level secondaryContentLocation flag. -->
+    @if (secondaryContentLocation === "footer") {
+      <router-outlet slot="footer-secondary" name="secondary"></router-outlet>
+    } @else {
+      <router-outlet slot="secondary" name="secondary"></router-outlet>
+    }
     <router-outlet slot="environment-selector" name="environment-selector"></router-outlet>
   </auth-anon-layout>
 </popup-page>

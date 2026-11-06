@@ -1,4 +1,5 @@
-import { EncString } from "@bitwarden/common/key-management/crypto/models/enc-string";
+// eslint-disable-next-line no-restricted-imports
+import { DECRYPT_ERROR, EncString } from "@bitwarden/legacy-crypto";
 import {
   Collection as SdkCollection,
   CollectionView as SdkCollectionView,
@@ -32,7 +33,7 @@ function makeSdkCollection(overrides: Partial<SdkCollection> = {}): SdkCollectio
     readOnly: false,
     manage: true,
     defaultUserCollectionEmail: undefined,
-    type: "SharedCollection",
+    type: CollectionTypes.SharedCollection,
     ...overrides,
   };
 }
@@ -46,7 +47,7 @@ function makeSdkCollectionView(overrides: Partial<SdkCollectionView> = {}): SdkC
     hidePasswords: false,
     readOnly: false,
     manage: true,
-    type: "SharedCollection",
+    type: CollectionTypes.SharedCollection,
     ...overrides,
   };
 }
@@ -69,7 +70,8 @@ describe("Collection SDK mapping", () => {
         readOnly: true,
         manage: false,
         defaultUserCollectionEmail: "user@example.com",
-        type: "DefaultUserCollection",
+        type: CollectionTypes.DefaultUserCollection,
+        hasEnabledAccessRule: true,
       });
 
       const result = Collection.fromSdkCollection(sdkCollection);
@@ -80,11 +82,12 @@ describe("Collection SDK mapping", () => {
       expect(result.manage).toBe(false);
       expect(result.defaultUserCollectionEmail).toBe("user@example.com");
       expect(result.type).toBe(CollectionTypes.DefaultUserCollection);
+      expect(result.hasEnabledAccessRule).toBe(true);
       expect(result.name).toBeInstanceOf(EncString);
     });
 
     it("maps SharedCollection type correctly", () => {
-      const sdkCollection = makeSdkCollection({ type: "SharedCollection" });
+      const sdkCollection = makeSdkCollection({ type: CollectionTypes.SharedCollection });
       const result = Collection.fromSdkCollection(sdkCollection);
       expect(result.type).toBe(CollectionTypes.SharedCollection);
     });
@@ -105,6 +108,7 @@ describe("Collection SDK mapping", () => {
         manage: false,
         defaultUserCollectionEmail: "user@example.com",
         type: CollectionTypes.DefaultUserCollection,
+        hasEnabledAccessRule: true,
       });
 
       const result = collection.toSdkCollection();
@@ -114,13 +118,14 @@ describe("Collection SDK mapping", () => {
       expect(result.readOnly).toBe(true);
       expect(result.manage).toBe(false);
       expect(result.defaultUserCollectionEmail).toBe("user@example.com");
-      expect(result.type).toBe("DefaultUserCollection");
+      expect(result.type).toBe(CollectionTypes.DefaultUserCollection);
+      expect(result.hasEnabledAccessRule).toBe(true);
     });
 
     it("maps SharedCollection type correctly", () => {
       const collection = makeCollection({ type: CollectionTypes.SharedCollection });
       const result = collection.toSdkCollection();
-      expect(result.type).toBe("SharedCollection");
+      expect(result.type).toBe(CollectionTypes.SharedCollection);
     });
 
     it("sets id to undefined when collection has no id", () => {
@@ -148,7 +153,7 @@ describe("CollectionView SDK mapping", () => {
         hidePasswords: true,
         readOnly: true,
         manage: false,
-        type: "DefaultUserCollection",
+        type: CollectionTypes.DefaultUserCollection,
       });
       const source = makeCollection();
 
@@ -164,7 +169,7 @@ describe("CollectionView SDK mapping", () => {
     });
 
     it("maps SharedCollection type correctly", () => {
-      const sdkView = makeSdkCollectionView({ type: "SharedCollection" });
+      const sdkView = makeSdkCollectionView({ type: CollectionTypes.SharedCollection });
       const source = makeCollection();
       const result = CollectionView.fromSdkCollectionView(sdkView, source);
       expect(result.type).toBe(CollectionTypes.SharedCollection);
@@ -184,10 +189,30 @@ describe("CollectionView SDK mapping", () => {
       expect(result.assigned).toBe(true);
     });
 
+    describe("hasEnabledAccessRule", () => {
+      it("reads hasEnabledAccessRule from the SDK view, not the source collection", () => {
+        const result = CollectionView.fromSdkCollectionView(
+          makeSdkCollectionView({ hasEnabledAccessRule: true }),
+          makeCollection(),
+        );
+
+        expect(result.hasEnabledAccessRule).toBe(true);
+      });
+
+      it("defaults hasEnabledAccessRule to false when the SDK view omits it", () => {
+        const result = CollectionView.fromSdkCollectionView(
+          makeSdkCollectionView(),
+          makeCollection(),
+        );
+
+        expect(result.hasEnabledAccessRule).toBe(false);
+      });
+    });
+
     describe("defaultUserCollectionEmail preservation (canEditName security invariant)", () => {
       it("copies defaultUserCollectionEmail from the source collection, not the SDK view", () => {
         const email = "offboarded-user@example.com";
-        const sdkView = makeSdkCollectionView({ type: "DefaultUserCollection" });
+        const sdkView = makeSdkCollectionView({ type: CollectionTypes.DefaultUserCollection });
         const source = makeCollection({
           defaultUserCollectionEmail: email,
           type: CollectionTypes.DefaultUserCollection,
@@ -199,7 +224,7 @@ describe("CollectionView SDK mapping", () => {
       });
 
       it("leaves defaultUserCollectionEmail undefined for regular collections", () => {
-        const sdkView = makeSdkCollectionView({ type: "SharedCollection" });
+        const sdkView = makeSdkCollectionView({ type: CollectionTypes.SharedCollection });
         const source = makeCollection({ defaultUserCollectionEmail: undefined });
 
         const result = CollectionView.fromSdkCollectionView(sdkView, source);
@@ -208,7 +233,7 @@ describe("CollectionView SDK mapping", () => {
       });
 
       it("canEditName returns false when defaultUserCollectionEmail is present", () => {
-        const sdkView = makeSdkCollectionView({ type: "DefaultUserCollection" });
+        const sdkView = makeSdkCollectionView({ type: CollectionTypes.DefaultUserCollection });
         const source = makeCollection({
           defaultUserCollectionEmail: "offboarded@example.com",
           type: CollectionTypes.DefaultUserCollection,
@@ -218,7 +243,7 @@ describe("CollectionView SDK mapping", () => {
         result.manage = true;
 
         // canEditName should be false because defaultUserCollectionEmail is set
-        const mockOrg: any = { canManageAllCollections: true };
+        const mockOrg: any = { id: orgId, canManageAllCollections: true };
         expect(result.canEditName(mockOrg)).toBe(false);
       });
 
@@ -226,7 +251,7 @@ describe("CollectionView SDK mapping", () => {
         // This test asserts the security invariant stated in the WARNING on canEditName():
         // a DefaultUserCollection with a set defaultUserCollectionEmail must never be editable.
         const email = "ghost@example.com";
-        const sdkView = makeSdkCollectionView({ type: "DefaultUserCollection" });
+        const sdkView = makeSdkCollectionView({ type: CollectionTypes.DefaultUserCollection });
         const source = makeCollection({
           defaultUserCollectionEmail: email,
           type: CollectionTypes.DefaultUserCollection,
@@ -236,9 +261,66 @@ describe("CollectionView SDK mapping", () => {
         sdkPathResult.manage = true;
 
         expect(sdkPathResult.defaultUserCollectionEmail).toBe(email);
-        const mockOrg: any = { canManageAllCollections: true };
+        const mockOrg: any = { id: orgId, canManageAllCollections: true };
         expect(sdkPathResult.canEditName(mockOrg)).toBe(false);
       });
+    });
+  });
+
+  describe("CollectionView.fromFailedDecryption", () => {
+    it("falls back to the decrypt-error placeholder for the name and flags the failure", () => {
+      const source = makeCollection();
+
+      const result = CollectionView.fromFailedDecryption(source);
+
+      expect(result.decryptionFailure).toBe(true);
+      expect(result.name).toBe(DECRYPT_ERROR);
+    });
+
+    it("preserves identity and permission fields so the row stays actionable", () => {
+      const source = makeCollection({ manage: true, readOnly: false, hidePasswords: false });
+
+      const result = CollectionView.fromFailedDecryption(source);
+
+      expect(result.id).toBe(collectionId);
+      expect(result.organizationId).toBe(orgId);
+      expect(result.manage).toBe(true);
+      expect(result.readOnly).toBe(false);
+      expect(result.hidePasswords).toBe(false);
+      expect(result.assigned).toBe(true);
+      expect(result.type).toBe(CollectionTypes.SharedCollection);
+    });
+
+    it("still allows the name to be edited so the user can repair the collection", () => {
+      const source = makeCollection({ manage: true });
+
+      const result = CollectionView.fromFailedDecryption(source);
+
+      const mockOrg: any = { id: orgId };
+      expect(result.canEditName(mockOrg)).toBe(true);
+    });
+
+    it("keeps defaultUserCollectionEmail so canEditName stays restricted for offboarded users", () => {
+      const email = "offboarded@example.com";
+      const source = makeCollection({
+        defaultUserCollectionEmail: email,
+        type: CollectionTypes.DefaultUserCollection,
+        manage: true,
+      });
+
+      const result = CollectionView.fromFailedDecryption(source);
+
+      expect(result.defaultUserCollectionEmail).toBe(email);
+      const mockOrg: any = { id: orgId };
+      expect(result.canEditName(mockOrg)).toBe(false);
+    });
+
+    it("keeps hasEnabledAccessRule so a governed collection still reads as governed", () => {
+      const source = makeCollection({ hasEnabledAccessRule: true });
+
+      const result = CollectionView.fromFailedDecryption(source);
+
+      expect(result.hasEnabledAccessRule).toBe(true);
     });
   });
 
@@ -254,6 +336,7 @@ describe("CollectionView SDK mapping", () => {
       view.readOnly = false;
       view.manage = true;
       view.type = CollectionTypes.DefaultUserCollection;
+      view.hasEnabledAccessRule = true;
 
       const result = view.toSdkCollectionView();
 
@@ -262,14 +345,15 @@ describe("CollectionView SDK mapping", () => {
       expect(result.hidePasswords).toBe(true);
       expect(result.readOnly).toBe(false);
       expect(result.manage).toBe(true);
-      expect(result.type).toBe("DefaultUserCollection");
+      expect(result.type).toBe(CollectionTypes.DefaultUserCollection);
+      expect(result.hasEnabledAccessRule).toBe(true);
     });
 
     it("maps SharedCollection type correctly", () => {
       const view = new CollectionView({ id: collectionId, organizationId: orgId, name: "Test" });
       view.type = CollectionTypes.SharedCollection;
       const result = view.toSdkCollectionView();
-      expect(result.type).toBe("SharedCollection");
+      expect(result.type).toBe(CollectionTypes.SharedCollection);
     });
 
     it("sets id to undefined when view has no id", () => {

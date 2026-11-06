@@ -1,5 +1,5 @@
 import { inject, Injectable } from "@angular/core";
-import { combineLatest, map, Observable, shareReplay } from "rxjs";
+import { combineLatest, map, Observable } from "rxjs";
 
 import { UserKeyDefinition, NUDGES_DISK } from "@bitwarden/common/platform/state";
 import { UserId } from "@bitwarden/common/types/guid";
@@ -13,6 +13,7 @@ import {
   AccountSecurityNudgeService,
   VaultSettingsImportNudgeService,
   NoOpNudgeService,
+  Vfo1OnboardingNudgeService,
 } from "./custom-nudges-services";
 import { DefaultSingleNudgeService, SingleNudgeService } from "./default-single-nudge.service";
 import { AUTOFILL_NUDGE_SERVICE, AUTO_CONFIRM_NUDGE_SERVICE } from "./nudge-injection-tokens";
@@ -38,10 +39,11 @@ export const NudgeType = {
   NewIdentityItemStatus: "new-identity-item-status",
   NewNoteItemStatus: "new-note-item-status",
   NewSshItemStatus: "new-ssh-item-status",
-  NewBankAccountItemStatus: "new-bank-account-item-status",
   GeneratorNudgeStatus: "generator-nudge-status",
   AutoConfirmNudge: "auto-confirm-nudge",
   PremiumUpgrade: "premium-upgrade",
+  Vfo1NewExperience: "vfo1-new-experience",
+  Vfo1Walkthrough: "vfo1-walkthrough",
 } as const;
 
 export type NudgeType = UnionOfValues<typeof NudgeType>;
@@ -59,6 +61,7 @@ export const NUDGE_DISMISSED_DISK_KEY = new UserKeyDefinition<
 export class NudgesService {
   private newItemNudgeService = inject(NewItemNudgeService);
   private newAcctNudgeService = inject(NewAccountNudgeService);
+  private vfo1OnboardingNudgeService = inject(Vfo1OnboardingNudgeService);
 
   // NoOp service that always returns dismissed
   private noOpNudgeService = inject(NoOpNudgeService);
@@ -93,8 +96,9 @@ export class NudgesService {
     [NudgeType.NewIdentityItemStatus]: this.newItemNudgeService,
     [NudgeType.NewNoteItemStatus]: this.newItemNudgeService,
     [NudgeType.NewSshItemStatus]: this.newItemNudgeService,
-    [NudgeType.NewBankAccountItemStatus]: this.newItemNudgeService,
     [NudgeType.AutoConfirmNudge]: this.autoConfirmNudgeService ?? this.noOpNudgeService,
+    [NudgeType.Vfo1NewExperience]: this.vfo1OnboardingNudgeService,
+    [NudgeType.Vfo1Walkthrough]: this.vfo1OnboardingNudgeService,
   };
 
   /**
@@ -167,10 +171,7 @@ export class NudgesService {
     const nudgeTypesWithBadge$ = nudgeTypes.map((nudge) => {
       return this.getNudgeService(nudge)
         .nudgeStatus$(nudge, userId)
-        .pipe(
-          map((status) => !status?.hasBadgeDismissed),
-          shareReplay({ refCount: false, bufferSize: 1 }),
-        );
+        .pipe(map((status) => !status?.hasBadgeDismissed));
     });
 
     return combineLatest(nudgeTypesWithBadge$).pipe(

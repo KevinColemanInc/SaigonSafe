@@ -1,4 +1,6 @@
-import { EncString } from "../../key-management/crypto/models/enc-string";
+// eslint-disable-next-line no-restricted-imports
+import { EncString } from "@bitwarden/legacy-crypto";
+
 import { SshKey as SshKeyDomain } from "../../vault/models/domain/ssh-key";
 import { SshKeyView as SshKeyView } from "../../vault/models/view/ssh-key.view";
 
@@ -18,15 +20,8 @@ export class SshKeyExport {
       return undefined;
     }
 
-    // Validate required fields
     if (!req.privateKey || req.privateKey.trim() === "") {
       throw new Error("SSH key private key is required.");
-    }
-    if (!req.publicKey || req.publicKey.trim() === "") {
-      throw new Error("SSH key public key is required.");
-    }
-    if (!req.keyFingerprint || req.keyFingerprint.trim() === "") {
-      throw new Error("SSH key fingerprint is required.");
     }
 
     view.privateKey = req.privateKey;

@@ -21,6 +21,7 @@ import {
   Subject,
   takeUntil,
   tap,
+  timeout,
 } from "rxjs";
 
 import { LoginApprovalDialogComponent } from "@bitwarden/angular/auth/login-approval/login-approval-dialog.component";
@@ -28,22 +29,24 @@ import { DeviceTrustToastService } from "@bitwarden/angular/auth/services/device
 import { DocumentLangSetter } from "@bitwarden/angular/platform/i18n";
 import {
   AuthRequestServiceAbstraction,
-  LogoutReason,
   UserDecryptionOptionsServiceAbstraction,
 } from "@bitwarden/auth/common";
-import { BrowserApi } from "@bitwarden/browser/platform/browser/browser-api";
 import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
 import { AuthRequestAnsweringService } from "@bitwarden/common/auth/abstractions/auth-request-answering/auth-request-answering.service.abstraction";
 import { AuthService } from "@bitwarden/common/auth/abstractions/auth.service";
 import { TokenService } from "@bitwarden/common/auth/abstractions/token.service";
 import { AuthenticationStatus } from "@bitwarden/common/auth/enums/authentication-status";
+import { LogoutReason } from "@bitwarden/common/auth/logout";
+import { getOptionalUserId } from "@bitwarden/common/auth/services/account.service";
 import { PendingAuthRequestsStateService } from "@bitwarden/common/auth/services/auth-request-answering/pending-auth-requests.state";
+import { PremiumCheckoutPendingService } from "@bitwarden/common/billing/abstractions/account/premium-checkout-pending.service";
 import { AnimationControlService } from "@bitwarden/common/platform/abstractions/animation-control.service";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import { LogService } from "@bitwarden/common/platform/abstractions/log.service";
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
 import { SdkService } from "@bitwarden/common/platform/abstractions/sdk/sdk.service";
 import { MessageListener } from "@bitwarden/common/platform/messaging";
+import { SyncService } from "@bitwarden/common/platform/sync";
 import { UserId } from "@bitwarden/common/types/guid";
 import { CipherService } from "@bitwarden/common/vault/abstractions/cipher.service";
 import {
@@ -60,7 +63,12 @@ import { PopupSizeService } from "../platform/popup/layout/popup-size.service";
 import { initPopupClosedListener } from "../platform/services/popup-view-cache-background.service";
 
 import { routerTransition } from "./app-routing.animations";
-import { DesktopSyncVerificationDialogComponent } from "./components/desktop-sync-verification-dialog.component";
+
+/**
+ * How long a "locked" message waits for the popup to see its user become active. The
+ * background switches accounts, then sends "locked", which can arrive first.
+ */
+const ACTIVE_USER_SYNC_TIMEOUT_MS = 1_000;
 
 // FIXME(https://bitwarden.atlassian.net/browse/CL-764): Migrate to OnPush
 // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
@@ -108,18 +116,20 @@ export class AppComponent implements OnInit, OnDestroy {
     private deviceTrustToastService: DeviceTrustToastService,
     private userDecryptionOptionsService: UserDecryptionOptionsServiceAbstraction,
     private keyService: KeyService,
-    private readonly destoryRef: DestroyRef,
+    private readonly destroyRef: DestroyRef,
     private readonly documentLangSetter: DocumentLangSetter,
     private popupSizeService: PopupSizeService,
     private logService: LogService,
     private authRequestService: AuthRequestServiceAbstraction,
     private pendingAuthRequestsState: PendingAuthRequestsStateService,
     private authRequestAnsweringService: AuthRequestAnsweringService,
+    private premiumCheckoutPendingService: PremiumCheckoutPendingService,
+    private syncService: SyncService,
   ) {
     this.deviceTrustToastService.setupListeners$.pipe(takeUntilDestroyed()).subscribe();
 
     const langSubscription = this.documentLangSetter.start();
-    this.destoryRef.onDestroy(() => langSubscription.unsubscribe());
+    this.destroyRef.onDestroy(() => langSubscription.unsubscribe());
   }
 
   async ngOnInit() {
@@ -131,6 +141,9 @@ export class AppComponent implements OnInit, OnDestroy {
     this.accountService.activeAccount$.pipe(takeUntil(this.destroy$)).subscribe((account) => {
       this.activeUserId = account?.id;
     });
+
+    await this.syncIfReturningFromCheckout();
+    window.addEventListener("focus", this.onWindowFocus);
 
     this.authRequestAnsweringService.setupUnlockListenersForProcessingAuthRequests(this.destroy$);
 
@@ -156,7 +169,7 @@ export class AppComponent implements OnInit, OnDestroy {
       .pipe(
         tap(async (msg: any) => {
           if (msg.command === "doneLoggingOut") {
-            // TODO: PM-8544 - why do we call logout in the popup after receiving the doneLoggingOut message? Hasn't this already completeted logout?
+            // TODO: PM-8544 - why do we call logout in the popup after receiving the doneLoggingOut message? Hasn't this already completed logout?
             this.authService.logOut(async () => {
               if (msg.logoutReason) {
                 await this.displayLogoutReason(msg.logoutReason);
@@ -171,7 +184,7 @@ export class AppComponent implements OnInit, OnDestroy {
               return;
             }
 
-            if (msg.userId !== this.activeUserId) {
+            if (!(await this.becomesActiveUser(msg.userId))) {
               this.logService.error(
                 `'locked' message received with userId ${msg.userId} but active userId is ${this.activeUserId}.`,
               );
@@ -227,18 +240,6 @@ export class AppComponent implements OnInit, OnDestroy {
             // FIXME: Verify that this floating promise is intentional. If it is, add an explanatory comment and ensure there is proper error handling.
             // eslint-disable-next-line @typescript-eslint/no-floating-promises
             this.showDialog(msg);
-          } else if (msg.command === "showNativeMessagingFingerprintDialog") {
-            // TODO: Should be refactored to live in another service.
-            // FIXME: Verify that this floating promise is intentional. If it is, add an explanatory comment and ensure there is proper error handling.
-            // eslint-disable-next-line @typescript-eslint/no-floating-promises
-            this.showNativeMessagingFingerprintDialog(msg);
-          } else if (msg.command === "showUpdateDesktopAppOrDisableFingerprintDialog") {
-            // TODO: Should be refactored to live in another service.
-            await this.showDialog({
-              title: this.i18nService.t("updateDesktopAppOrDisableFingerprintDialogTitle"),
-              content: this.i18nService.t("updateDesktopAppOrDisableFingerprintDialogMessage"),
-              type: "warning",
-            });
           } else if (msg.command === "showToast") {
             this.toastService._showToast(msg);
           } else if (msg.command === "reloadProcess") {
@@ -248,13 +249,14 @@ export class AppComponent implements OnInit, OnDestroy {
                 window.location.reload();
               }, 2000);
             } else {
-              // Close browser action popup before extension reload to prevent zombie popup with invalidated context.
-              // This issue occurs in Chromium-based browsers (Chrome, Vivaldi, etc.) where chrome.runtime.reload()
-              // invalidates extension contexts before popup can close naturally
-              if (BrowserPopupUtils.inPopup(window)) {
-                BrowserApi.closePopup(window);
-              }
+              // On Chromium-based browsers (Chrome, Vivaldi, etc.), `chrome.runtime.reload()` invalidates extension contexts before the view can close naturally.
+              // Popouts also need closing because they survive the runtime reload and strand the user on broken states.
+              await BrowserPopupUtils.closeCurrentPopupOrPopout(window);
             }
+          } else if (msg.command === "reloadExtension") {
+            // The background reloads the extension after this message. Close this popup/popout
+            // first so the runtime reload doesn't strand it with an invalidated context.
+            await BrowserPopupUtils.closeCurrentPopupOrPopout(window);
           } else if (msg.command === "reloadPopup") {
             // FIXME: Verify that this floating promise is intentional. If it is, add an explanatory comment and ensure there is proper error handling.
             // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -294,9 +296,43 @@ export class AppComponent implements OnInit, OnDestroy {
       });
   }
 
+  /**
+   * Whether `userId` is, or within a moment becomes, the popup's active user. Switching to a
+   * locked account sends "locked" right after the switch, which can reach the popup before
+   * its active account updates. Messages for other users, e.g. from lock all, resolve false.
+   */
+  private async becomesActiveUser(userId: UserId): Promise<boolean> {
+    return await firstValueFrom(
+      this.accountService.activeAccount$.pipe(
+        filter((account) => account?.id === userId),
+        map(() => true),
+        timeout({ first: ACTIVE_USER_SYNC_TIMEOUT_MS, with: () => of(false) }),
+      ),
+    );
+  }
+
   ngOnDestroy(): void {
+    window.removeEventListener("focus", this.onWindowFocus);
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  private readonly onWindowFocus = (): void => {
+    void this.syncIfReturningFromCheckout();
+  };
+
+  private async syncIfReturningFromCheckout(): Promise<void> {
+    try {
+      const userId = await firstValueFrom(getOptionalUserId(this.accountService.activeAccount$));
+      if (userId == null) {
+        return;
+      }
+      if (await this.premiumCheckoutPendingService.consumeCheckoutPending(userId)) {
+        await this.syncService.fullSync(true);
+      }
+    } catch (e) {
+      this.logService.error("Failed to sync after returning from premium checkout", e);
+    }
   }
 
   getRouteElevation(outlet: RouterOutlet) {
@@ -327,14 +363,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private async showDialog(msg: SimpleDialogOptions) {
     await this.dialogService.openSimpleDialog(msg);
-  }
-
-  private async showNativeMessagingFingerprintDialog(msg: any) {
-    const dialogRef = DesktopSyncVerificationDialogComponent.open(this.dialogService, {
-      fingerprint: msg.fingerprint,
-    });
-
-    return firstValueFrom(dialogRef.closed);
   }
 
   // Displaying toasts isn't super useful on the popup due to the reloads we do.

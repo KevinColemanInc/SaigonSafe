@@ -21,9 +21,11 @@ import {
   VaultFilterServiceAbstraction as VaultFilterService,
   AddEditFolderDialogComponent,
   RoutedVaultFilterBridgeService,
+  Vfo1I18nPipe,
+  Vfo1IconPipe,
 } from "@bitwarden/vault";
 
-import { DesktopPremiumUpgradePromptService } from "../../../../services/desktop-premium-upgrade-prompt.service";
+import { DesktopPremiumUpgradePromptService } from "../../../../billing/services/desktop-premium-upgrade-prompt.service";
 
 import { CollectionFilterComponent } from "./filters/collection-filter.component";
 import { FolderFilterComponent } from "./filters/folder-filter.component";
@@ -46,6 +48,8 @@ import { TypeFilterComponent } from "./filters/type-filter.component";
     CollectionFilterComponent,
     FolderFilterComponent,
     A11yTitleDirective,
+    Vfo1I18nPipe,
+    Vfo1IconPipe,
   ],
   providers: [
     {

@@ -1,0 +1,10 @@
+{
+  "name": "__MSG_extNameBeta__",
+  "short_name": "SaigonSafe Beta",
+  "action": {
+    "default_title": "SaigonSafe Beta"
+  },
+  "browser_action": {
+    "default_title": "SaigonSafe Beta"
+  }
+}

@@ -7,9 +7,7 @@ import { Observable, firstValueFrom, of } from "rxjs";
 
 import { OrganizationService } from "@bitwarden/common/admin-console/abstractions/organization/organization.service.abstraction";
 import { PolicyService } from "@bitwarden/common/admin-console/abstractions/policy/policy.service.abstraction";
-import { ProviderService } from "@bitwarden/common/admin-console/abstractions/provider.service";
 import { Organization } from "@bitwarden/common/admin-console/models/domain/organization";
-import { Provider } from "@bitwarden/common/admin-console/models/domain/provider";
 import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
 import { BillingAccountProfileStateService } from "@bitwarden/common/billing/abstractions";
 import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
@@ -17,6 +15,7 @@ import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.servic
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
 import { Utils } from "@bitwarden/common/platform/misc/utils";
 import { SyncService } from "@bitwarden/common/platform/sync";
+import { ProviderService, Provider } from "@bitwarden/common/provider";
 import { FakeAccountService, mockAccountServiceWith } from "@bitwarden/common/spec";
 import { UserId } from "@bitwarden/common/types/guid";
 
@@ -30,9 +29,9 @@ describe("ProductSwitcherService", () => {
   let accountService: FakeAccountService;
   let platformUtilsService: MockProxy<PlatformUtilsService>;
   let billingAccountProfileStateService: MockProxy<BillingAccountProfileStateService>;
-  let configService: MockProxy<ConfigService>;
   let activeRouteParams = convertToParamMap({ organizationId: "1234" });
   let singleOrgPolicyEnabled = false;
+  let vfo1Enabled = false;
   const getLastSync = jest.fn().mockResolvedValue(new Date("2024-05-14"));
   const userId = Utils.newGuid() as UserId;
 
@@ -46,6 +45,8 @@ describe("ProductSwitcherService", () => {
 
   beforeEach(() => {
     jest.useFakeTimers();
+    singleOrgPolicyEnabled = false;
+    vfo1Enabled = false;
     getLastSync.mockResolvedValue(new Date("2024-05-14"));
     router = mock<Router>();
     organizationService = mock<OrganizationService>();
@@ -53,8 +54,6 @@ describe("ProductSwitcherService", () => {
     accountService = mockAccountServiceWith(userId);
     platformUtilsService = mock<PlatformUtilsService>();
     billingAccountProfileStateService = mock<BillingAccountProfileStateService>();
-    configService = mock<ConfigService>();
-    configService.getFeatureFlag$.mockReturnValue(of(false));
 
     router.url = "/";
     router.events = of({});
@@ -93,7 +92,10 @@ describe("ProductSwitcherService", () => {
           },
         },
         { provide: BillingAccountProfileStateService, useValue: billingAccountProfileStateService },
-        { provide: ConfigService, useValue: configService },
+        {
+          provide: ConfigService,
+          useValue: { getFeatureFlag$: () => of(vfo1Enabled) },
+        },
       ],
     });
   });
@@ -138,6 +140,18 @@ describe("ProductSwitcherService", () => {
         const products = await firstValueFrom(service.products$);
 
         expect(products.other.find((p) => p.name === "Secrets Manager")).toBeDefined();
+      });
+
+      it("overrides the other section name when the VFO1 flag is enabled", async () => {
+        vfo1Enabled = true;
+
+        initiateService();
+
+        const products = await firstValueFrom(service.products$);
+
+        expect(
+          products.other.find((p) => p.name === "Secrets Manager").otherProductOverrides.name,
+        ).toBe("getSecretsManager");
       });
 
       it("is included in bento when there is an organization with SM", async () => {
@@ -205,6 +219,25 @@ describe("ProductSwitcherService", () => {
       it("does not include Organizations when the user's single org policy is enabled", async () => {
         singleOrgPolicyEnabled = true;
         initiateService();
+        const products = await firstValueFrom(service.products$);
+
+        expect(products.other.find((p) => p.name === "Organizations")).not.toBeDefined();
+      });
+
+      it("does not include Organizations when the VFO1 foundation flag is enabled", async () => {
+        vfo1Enabled = true;
+        initiateService();
+
+        const products = await firstValueFrom(service.products$);
+
+        expect(products.other.find((p) => p.name === "Organizations")).not.toBeDefined();
+      });
+
+      it("does not include Organizations on Self-Host when the VFO1 foundation flag is enabled", async () => {
+        platformUtilsService.isSelfHost.mockReturnValue(true);
+        vfo1Enabled = true;
+        initiateService();
+
         const products = await firstValueFrom(service.products$);
 
         expect(products.other.find((p) => p.name === "Organizations")).not.toBeDefined();
@@ -336,19 +369,7 @@ describe("ProductSwitcherService", () => {
   });
 
   describe("shouldShowPremiumUpgradeButton$", () => {
-    it("returns false when feature flag is disabled", async () => {
-      configService.getFeatureFlag$.mockReturnValue(of(false));
-      billingAccountProfileStateService.hasPremiumFromAnySource$.mockReturnValue(of(false));
-
-      initiateService();
-
-      const shouldShow = await firstValueFrom(service.shouldShowPremiumUpgradeButton$);
-
-      expect(shouldShow).toBe(false);
-    });
-
     it("returns false when there is no active account", async () => {
-      configService.getFeatureFlag$.mockReturnValue(of(true));
       accountService.activeAccount$ = of(null);
       billingAccountProfileStateService.hasPremiumFromAnySource$.mockReturnValue(of(false));
 
@@ -359,8 +380,7 @@ describe("ProductSwitcherService", () => {
       expect(shouldShow).toBe(false);
     });
 
-    it("returns true when feature flag is enabled, account exists, and user has no premium", async () => {
-      configService.getFeatureFlag$.mockReturnValue(of(true));
+    it("returns true when account exists and user has no premium", async () => {
       billingAccountProfileStateService.hasPremiumFromAnySource$.mockReturnValue(of(false));
 
       initiateService();
@@ -373,8 +393,7 @@ describe("ProductSwitcherService", () => {
       );
     });
 
-    it("returns false when feature flag is enabled, account exists, but user has premium", async () => {
-      configService.getFeatureFlag$.mockReturnValue(of(true));
+    it("returns false when account exists but user has premium", async () => {
       billingAccountProfileStateService.hasPremiumFromAnySource$.mockReturnValue(of(true));
 
       initiateService();

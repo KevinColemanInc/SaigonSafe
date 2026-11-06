@@ -5,15 +5,16 @@
 import { mock } from "jest-mock-extended";
 import { of, firstValueFrom } from "rxjs";
 
-import { ApiService } from "@bitwarden/common/abstractions/api.service";
-import { BillingAccountProfileStateService } from "@bitwarden/common/billing/abstractions";
-import { CipherId, UserId } from "@bitwarden/common/types/guid";
-import { CipherService } from "@bitwarden/common/vault/abstractions/cipher.service";
+import { CipherListView } from "@bitwarden/sdk-internal";
+
+import { ApiService } from "../../abstractions/api.service";
+import { BillingAccountProfileStateService } from "../../billing/abstractions";
+import { CipherId, UserId } from "../../types/guid";
+import { CipherService } from "../abstractions/cipher.service";
 import {
   CipherBulkArchiveRequest,
   CipherBulkUnarchiveRequest,
-} from "@bitwarden/common/vault/models/request/cipher-bulk-archive.request";
-import { CipherListView } from "@bitwarden/sdk-internal";
+} from "../models/request/cipher-bulk-archive.request";
 
 import { DefaultCipherArchiveService } from "./default-cipher-archive.service";
 
@@ -230,6 +231,22 @@ describe("DefaultCipherArchiveService", () => {
         true,
       );
     });
+
+    it("archives a restricted cipher, since archive is a user field", async () => {
+      mockCipherService.ciphers$.mockReturnValue(
+        of({ [cipherId]: { id: cipherId, partialData: "{}" } as any }),
+      );
+
+      await service.archiveWithServer(cipherId, userId);
+
+      expect(mockApiService.send).toHaveBeenCalledWith(
+        "PUT",
+        "/ciphers/archive",
+        expect.any(CipherBulkArchiveRequest),
+        true,
+        true,
+      );
+    });
   });
 
   describe("unarchiveWithServer", () => {
@@ -288,6 +305,22 @@ describe("DefaultCipherArchiveService", () => {
         expect.objectContaining({
           ids: cipherIds,
         }),
+        true,
+        true,
+      );
+    });
+
+    it("unarchives a restricted cipher, since archive is a user field", async () => {
+      mockCipherService.ciphers$.mockReturnValue(
+        of({ [cipherId]: { id: cipherId, partialData: "{}" } as any }),
+      );
+
+      await service.unarchiveWithServer(cipherId, userId);
+
+      expect(mockApiService.send).toHaveBeenCalledWith(
+        "PUT",
+        "/ciphers/unarchive",
+        expect.any(CipherBulkUnarchiveRequest),
         true,
         true,
       );

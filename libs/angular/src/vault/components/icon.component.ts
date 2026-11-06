@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { ChangeDetectionStrategy, Component, computed, input, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from "@angular/core";
 import { toObservable } from "@angular/core/rxjs-interop";
 import {
   combineLatest,
@@ -12,9 +12,21 @@ import {
 } from "rxjs";
 
 import { DomainSettingsService } from "@bitwarden/common/autofill/services/domain-settings.service";
+import { FeatureFlag } from "@bitwarden/common/enums/feature-flag.enum";
+import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { EnvironmentService } from "@bitwarden/common/platform/abstractions/environment.service";
 import { buildCipherIcon, CipherIconDetails } from "@bitwarden/common/vault/icon/build-cipher-icon";
 import { CipherViewLike } from "@bitwarden/common/vault/utils/cipher-view-like-utils";
+import { LogService, Measurement, PerfTrackGroup } from "@bitwarden/logging";
+
+const PERF_TRACK = "Icons";
+const PERF_ENTRY = "Load icon";
+
+const IconLoadResult = Object.freeze({
+  Loaded: "loaded",
+  Error: "error",
+} as const);
+type IconLoadResult = (typeof IconLoadResult)[keyof typeof IconLoadResult];
 
 @Component({
   selector: "app-vault-icon",
@@ -61,9 +73,15 @@ export class IconComponent {
 
   protected readonly data$: Observable<CipherIconDetails>;
 
+  private readonly logService = inject(LogService);
+
+  /** Running from when the image URL is bound until the image loads or fails. */
+  private readonly loadMeasurement = signal<Measurement | null>(null);
+
   constructor(
     private readonly environmentService: EnvironmentService,
     private readonly domainSettingsService: DomainSettingsService,
+    private readonly configService: ConfigService,
   ) {
     const iconSettings$ = combineLatest([
       this.environmentService.environment$.pipe(map((e) => e.getIconsUrl())),
@@ -74,17 +92,52 @@ export class IconComponent {
       distinctUntilChanged(),
     );
 
-    this.data$ = combineLatest([iconSettings$, toObservable(this.cipher)]).pipe(
-      map(([{ iconsUrl, showFavicon }, cipher]) => buildCipherIcon(iconsUrl, cipher, showFavicon)),
+    const newItemTypes$ = this.configService.getFeatureFlag$(FeatureFlag.PM32009NewItemTypes);
+
+    this.data$ = combineLatest([iconSettings$, toObservable(this.cipher), newItemTypes$]).pipe(
+      map(([{ iconsUrl, showFavicon }, cipher, newItemTypes]) =>
+        buildCipherIcon(iconsUrl, cipher, showFavicon, newItemTypes),
+      ),
       startWith(null),
       pairwise(),
       tap(([prev, next]) => {
         if (prev?.image !== next?.image) {
           // The image changed, reset the loaded state to not show an empty icon
           this.imageLoaded.set(false);
+          this.startLoad(next);
         }
       }),
       map(([_, next]) => next!),
     );
+  }
+
+  protected onImageLoad() {
+    this.imageLoaded.set(true);
+    this.finishLoad(IconLoadResult.Loaded);
+  }
+
+  protected onImageError() {
+    this.imageLoaded.set(false);
+    this.finishLoad(IconLoadResult.Error);
+  }
+
+  /**
+   * Starts a DevTools entry under Performance > "Vault" > "Icons" for an image about to load.
+   * The URL is left out, since the hostname is vault data.
+   */
+  private startLoad(next: CipherIconDetails | null) {
+    if (!next?.imageEnabled || !next.image) {
+      this.loadMeasurement.set(null);
+      return;
+    }
+
+    this.loadMeasurement.set(
+      this.logService.startMeasurement(PerfTrackGroup.Vault, PERF_TRACK, PERF_ENTRY),
+    );
+  }
+
+  private finishLoad(result: IconLoadResult) {
+    this.loadMeasurement()?.finish([["Result", result]]);
+    this.loadMeasurement.set(null);
   }
 }

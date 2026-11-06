@@ -1,23 +1,27 @@
-import { OrganizationInviteLinkCreateRequest } from "../models/requests/organization-invite-link-create.request";
-import { OrganizationInviteLinkUpdateRequest } from "../models/requests/organization-invite-link-update.request";
-import { OrganizationInviteLinkResponseModel } from "../models/responses/organization-invite-link.response";
+import { OrganizationInviteLinkValidateEmailDomainRequest } from "../models/requests/organization-invite-link-validate-email-domain.request";
+import { OrganizationInviteLinkStatusResponseModel } from "../models/responses/organization-invite-link-status.response";
+import { OrganizationInviteLinkValidateEmailDomainResponse } from "../models/responses/organization-invite-link-validate-email-domain.response";
 
+/**
+ * @deprecated Use the SDK instead - see the invite_link() client.
+ */
 export abstract class OrganizationInviteLinkApiService {
-  /** Create or replace the invite link for the given organization */
-  abstract create(
+  /**
+   * @deprecated Use the SDK instead: invite_link().user().is_email_allowed
+   *
+   * Check whether an email's domain is permitted by the invite link
+   */
+  abstract validateEmailDomain(
+    request: OrganizationInviteLinkValidateEmailDomainRequest,
+  ): Promise<OrganizationInviteLinkValidateEmailDomainResponse>;
+
+  /**
+   * @deprecated Use the SDK instead: invite_link().user().get_status
+   *
+   * Get the public status of an invite link (anonymous)
+   */
+  abstract getStatus(
     organizationId: string,
-    request: OrganizationInviteLinkCreateRequest,
-  ): Promise<OrganizationInviteLinkResponseModel>;
-
-  /** Update allowed domains on the invite link for the given organization */
-  abstract update(
-    organizationId: string,
-    request: OrganizationInviteLinkUpdateRequest,
-  ): Promise<OrganizationInviteLinkResponseModel>;
-
-  /** Retrieve the invite link for the given organization */
-  abstract get(organizationId: string): Promise<OrganizationInviteLinkResponseModel>;
-
-  /** Delete (revoke) the invite link for the given organization */
-  abstract delete(organizationId: string): Promise<void>;
+    code: string,
+  ): Promise<OrganizationInviteLinkStatusResponseModel>;
 }

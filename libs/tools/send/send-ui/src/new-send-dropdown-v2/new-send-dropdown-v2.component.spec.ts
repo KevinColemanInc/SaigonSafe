@@ -8,6 +8,8 @@ import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.servic
 import { SendType } from "@bitwarden/common/tools/send/types/send-type";
 import { PremiumUpgradePromptService } from "@bitwarden/common/vault/abstractions/premium-upgrade-prompt.service";
 
+import { SendPolicyService } from "../services/send-policy.service";
+
 import { NewSendDropdownV2Component } from "./new-send-dropdown-v2.component";
 
 describe("NewSendDropdownV2Component", () => {
@@ -36,6 +38,12 @@ describe("NewSendDropdownV2Component", () => {
         { provide: AccountService, useValue: accountService },
         { provide: PremiumUpgradePromptService, useValue: premiumUpgradeService },
         { provide: I18nService, useValue: i18nService },
+        {
+          provide: SendPolicyService,
+          useValue: {
+            allowedSendTypes$: of([]),
+          },
+        },
       ],
     }).compileComponents();
 

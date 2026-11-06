@@ -1,4 +1,3 @@
-import { OverlayModule } from "@angular/cdk/overlay";
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 
@@ -7,12 +6,15 @@ import {
   ChipActionComponent,
   ChipFilterComponent,
   TooltipDirective,
+  BreadcrumbsModule,
 } from "@bitwarden/components";
 import {
   CipherFormConfigService,
   DefaultCipherFormConfigService,
   RoutedVaultFilterBridgeService,
   RoutedVaultFilterService,
+  Vfo1IconPipe,
+  Vfo1I18nPipe,
 } from "@bitwarden/vault";
 
 import { HeaderModule } from "../../layouts/header/header.module";
@@ -24,6 +26,7 @@ import { AdminConsoleCipherFormConfigService } from "../../vault/org-vault/servi
 import { BreachReportComponent } from "./pages/breach-report.component";
 import { ExposedPasswordsReportComponent } from "./pages/exposed-passwords-report.component";
 import { InactiveTwoFactorReportComponent } from "./pages/inactive-two-factor-report.component";
+import { PasskeyReportComponent } from "./pages/passkey-report.component";
 import { ReportsHomeComponent } from "./pages/reports-home.component";
 import { ReusedPasswordsReportComponent } from "./pages/reused-passwords-report.component";
 import { UnsecuredWebsitesReportComponent } from "./pages/unsecured-websites-report.component";
@@ -35,7 +38,6 @@ import { ReportsSharedModule } from "./shared";
 @NgModule({
   imports: [
     CommonModule,
-    OverlayModule,
     SharedModule,
     ReportsSharedModule,
     ReportsRoutingModule,
@@ -45,7 +47,11 @@ import { ReportsSharedModule } from "./shared";
     ChipActionComponent,
     ChipFilterComponent,
     BerryComponent,
+    PasskeyReportComponent,
     TooltipDirective,
+    Vfo1IconPipe,
+    Vfo1I18nPipe,
+    BreadcrumbsModule,
   ],
   declarations: [
     BreachReportComponent,

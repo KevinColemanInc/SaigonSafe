@@ -1,8 +1,9 @@
 import { Overlay, OverlayRef } from "@angular/cdk/overlay";
 import { DomPortal } from "@angular/cdk/portal";
-import { ElementRef, Injectable, inject } from "@angular/core";
+import { ElementRef, Injectable, NgZone, inject } from "@angular/core";
+import { Observable, Subject } from "rxjs";
 
-import type { PopoverAnchorForDirective } from "./popover-anchor-for.directive";
+import type { PopoverRef } from "./popover-ref";
 
 /**
  * Service that coordinates spotlight effects across multiple popover instances.
@@ -12,29 +13,24 @@ import type { PopoverAnchorForDirective } from "./popover-anchor-for.directive";
 @Injectable({ providedIn: "root" })
 export class SpotlightService {
   private readonly overlay = inject(Overlay);
-  private readonly backdropElement: HTMLElement;
+  private readonly ngZone = inject(NgZone);
   private readonly borderElement: HTMLElement;
   private currentTarget: HTMLElement | null = null;
-  private currentPadding = 0;
   private borderOverlayRef: OverlayRef | null = null;
   private resizeObserver: ResizeObserver | null = null;
+  private windowResizeListener: (() => void) | null = null;
   private hideTimeout: number | null = null;
-  private activePopover: PopoverAnchorForDirective | null = null;
+  private activePopover: PopoverRef | null = null;
+  private frameHandle: number | null = null;
+  private lastTargetRect: DOMRect | null = null;
+  private readonly movedSubject = new Subject<void>();
+
+  /** Emits after the ring is resized or repositioned to follow its target. */
+  readonly moved$: Observable<void> = this.movedSubject.asObservable();
+
+  private readonly padding: number = 8;
 
   constructor() {
-    // Create backdrop element (initially hidden)
-    this.backdropElement = document.createElement("div");
-    this.backdropElement.style.cssText = `
-      position: fixed;
-      inset: 0;
-      background: transparent;
-      z-index: 999;
-      pointer-events: auto;
-      display: none;
-    `;
-    this.backdropElement.setAttribute("data-spotlight-backdrop", "true");
-    document.body.appendChild(this.backdropElement);
-
     // Create border element — attached to a CDK overlay pane when spotlight is active.
     // Must be appended to the DOM so DomPortal has a parent node to detach it from.
     this.borderElement = document.createElement("div");
@@ -52,40 +48,51 @@ export class SpotlightService {
   /**
    * Shows spotlight on the target element.
    * If a spotlight is already active, smoothly transitions to the new target.
-   * @param target - The element to highlight
-   * @param padding - Padding around the element in pixels
+   * @param target - The element to highlight; a `data-spotlight-host` redirects the ring to its
+   *   `[data-spotlight-target]` descendant.
    */
-  showSpotlight(target: HTMLElement, padding: number): void {
+  showSpotlight(target: HTMLElement): void {
+    const hostTarget = target.hasAttribute("data-spotlight-host")
+      ? target.querySelector<HTMLElement>("[data-spotlight-target]")
+      : null;
+    const resolvedTarget = hostTarget ?? target;
+
     if (this.hideTimeout !== null) {
       clearTimeout(this.hideTimeout);
       this.hideTimeout = null;
     }
 
-    if (this.currentTarget === target && this.currentPadding === padding) {
+    if (this.currentTarget === resolvedTarget) {
       return;
     }
 
-    const isNewTarget = this.currentTarget !== target;
-    this.currentTarget = target;
-    this.currentPadding = padding;
+    this.currentTarget = resolvedTarget;
 
     // Scroll the new target into view
-    if (isNewTarget && typeof target.scrollIntoView === "function") {
-      target.scrollIntoView({ block: "center", inline: "nearest" });
+    if (typeof resolvedTarget.scrollIntoView === "function") {
+      resolvedTarget.scrollIntoView({ block: "center", inline: "nearest" });
     }
 
-    this.backdropElement.style.display = "block";
-
-    // Recreate the CDK border overlay for the new target/padding
+    // Recreate the CDK border overlay for the new target
     this.disposeBorderOverlay();
-    this.createBorderOverlay(target, padding);
+    this.createBorderOverlay(resolvedTarget);
   }
 
-  /**
-   * The CDK overlay pane element for the active spotlight border.
-   * Used by PopoverAnchorForDirective as the popover origin when spotlight is enabled,
-   * so the popover naturally attaches to the outer edge of the highlighted area.
-   */
+  /** Resizes and repositions the ring to the target's current layout. */
+  refresh(): void {
+    if (!this.currentTarget || !this.borderOverlayRef) {
+      return;
+    }
+    this.lastTargetRect = this.currentTarget.getBoundingClientRect();
+    this.borderOverlayRef.updateSize({
+      width: this.currentTarget.offsetWidth + this.padding * 2,
+      height: this.currentTarget.offsetHeight + this.padding * 2,
+    });
+    this.borderOverlayRef.updatePosition();
+    this.movedSubject.next();
+  }
+
+  /** The active spotlight's overlay pane; popovers attach to its outer edge. */
   get overlayElement(): HTMLElement | null {
     return this.borderOverlayRef?.overlayElement ?? null;
   }
@@ -94,18 +101,18 @@ export class SpotlightService {
    * Registers a popover as the active spotlight popover.
    * Closes any other active spotlight popover.
    */
-  register(directive: PopoverAnchorForDirective): void {
-    if (this.activePopover && this.activePopover !== directive) {
-      this.activePopover.closePopover();
+  register(popover: PopoverRef): void {
+    if (this.activePopover && this.activePopover !== popover) {
+      this.activePopover.close();
     }
-    this.activePopover = directive;
+    this.activePopover = popover;
   }
 
   /**
    * Unregisters a popover when it closes.
    */
-  unregister(directive: PopoverAnchorForDirective): void {
-    if (this.activePopover === directive) {
+  unregister(popover: PopoverRef): void {
+    if (this.activePopover === popover) {
       this.activePopover = null;
     }
   }
@@ -116,10 +123,8 @@ export class SpotlightService {
    */
   hideSpotlight(): void {
     this.hideTimeout = window.setTimeout(() => {
-      this.backdropElement.style.display = "none";
       this.disposeBorderOverlay();
       this.currentTarget = null;
-      this.currentPadding = 0;
       this.hideTimeout = null;
     }, 100);
   }
@@ -129,9 +134,12 @@ export class SpotlightService {
    * Uses the reposition scroll strategy so CDK repositions the pane on every animation
    * frame during scroll — including smooth-scroll animations triggered by scrollIntoView.
    */
-  private createBorderOverlay(target: HTMLElement, padding: number): void {
-    const computedStyle = window.getComputedStyle(target);
-    this.borderElement.style.borderRadius = computedStyle.borderRadius;
+  private createBorderOverlay(target: HTMLElement): void {
+    const computedTargetStyle = window.getComputedStyle(target);
+    const borderRadius = parseFloat(computedTargetStyle.borderRadius);
+
+    this.borderElement.style.borderRadius = `${borderRadius + this.padding}px`;
+    this.borderElement.style.border = "2px solid var(--color-border-accent-primary)";
 
     const positionStrategy = this.overlay
       .position()
@@ -142,8 +150,8 @@ export class SpotlightService {
           originY: "top",
           overlayX: "start",
           overlayY: "top",
-          offsetX: -padding,
-          offsetY: -padding,
+          offsetX: -this.padding,
+          offsetY: -this.padding,
         },
       ])
       .withLockedPosition(false)
@@ -151,32 +159,65 @@ export class SpotlightService {
       .withPush(false);
 
     this.borderOverlayRef = this.overlay.create({
+      // Blocks clicks in the top layer, above any earlier overlay such as a dialog. The base
+      // backdrop is invisible and catches clicks at once; the transparent class waits a frame.
+      hasBackdrop: true,
+      backdropClass: "bit-spotlight-backdrop",
       positionStrategy,
       scrollStrategy: this.overlay.scrollStrategies.reposition(),
-      width: target.offsetWidth + padding * 2,
-      height: target.offsetHeight + padding * 2,
+      width: target.offsetWidth + this.padding * 2,
+      height: target.offsetHeight + this.padding * 2,
     });
 
     this.borderElement.style.display = "block";
     this.borderOverlayRef.attach(new DomPortal(this.borderElement));
 
-    // Resize observer keeps the overlay size in sync if the target element resizes
-    this.resizeObserver = new ResizeObserver(() => {
-      if (!this.currentTarget || !this.borderOverlayRef) {
-        return;
-      }
-      this.borderOverlayRef.updateSize({
-        width: this.currentTarget.offsetWidth + padding * 2,
-        height: this.currentTarget.offsetHeight + padding * 2,
-      });
-      this.borderOverlayRef.updatePosition();
-    });
+    this.resizeObserver = new ResizeObserver(() => this.refresh());
     this.resizeObserver.observe(target);
+
+    this.lastTargetRect = target.getBoundingClientRect();
+    this.watchTargetRect();
+
+    // Reposition on window resize — CDK's reposition scroll strategy only covers scroll events
+    this.windowResizeListener = () => {
+      this.borderOverlayRef?.updatePosition();
+    };
+    window.addEventListener("resize", this.windowResizeListener);
+  }
+
+  /** Layout shifts move the target without resizing it, so its rect is checked every frame. */
+  private watchTargetRect(): void {
+    this.ngZone.runOutsideAngular(() => {
+      this.frameHandle = requestAnimationFrame(() => {
+        const rect = this.currentTarget?.getBoundingClientRect();
+        const last = this.lastTargetRect;
+        if (
+          rect &&
+          last &&
+          (rect.left !== last.left ||
+            rect.top !== last.top ||
+            rect.width !== last.width ||
+            rect.height !== last.height)
+        ) {
+          this.refresh();
+        }
+        this.watchTargetRect();
+      });
+    });
   }
 
   private disposeBorderOverlay(): void {
+    if (this.frameHandle !== null) {
+      cancelAnimationFrame(this.frameHandle);
+      this.frameHandle = null;
+    }
+    this.lastTargetRect = null;
     this.resizeObserver?.disconnect();
     this.resizeObserver = null;
+    if (this.windowResizeListener) {
+      window.removeEventListener("resize", this.windowResizeListener);
+      this.windowResizeListener = null;
+    }
     this.borderOverlayRef?.dispose(); // CDK moves borderElement back to document.body
     this.borderOverlayRef = null;
     this.borderElement.style.display = "none";

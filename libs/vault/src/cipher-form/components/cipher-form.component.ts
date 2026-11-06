@@ -1,6 +1,5 @@
 // FIXME: Update this file to be type safe and remove this and next line
 // @ts-strict-ignore
-import { NgIf } from "@angular/common";
 import {
   AfterViewChecked,
   AfterViewInit,
@@ -37,6 +36,7 @@ import { AccountService } from "@bitwarden/common/auth/abstractions/account.serv
 import { getUserId } from "@bitwarden/common/auth/services/account.service";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import { CipherArchiveService } from "@bitwarden/common/vault/abstractions/cipher-archive.service";
+import { RestrictedCipherWriteError } from "@bitwarden/common/vault/abstractions/cipher.service";
 import { CipherType, SecureNoteType } from "@bitwarden/common/vault/enums";
 import { CipherView } from "@bitwarden/common/vault/models/view/cipher.view";
 import {
@@ -53,15 +53,18 @@ import {
 import { CipherFormConfig } from "../abstractions/cipher-form-config.service";
 import { CipherFormService } from "../abstractions/cipher-form.service";
 import { CipherForm, CipherFormContainer } from "../cipher-form-container";
+import { CipherFormHTTPAuthenticationService } from "../services/cipher-form-http-authentication.service";
 import { CipherFormCacheService } from "../services/default-cipher-form-cache.service";
 
 import { AdditionalOptionsSectionComponent } from "./additional-options/additional-options-section.component";
 import { BankAccountSectionComponent } from "./bank-account-section/bank-account-section.component";
 import { CardDetailsSectionComponent } from "./card-details-section/card-details-section.component";
+import { DriversLicenseSectionComponent } from "./drivers-license-section/drivers-license-section.component";
 import { IdentitySectionComponent } from "./identity/identity.component";
 import { ItemDetailsSectionComponent } from "./item-details/item-details-section.component";
 import { LoginDetailsSectionComponent } from "./login-details-section/login-details-section.component";
 import { NewItemNudgeComponent } from "./new-item-nudge/new-item-nudge.component";
+import { PassportSectionComponent } from "./passport-section/passport-section.component";
 import { SshKeySectionComponent } from "./sshkey-section/sshkey-section.component";
 
 // FIXME(https://bitwarden.atlassian.net/browse/CL-764): Migrate to OnPush
@@ -77,6 +80,9 @@ import { SshKeySectionComponent } from "./sshkey-section/sshkey-section.componen
     {
       provide: CipherFormCacheService,
     },
+    {
+      provide: CipherFormHTTPAuthenticationService,
+    },
   ],
   imports: [
     AsyncActionsModule,
@@ -90,7 +96,8 @@ import { SshKeySectionComponent } from "./sshkey-section/sshkey-section.componen
     IdentitySectionComponent,
     SshKeySectionComponent,
     BankAccountSectionComponent,
-    NgIf,
+    DriversLicenseSectionComponent,
+    PassportSectionComponent,
     AdditionalOptionsSectionComponent,
     LoginDetailsSectionComponent,
     NewItemNudgeComponent,
@@ -471,13 +478,24 @@ export class CipherFormComponent
       if (control instanceof FormGroup) {
         return count + this.countInvalidFields(control);
       }
-      return count + (control.invalid ? 1 : 0);
+
+      // Complex child components may have multiple fields.
+      // They can pass `fieldCount` in the errors object to specify how many fields are invalid.
+      const fieldCount = control.invalid ? ((control.errors?.["fieldCount"] as number) ?? 1) : 0;
+      return count + fieldCount;
     }, 0);
   }
 
   submit = async () => this.save(true);
 
   private async persist(manual: boolean): Promise<void> {
+    if (!this.config.organizationDataOwnershipDisabled && this.config.organizations.length === 0) {
+      this.toastService.showToast({
+        variant: "error",
+        message: this.i18nService.t("cannotSaveItemNoConfirmedOrgs"),
+      });
+      return;
+    }
     let successToast: string = "editedItem";
     if (this.cipherForm.invalid) {
       this.cipherForm.markAllAsTouched();
@@ -537,7 +555,22 @@ export class CipherFormComponent
         successToast = "itemRestored";
       }
 
-      const savedCipher = await this.addEditFormService.saveCipher(cipherToSave, this.config);
+      let savedCipher: CipherView;
+      try {
+        savedCipher = await this.addEditFormService.saveCipher(cipherToSave, this.config);
+      } catch (error) {
+        if (error instanceof RestrictedCipherWriteError) {
+          if (this.autoSaveEnabled) {
+            this.autoSaveStatus = "autoSaveFailed";
+          }
+          this.toastService.showToast({
+            variant: "error",
+            message: this.i18nService.t("restrictedItemChangeRefused"),
+          });
+          return;
+        }
+        throw error;
+      }
 
       // A null result means collection changes removed access to the item.
       // Return to the vault through the existing manual-save handler in that case.

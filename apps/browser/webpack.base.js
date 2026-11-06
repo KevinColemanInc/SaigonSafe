@@ -52,7 +52,7 @@ module.exports.buildConfig = function buildConfig(params) {
 
   console.log(`Building Manifest Version ${manifestVersion} app - ${params.configName} version`);
 
-  const envConfig = configurator.load(ENV);
+  const envConfig = configurator.load(ENV, process.env.CHANNEL);
   configurator.log(envConfig);
 
   const moduleRules = [
@@ -136,12 +136,31 @@ module.exports.buildConfig = function buildConfig(params) {
     new webpack.DefinePlugin({
       "process.env": {
         ENV: JSON.stringify(ENV),
+        BW_INCLUDE_CONTENT_SCRIPT_MEASUREMENTS: JSON.stringify(
+          process.env.BW_INCLUDE_CONTENT_SCRIPT_MEASUREMENTS === "true",
+        ),
+        BW_DETECT_SYNC_BOUNDARIES: JSON.stringify(
+          process.env.BW_DETECT_SYNC_BOUNDARIES === "true" || ENV === "development",
+        ),
       },
     }),
     new webpack.EnvironmentPlugin({
       FLAGS: envConfig.flags,
       DEV_FLAGS: ENV === "development" ? envConfig.devFlags : {},
     }),
+    // The Chrome build ships without core-js's polyfills: modern Chrome provides them
+    // natively, and core-js's IE-era Object.create shim is what the Chrome Web Store flags
+    // as "obfuscated code". The Chrome manifest pins minimum_chrome_version to 134 (see
+    // manifest.v3.json) so the store never serves this build to a Chrome lacking native
+    // Symbol.dispose / explicit resource management, which the SDK's `using` disposal needs.
+    ...(browser === "chrome"
+      ? [
+          new webpack.NormalModuleReplacementPlugin(
+            /^core-js\/(stable|proposals\/explicit-resource-management)$/,
+            path.resolve(__dirname, "webpack/empty-module.js"),
+          ),
+        ]
+      : []),
   ];
 
   const plugins = [
@@ -193,6 +212,7 @@ module.exports.buildConfig = function buildConfig(params) {
           from: path.resolve(__dirname, "src/images"),
           to: "images",
           transform: brandIcons.transform({ browser, env: ENV }),
+          filter: (resourcePath) => !path.basename(resourcePath).includes("_beta"),
         },
         { from: path.resolve(__dirname, "src/popup/images"), to: "popup/images" },
         { from: path.resolve(__dirname, "src/autofill/content/autofill.css"), to: "content" },
@@ -270,7 +290,7 @@ module.exports.buildConfig = function buildConfig(params) {
         __dirname,
         "src/platform/ipc/content/ipc-content-script.ts",
       ),
-      "notification/bar": path.resolve(__dirname, "src/autofill/notification/bar.ts"),
+      "notification/bar": path.resolve(__dirname, "src/autofill/notification/bootstrap-bar.ts"),
       "overlay/menu-button": path.resolve(
         __dirname,
         "src/autofill/overlay/inline-menu/pages/button/bootstrap-autofill-inline-menu-button.ts",
@@ -435,6 +455,18 @@ module.exports.buildConfig = function buildConfig(params) {
           template: path.resolve(__dirname, "src/platform/offscreen-document/index.html"),
           filename: "offscreen-document/index.html",
           chunks: ["offscreen-document/offscreen-document"],
+        }),
+      );
+    }
+
+    // Chrome-only: side panel placeholder page (disabled by default, enabled per-tab for triage)
+    if (browser === "chrome") {
+      mainConfig.plugins.push(
+        new HtmlWebpackPlugin({
+          template: path.resolve(__dirname, "src/sidepanel-disabled.html"),
+          filename: "sidepanel-disabled.html",
+          chunks: [],
+          inject: false,
         }),
       );
     }

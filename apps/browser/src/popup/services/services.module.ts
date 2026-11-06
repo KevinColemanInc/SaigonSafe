@@ -5,6 +5,7 @@ import { merge, of, Subject } from "rxjs";
 
 import { CollectionService } from "@bitwarden/admin-console/common";
 import { DeviceManagementComponentServiceAbstraction } from "@bitwarden/angular/auth/device-management/device-management-component.service.abstraction";
+import { LoginViaWebAuthnComponentService } from "@bitwarden/angular/auth/login-via-webauthn/login-via-webauthn-component.service";
 import { ChangePasswordService } from "@bitwarden/angular/auth/password-management/change-password";
 import { AngularThemingService } from "@bitwarden/angular/platform/services/theming/angular-theming.service";
 import { SafeProvider, safeProvider } from "@bitwarden/angular/platform/utils/safe-provider";
@@ -38,19 +39,21 @@ import {
   NewDeviceVerificationComponentService,
 } from "@bitwarden/auth/angular";
 import {
-  LockService,
   LoginEmailService,
   SsoUrlService,
-  LogoutService,
   UserDecryptionOptionsServiceAbstraction,
 } from "@bitwarden/auth/common";
 import { AutomaticUserConfirmationService } from "@bitwarden/auto-confirm";
 import { ExtensionAuthRequestAnsweringService } from "@bitwarden/browser/auth/services/auth-request-answering/extension-auth-request-answering.service";
 import { ExtensionNewDeviceVerificationComponentService } from "@bitwarden/browser/auth/services/new-device-verification/extension-new-device-verification-component.service";
 import { BrowserRouterService } from "@bitwarden/browser/platform/popup/services/browser-router.service";
+import { BrowserShareItemPresenter } from "@bitwarden/browser/tools/popup/share/browser-share-item.presenter";
 import { ApiService } from "@bitwarden/common/abstractions/api.service";
 import { OrganizationService } from "@bitwarden/common/admin-console/abstractions/organization/organization.service.abstraction";
-import { PolicyService } from "@bitwarden/common/admin-console/abstractions/policy/policy.service.abstraction";
+import {
+  InternalPolicyService,
+  PolicyService,
+} from "@bitwarden/common/admin-console/abstractions/policy/policy.service.abstraction";
 import {
   AccountService,
   AccountService as AccountServiceAbstraction,
@@ -62,6 +65,8 @@ import { SsoLoginServiceAbstraction } from "@bitwarden/common/auth/abstractions/
 import { TokenService } from "@bitwarden/common/auth/abstractions/token.service";
 import { UserVerificationService } from "@bitwarden/common/auth/abstractions/user-verification/user-verification.service.abstraction";
 import { WebAuthnLoginPrfKeyServiceAbstraction } from "@bitwarden/common/auth/abstractions/webauthn/webauthn-login-prf-key.service.abstraction";
+import { LogoutService } from "@bitwarden/common/auth/logout";
+import { OrganizationInviteService } from "@bitwarden/common/auth/organization-invite";
 import { PendingAuthRequestsStateService } from "@bitwarden/common/auth/services/auth-request-answering/pending-auth-requests.state";
 import {
   AutofillSettingsService,
@@ -82,10 +87,6 @@ import { PhishingDetectionSettingsServiceAbstraction } from "@bitwarden/common/d
 import { PhishingDetectionSettingsService } from "@bitwarden/common/dirt/services/phishing-detection/phishing-detection-settings.service";
 import { ClientType } from "@bitwarden/common/enums";
 import { AccountCryptographicStateService } from "@bitwarden/common/key-management/account-cryptography/account-cryptographic-state.service";
-import { KeyGenerationService } from "@bitwarden/common/key-management/crypto";
-import { CryptoFunctionService } from "@bitwarden/common/key-management/crypto/abstractions/crypto-function.service";
-import { EncryptService } from "@bitwarden/common/key-management/crypto/abstractions/encrypt.service";
-import { WebCryptoFunctionService } from "@bitwarden/common/key-management/crypto/services/web-crypto-function.service";
 import { MasterPasswordUnlockService } from "@bitwarden/common/key-management/master-password/abstractions/master-password-unlock.service";
 import {
   InternalMasterPasswordServiceAbstraction,
@@ -93,6 +94,11 @@ import {
 } from "@bitwarden/common/key-management/master-password/abstractions/master-password.service.abstraction";
 import { PinServiceAbstraction } from "@bitwarden/common/key-management/pin/pin.service.abstraction";
 import { SessionTimeoutTypeService } from "@bitwarden/common/key-management/session-timeout";
+import {
+  SharedUnlockSettingsService,
+  DefaultSharedUnlockSettingsService,
+} from "@bitwarden/common/key-management/shared-unlock";
+import { V2UpgradeTokenStateService } from "@bitwarden/common/key-management/upgrade-token/abstractions/v2-upgrade-token-state.service.abstraction";
 import {
   VaultTimeoutService,
   VaultTimeoutStringType,
@@ -111,6 +117,7 @@ import {
   MessagingService as MessagingServiceAbstraction,
 } from "@bitwarden/common/platform/abstractions/messaging.service";
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
+import { RegisterSdkService } from "@bitwarden/common/platform/abstractions/sdk/register-sdk.service";
 import { SdkClientFactory } from "@bitwarden/common/platform/abstractions/sdk/sdk-client-factory";
 import { SdkLoadService } from "@bitwarden/common/platform/abstractions/sdk/sdk-load.service";
 import { SdkService } from "@bitwarden/common/platform/abstractions/sdk/sdk.service";
@@ -120,6 +127,7 @@ import {
   ObservableStorageService,
 } from "@bitwarden/common/platform/abstractions/storage.service";
 import { ActionsService } from "@bitwarden/common/platform/actions";
+import { IpcService } from "@bitwarden/common/platform/ipc";
 import { Message, MessageListener, MessageSender } from "@bitwarden/common/platform/messaging";
 // eslint-disable-next-line no-restricted-imports -- Used for dependency injection
 import { SubjectMessageSender } from "@bitwarden/common/platform/messaging/internal";
@@ -166,39 +174,65 @@ import {
   WebAuthnPrfUnlockService,
   DefaultWebAuthnPrfUnlockService,
   SessionTimeoutSettingsComponentService,
+  KeyManagementUiModule,
 } from "@bitwarden/key-management-ui";
+// eslint-disable-next-line no-restricted-imports
+import {
+  CryptoFunctionService,
+  DefaultLegacyCompatKeyService,
+  EncryptService,
+  KeyGenerationService,
+  LegacyCompatKeyService,
+  WebCryptoFunctionService,
+} from "@bitwarden/legacy-crypto";
+import { FlightRecorderLogRecorderService } from "@bitwarden/logging-angular";
 import { DerivedStateProvider, GlobalStateProvider, StateProvider } from "@bitwarden/state";
 import { InlineDerivedStateProvider } from "@bitwarden/state-internal";
+import { SHARE_ITEM_PRESENTER, SHARE_PASSWORD_REPROMPT } from "@bitwarden/tools-share";
+import {
+  AutoUnlockService,
+  ForegroundLockService,
+  LockService,
+  UnlockService,
+} from "@bitwarden/unlock";
 import {
   DefaultSshImportPromptService,
+  DefaultVaultNavService,
   PasswordRepromptService,
   SshImportPromptService,
+  VAULT_BASE_ROUTE,
+  VaultNavService,
 } from "@bitwarden/vault";
 
 import { AccountSwitcherService } from "../../auth/popup/account-switching/services/account-switcher.service";
-import { ForegroundLockService } from "../../auth/popup/accounts/foreground-lock.service";
 import { ExtensionChangePasswordService } from "../../auth/popup/change-password/extension-change-password.service";
 import { ExtensionLoginComponentService } from "../../auth/popup/login/extension-login-component.service";
+import { ExtensionLoginViaWebAuthnComponentService } from "../../auth/popup/login/extension-login-via-webauthn-component.service";
 import { ExtensionSsoComponentService } from "../../auth/popup/login/extension-sso-component.service";
 import { ExtensionLogoutService } from "../../auth/popup/logout/extension-logout.service";
 import { ExtensionDeviceManagementComponentService } from "../../auth/services/extension-device-management-component.service";
 import { ExtensionTwoFactorAuthComponentService } from "../../auth/services/extension-two-factor-auth-component.service";
 import { ExtensionTwoFactorAuthDuoComponentService } from "../../auth/services/extension-two-factor-auth-duo-component.service";
 import { ExtensionTwoFactorAuthWebAuthnComponentService } from "../../auth/services/extension-two-factor-auth-webauthn-component.service";
+import { AutofillLifecycleService } from "../../autofill/services/abstractions/autofill-lifecycle.service";
 import { AutofillService as AutofillServiceAbstraction } from "../../autofill/services/abstractions/autofill.service";
 import AutofillService from "../../autofill/services/autofill.service";
 import { InlineMenuFieldQualificationService } from "../../autofill/services/inline-menu-field-qualification.service";
+import { NoopAutofillLifecycleService } from "../../autofill/services/noop-autofill-lifecycle.service";
+import { WebmapperDraftService } from "../../autofill/services/webmapper-draft.service";
 import { ForegroundEventUploadService } from "../../dirt/event-logs/foreground-event-upload.service";
 import { ForegroundBrowserBiometricsService } from "../../key-management/biometrics/foreground-browser-biometrics";
 import { ExtensionLockComponentService } from "../../key-management/lock/services/extension-lock-component.service";
 import { BrowserSessionTimeoutSettingsComponentService } from "../../key-management/session-timeout/services/browser-session-timeout-settings-component.service";
 import { BrowserSessionTimeoutTypeService } from "../../key-management/session-timeout/services/browser-session-timeout-type.service";
+import { ForegroundUnlockService } from "../../key-management/unlock/foreground-unlock.service";
 import { ForegroundVaultTimeoutService } from "../../key-management/vault-timeout/foreground-vault-timeout.service";
 import { BrowserActionsService } from "../../platform/actions/browser-actions.service";
 import { BrowserApi } from "../../platform/browser/browser-api";
 import { runInsideAngular } from "../../platform/browser/run-inside-angular.operator";
 /* eslint-disable no-restricted-imports */
 import { ZonedMessageListenerService } from "../../platform/browser/zoned-message-listener.service";
+import { IpcForegroundService } from "../../platform/ipc/ipc-foreground.service";
 import { ChromeMessageSender } from "../../platform/messaging/chrome-message.sender";
 /* eslint-enable no-restricted-imports */
 import { ForegroundServerNotificationsService } from "../../platform/notifications/foreground-server-notifications.service";
@@ -214,6 +248,7 @@ import BrowserMemoryStorageService from "../../platform/services/browser-memory-
 import { BrowserScriptInjectorService } from "../../platform/services/browser-script-injector.service";
 import I18nService from "../../platform/services/i18n.service";
 import { ForegroundPlatformUtilsService } from "../../platform/services/platform-utils/foreground-platform-utils.service";
+import { BrowserForegroundSdkClientFactory } from "../../platform/services/sdk/browser-foreground-sdk-client-factory";
 import { BrowserSdkLoadService } from "../../platform/services/sdk/browser-sdk-load.service";
 import { ForegroundTaskSchedulerService } from "../../platform/services/task-scheduler/foreground-task-scheduler.service";
 import { BrowserStorageServiceProvider } from "../../platform/storage/browser-storage-service.provider";
@@ -268,11 +303,16 @@ const safeProviders: SafeProvider[] = [
   }),
   safeProvider({
     provide: LogService,
-    useFactory: () => {
+    useFactory: (recorder: FlightRecorderLogRecorderService) => {
       const isDev = process.env.ENV === "development";
-      return new ConsoleLogService(isDev);
+      return new ConsoleLogService(isDev, null, recorder);
     },
-    deps: [],
+    deps: [FlightRecorderLogRecorderService],
+  }),
+  safeProvider({
+    provide: IpcService,
+    useClass: IpcForegroundService,
+    deps: [PlatformUtilsService, LogService],
   }),
   safeProvider({
     provide: EnvironmentService,
@@ -297,47 +337,52 @@ const safeProviders: SafeProvider[] = [
   }),
   safeProvider({
     provide: KeyService,
-    useFactory: (
-      masterPasswordService: InternalMasterPasswordServiceAbstraction,
-      keyGenerationService: KeyGenerationService,
-      cryptoFunctionService: CryptoFunctionService,
-      encryptService: EncryptService,
-      platformUtilsService: PlatformUtilsService,
-      logService: LogService,
-      stateService: StateService,
-      accountService: AccountServiceAbstraction,
-      stateProvider: StateProvider,
-      kdfConfigService: KdfConfigService,
-      accountCryptographicStateService: AccountCryptographicStateService,
-    ) => {
-      const keyService = new DefaultKeyService(
-        masterPasswordService,
-        keyGenerationService,
-        cryptoFunctionService,
-        encryptService,
-        platformUtilsService,
-        logService,
-        stateService,
-        accountService,
-        stateProvider,
-        kdfConfigService,
-        accountCryptographicStateService,
-      );
-      new ContainerService(keyService, encryptService).attachToGlobal(self);
-      return keyService;
-    },
+    useClass: DefaultKeyService,
     deps: [
-      InternalMasterPasswordServiceAbstraction,
-      KeyGenerationService,
       CryptoFunctionService,
       EncryptService,
       PlatformUtilsService,
       LogService,
       StateService,
-      AccountServiceAbstraction,
       StateProvider,
-      KdfConfigService,
       AccountCryptographicStateService,
+      BiometricsService,
+      SdkService,
+    ],
+  }),
+  safeProvider({
+    // Also attaches the ContainerService to the global scope; this provider is where both key
+    // services the container needs are first available together.
+    provide: LegacyCompatKeyService,
+    useFactory: (
+      keyGenerationService: KeyGenerationService,
+      cryptoFunctionService: CryptoFunctionService,
+      encryptService: EncryptService,
+      logService: LogService,
+      accountService: AccountServiceAbstraction,
+      kdfConfigService: KdfConfigService,
+      keyService: KeyService,
+    ) => {
+      const legacyCompatKeyService = new DefaultLegacyCompatKeyService(
+        keyGenerationService,
+        cryptoFunctionService,
+        encryptService,
+        logService,
+        accountService,
+        kdfConfigService,
+        keyService,
+      );
+      new ContainerService(keyService, encryptService, legacyCompatKeyService).attachToGlobal(self);
+      return legacyCompatKeyService;
+    },
+    deps: [
+      KeyGenerationService,
+      CryptoFunctionService,
+      EncryptService,
+      LogService,
+      AccountServiceAbstraction,
+      KdfConfigService,
+      KeyService,
     ],
   }),
   safeProvider({
@@ -390,6 +435,8 @@ const safeProviders: SafeProvider[] = [
       SendApiService,
       MessageListener,
       StateProvider,
+      ConfigService,
+      SdkService,
     ],
   }),
   safeProvider({
@@ -403,6 +450,11 @@ const safeProviders: SafeProvider[] = [
       EnvironmentService,
       AuthService,
     ],
+  }),
+  safeProvider({
+    provide: WebmapperDraftService,
+    useClass: WebmapperDraftService,
+    deps: [StateProvider],
   }),
   safeProvider({
     provide: AbstractStorageService,
@@ -419,6 +471,11 @@ const safeProviders: SafeProvider[] = [
     deps: [],
   }),
   safeProvider({
+    provide: AutofillLifecycleService,
+    useClass: NoopAutofillLifecycleService,
+    deps: [LogService],
+  }),
+  safeProvider({
     provide: AutofillService,
     deps: [
       CipherService,
@@ -432,10 +489,10 @@ const safeProviders: SafeProvider[] = [
       ScriptInjectorService,
       AccountServiceAbstraction,
       AuthService,
-      ConfigService,
       UserNotificationSettingsServiceAbstraction,
       MessageListener,
       AnimationControlService,
+      AutofillLifecycleService,
     ],
   }),
   safeProvider({
@@ -530,11 +587,16 @@ const safeProviders: SafeProvider[] = [
   safeProvider({
     provide: AutofillSettingsServiceAbstraction,
     useClass: AutofillSettingsService,
-    deps: [StateProvider, PolicyService, AccountService, RestrictedItemTypesService],
+    deps: [StateProvider, PolicyService, AccountService, RestrictedItemTypesService, ConfigService],
   }),
   safeProvider({
     provide: UserNotificationSettingsServiceAbstraction,
     useClass: UserNotificationSettingsService,
+    deps: [StateProvider],
+  }),
+  safeProvider({
+    provide: SharedUnlockSettingsService,
+    useClass: DefaultSharedUnlockSettingsService,
     deps: [StateProvider],
   }),
   safeProvider({
@@ -605,6 +667,8 @@ const safeProviders: SafeProvider[] = [
       BiometricStateService,
       BrowserRouterService,
       WebAuthnPrfUnlockService,
+      SharedUnlockSettingsService,
+      ConfigService,
     ],
   }),
   // TODO: PM-18182 - Refactor component services into lazy loaded modules
@@ -626,6 +690,7 @@ const safeProviders: SafeProvider[] = [
       EnvironmentService,
       I18nServiceAbstraction,
       PlatformUtilsService,
+      LogService,
     ],
   }),
   safeProvider({
@@ -659,13 +724,38 @@ const safeProviders: SafeProvider[] = [
     useClass: DefaultWebAuthnPrfUnlockService,
     deps: [
       WebAuthnLoginPrfKeyServiceAbstraction,
-      UserDecryptionOptionsServiceAbstraction,
+      StateProvider,
       EncryptService,
       EnvironmentService,
       PlatformUtilsService,
       WINDOW,
       LogService,
     ],
+  }),
+  safeProvider({
+    provide: ForegroundUnlockService,
+    useClass: ForegroundUnlockService,
+    deps: [
+      RegisterSdkService,
+      AccountCryptographicStateService,
+      KdfConfigService,
+      AccountServiceAbstraction,
+      InternalMasterPasswordServiceAbstraction,
+      StateProvider,
+      LogService,
+      BiometricsService,
+      BiometricStateService,
+      V2UpgradeTokenStateService,
+      KeyService,
+      SdkService,
+      AutoUnlockService,
+      MessageSender,
+      MessageListener,
+    ],
+  }),
+  safeProvider({
+    provide: UnlockService,
+    useExisting: ForegroundUnlockService,
   }),
   safeProvider({
     provide: AnimationControlService,
@@ -710,6 +800,11 @@ const safeProviders: SafeProvider[] = [
     ],
   }),
   safeProvider({
+    provide: LoginViaWebAuthnComponentService,
+    useClass: ExtensionLoginViaWebAuthnComponentService,
+    deps: [],
+  }),
+  safeProvider({
     provide: LockService,
     useClass: ForegroundLockService,
     deps: [MessageSender, MessageListener],
@@ -722,7 +817,9 @@ const safeProviders: SafeProvider[] = [
   safeProvider({
     provide: SdkClientFactory,
     useFactory: () =>
-      flagEnabled("sdk") ? new DefaultSdkClientFactory() : new NoopSdkClientFactory(),
+      flagEnabled("sdk")
+        ? new BrowserForegroundSdkClientFactory(new DefaultSdkClientFactory())
+        : new NoopSdkClientFactory(),
     deps: [],
   }),
   safeProvider({
@@ -738,7 +835,7 @@ const safeProviders: SafeProvider[] = [
   safeProvider({
     provide: LogoutService,
     useClass: ExtensionLogoutService,
-    deps: [MessagingServiceAbstraction, AccountSwitcherService],
+    deps: [MessagingServiceAbstraction, LogService, AccountSwitcherService, SdkService],
   }),
   safeProvider({
     provide: CompactModeService,
@@ -753,7 +850,14 @@ const safeProviders: SafeProvider[] = [
   safeProvider({
     provide: SshImportPromptService,
     useClass: DefaultSshImportPromptService,
-    deps: [DialogService, ToastService, PlatformUtilsService, I18nServiceAbstraction],
+    deps: [
+      DialogService,
+      ToastService,
+      PlatformUtilsService,
+      I18nServiceAbstraction,
+      ConfigService,
+      LogService,
+    ],
   }),
   safeProvider({
     provide: ChangePasswordService,
@@ -763,6 +867,8 @@ const safeProviders: SafeProvider[] = [
       MasterPasswordApiService,
       InternalMasterPasswordServiceAbstraction,
       MasterPasswordUnlockService,
+      InternalPolicyService,
+      OrganizationInviteService,
       WINDOW,
     ],
   }),
@@ -811,10 +917,35 @@ const safeProviders: SafeProvider[] = [
     useClass: AutoConfirmNudgeService,
     deps: [StateProvider, AutomaticUserConfirmationService],
   }),
+  safeProvider({
+    // Reads the account's vaults for the header switcher and for `vaultScopeGuard`.
+    provide: VaultNavService,
+    useClass: DefaultVaultNavService,
+    deps: [],
+  }),
+  safeProvider({
+    provide: VAULT_BASE_ROUTE as SafeInjectionToken<string>,
+    useValue: "/tabs/vault",
+  }),
+  // Sharing and the Vault layer reach each other through tokens rather than imports, because
+  // `@bitwarden/tools-share` already depends on `@bitwarden/vault` through `@bitwarden/send-ui`
+  // and importing it back would close a package cycle. The app sits above both, so it is the one
+  // place the two can be introduced.
+  safeProvider({
+    provide: SHARE_PASSWORD_REPROMPT,
+    useExisting: PasswordRepromptService,
+    deps: [],
+  }),
+  safeProvider(BrowserShareItemPresenter),
+  safeProvider({
+    provide: SHARE_ITEM_PRESENTER,
+    useExisting: BrowserShareItemPresenter,
+    deps: [],
+  }),
 ];
 
 @NgModule({
-  imports: [JslibServicesModule, GeneratorServicesModule],
+  imports: [JslibServicesModule, KeyManagementUiModule, GeneratorServicesModule],
   declarations: [],
   // Do not register your dependency here! Add it to the typesafeProviders array using the helper function
   providers: safeProviders,

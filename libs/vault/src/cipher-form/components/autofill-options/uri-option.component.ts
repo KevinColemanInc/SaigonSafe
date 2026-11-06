@@ -1,13 +1,14 @@
 // FIXME: Update this file to be type safe and remove this and next line
 // @ts-strict-ignore
 import { DragDropModule } from "@angular/cdk/drag-drop";
-import { NgForOf, NgIf } from "@angular/common";
 import {
   Component,
   ElementRef,
   EventEmitter,
   forwardRef,
+  inject,
   Input,
+  input,
   Output,
   ViewChild,
 } from "@angular/core";
@@ -18,7 +19,7 @@ import {
   NG_VALUE_ACCESSOR,
   ReactiveFormsModule,
 } from "@angular/forms";
-import { concatMap, pairwise } from "rxjs";
+import { concatMap, EMPTY, ObservableInput } from "rxjs";
 
 import { JslibModule } from "@bitwarden/angular/jslib.module";
 import {
@@ -34,6 +35,9 @@ import {
   SelectModule,
 } from "@bitwarden/components";
 
+import { DESKTOP_APP_URI_PREFIX } from "../../../models/desktop-app-uri.constants";
+import { CipherFormHTTPAuthenticationService } from "../../services/cipher-form-http-authentication.service";
+
 import { AdvancedUriOptionDialogComponent } from "./advanced-uri-option-dialog.component";
 
 // FIXME(https://bitwarden.atlassian.net/browse/CL-764): Migrate to OnPush
@@ -41,6 +45,10 @@ import { AdvancedUriOptionDialogComponent } from "./advanced-uri-option-dialog.c
 @Component({
   selector: "vault-autofill-uri-option",
   templateUrl: "./uri-option.component.html",
+  host: {
+    class:
+      "tw-flex tw-flex-col tw-p-3 -tw-mx-3 tw-gap-4 tw-bg-background tw-text-main tw-rounded-lg first:-tw-mt-3 last-of-type:tw-mb-0",
+  },
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -55,8 +63,6 @@ import { AdvancedUriOptionDialogComponent } from "./advanced-uri-option-dialog.c
     IconButtonModule,
     JslibModule,
     SelectModule,
-    NgForOf,
-    NgIf,
   ],
 })
 export class UriOptionComponent implements ControlValueAccessor {
@@ -136,6 +142,13 @@ export class UriOptionComponent implements ControlValueAccessor {
   // eslint-disable-next-line @angular-eslint/prefer-signals
   @Input({ required: true }) index: number;
 
+  /**
+   * When true, URIs prefixed with the desktop app scheme will display the "App (URI)" label
+   * instead of "Website (URI)". Should only be true when the WindowsDesktopAutotypeGA feature
+   * flag is enabled.
+   */
+  readonly showAppLabel = input(false);
+
   // FIXME(https://bitwarden.atlassian.net/browse/CL-903): Migrate to Signals
   // eslint-disable-next-line @angular-eslint/prefer-output-emitter-ref
   @Output()
@@ -151,6 +164,11 @@ export class UriOptionComponent implements ControlValueAccessor {
 
   protected showMatchDetection = false;
 
+  /** The most recent match strategy, used to restore it when a change is declined or cancelled */
+  private lastMatchDetection: UriMatchStrategySetting = null;
+
+  private httpAuthenticationService = inject(CipherFormHTTPAuthenticationService);
+
   protected toggleMatchDetection() {
     this.showMatchDetection = !this.showMatchDetection;
     if (this.showMatchDetection) {
@@ -159,6 +177,16 @@ export class UriOptionComponent implements ControlValueAccessor {
   }
 
   protected get uriLabel() {
+    const isAppUri =
+      this.showAppLabel() &&
+      (this.uriForm.controls.uri.value?.startsWith(DESKTOP_APP_URI_PREFIX) ?? false);
+
+    if (isAppUri) {
+      return this.index === 0
+        ? this.i18nService.t("appUri")
+        : this.i18nService.t("appUriCount", this.index + 1);
+    }
+
     return this.index === 0
       ? this.i18nService.t("websiteUri")
       : this.i18nService.t("websiteUriCount", this.index + 1);
@@ -195,33 +223,72 @@ export class UriOptionComponent implements ControlValueAccessor {
 
     this.uriForm.controls.matchDetection.valueChanges
       .pipe(
-        pairwise(),
-        concatMap(([previous, current]) => this.handleAdvancedMatch(previous, current)),
+        concatMap((current) => this.handleMatchDetectionChange(current)),
         takeUntilDestroyed(),
       )
       .subscribe();
   }
 
-  private async handleAdvancedMatch(
-    previous: UriMatchStrategySetting,
-    current: UriMatchStrategySetting,
-  ) {
-    const valueChange = previous !== current;
+  /**
+   * Compares a user-selected match strategy against the last known strategy, which `writeValue` and silent
+   * restores also keep current, and runs the confirmation for the newly selected strategy.
+   */
+  private handleMatchDetectionChange(current: UriMatchStrategySetting): ObservableInput<void> {
+    const previous = this.lastMatchDetection;
+    this.lastMatchDetection = current;
+
+    if (previous === current) {
+      return EMPTY;
+    }
+
+    if (current == null) {
+      return this.handleDefaultMatch(previous);
+    }
+
+    this.handleAdvancedMatch(previous, current);
+
+    return EMPTY;
+  }
+
+  /**
+   * HTTP authentication can't be used while a URI uses the default match strategy. Switching to the default
+   * strategy while HTTP authentication is on asks the user to confirm turning HTTP authentication off; declining
+   * restores the previous strategy.
+   */
+  private async handleDefaultMatch(previous: UriMatchStrategySetting) {
+    if (await this.httpAuthenticationService.confirmDefaultMatchStrategy()) {
+      return;
+    }
+
+    this.restoreMatchDetection(previous);
+  }
+
+  private handleAdvancedMatch(previous: UriMatchStrategySetting, current: UriMatchStrategySetting) {
     const isAdvanced =
       current === UriMatchStrategy.StartsWith || current === UriMatchStrategy.RegularExpression;
 
-    if (!valueChange || !isAdvanced) {
+    if (!isAdvanced) {
       return;
     }
+
     AdvancedUriOptionDialogComponent.open(this.dialogService, {
       contentKey: this.advancedOptionWarningMap[current],
-      onContinue: () => {
-        this.uriForm.controls.matchDetection.setValue(current);
-      },
+      // The control already holds the selected advanced strategy
+      onContinue: () => {},
       onCancel: () => {
-        this.uriForm.controls.matchDetection.setValue(previous);
+        this.restoreMatchDetection(previous);
       },
     });
+  }
+
+  /**
+   * Sets the match strategy without emitting a change, so restoring a declined strategy does not re-run the
+   * default or advanced option confirmations, then notifies the parent form of the restored value.
+   */
+  private restoreMatchDetection(value: UriMatchStrategySetting) {
+    this.uriForm.controls.matchDetection.setValue(value, { emitEvent: false });
+    this.lastMatchDetection = value;
+    this.onChange(this.uriForm.value);
   }
 
   focusInput() {
@@ -244,6 +311,7 @@ export class UriOptionComponent implements ControlValueAccessor {
         },
         { emitEvent: false },
       );
+      this.lastMatchDetection = value.matchDetection ?? null;
     }
   }
 

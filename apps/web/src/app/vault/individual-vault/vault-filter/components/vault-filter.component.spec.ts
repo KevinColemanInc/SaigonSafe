@@ -6,7 +6,6 @@ import { BehaviorSubject, firstValueFrom, of } from "rxjs";
 import { PolicyService } from "@bitwarden/common/admin-console/abstractions/policy/policy.service.abstraction";
 import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
 import { BillingApiServiceAbstraction } from "@bitwarden/common/billing/abstractions/billing-api.service.abstraction";
-import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
 import { mockAccountServiceWith } from "@bitwarden/common/spec";
@@ -25,9 +24,17 @@ import { CipherListView, CipherListViewType } from "@bitwarden/sdk-internal";
 import {
   VaultFilterServiceAbstraction as VaultFilterService,
   CipherTypeFilter,
+  ControlledAccessFilter,
+  VaultFilter,
   VaultFilterSection,
+  Vfo1TerminologyService,
 } from "@bitwarden/vault";
 import { OrganizationWarningsService } from "@bitwarden/web-vault/app/billing/organizations/warnings/services";
+
+import {
+  ControlledAccessFilterOption,
+  VaultControlledAccessFilter,
+} from "../../vault-controlled-access-filter.token";
 
 import { VaultFilterComponent } from "./vault-filter.component";
 
@@ -52,6 +59,8 @@ describe("VaultFilterComponent", () => {
   let vaultFilterService: MockProxy<VaultFilterService>;
   let cipherService: MockProxy<CipherService>;
   let restrictedSubject: BehaviorSubject<RestrictedCipherType[]>;
+  let policyService: MockProxy<PolicyService>;
+  let vfo1Enabled: jest.Mock<boolean, []>;
 
   beforeEach(async () => {
     vaultFilterService = mock<VaultFilterService>();
@@ -63,16 +72,31 @@ describe("VaultFilterComponent", () => {
       });
       return of(headNode);
     });
+    vaultFilterService.cipherTypeFilters$ = of([
+      {
+        id: "favorites",
+        name: "favorites",
+        type: "favorites" as CipherTypeFilter["type"],
+        icon: "bwi-star",
+      },
+      { id: "login", name: "typeLogin", type: CipherType.Login, icon: "bwi-globe" },
+      { id: "card", name: "typeCard", type: CipherType.Card, icon: "bwi-credit-card" },
+      { id: "identity", name: "typeIdentity", type: CipherType.Identity, icon: "bwi-id-card" },
+      { id: "note", name: "typeSecureNote", type: CipherType.SecureNote, icon: "bwi-sticky-note" },
+      { id: "sshKey", name: "typeSshKey", type: CipherType.SshKey, icon: "bwi-key" },
+    ]);
 
-    const policyService = mock<PolicyService>();
+    policyService = mock<PolicyService>();
     policyService.policyAppliesToUser$.mockReturnValue(of(false));
     policyService.policiesByType$.mockReturnValue(of([]));
+
+    vfo1Enabled = jest.fn<boolean, []>().mockReturnValue(false);
 
     const i18nService = mock<I18nService>();
     i18nService.t.mockImplementation((key: string) => key);
 
     cipherService = mock<CipherService>();
-    cipherService.cipherListViews$.mockReturnValue(of([]));
+    cipherService.cipherListViewsIncludingRestricted$.mockReturnValue(of([]));
 
     restrictedSubject = new BehaviorSubject<RestrictedCipherType[]>([]);
 
@@ -98,7 +122,7 @@ describe("VaultFilterComponent", () => {
         { provide: CipherArchiveService, useValue: mock<CipherArchiveService>() },
         { provide: PremiumUpgradePromptService, useValue: mock<PremiumUpgradePromptService>() },
         { provide: OrganizationWarningsService, useValue: mock<OrganizationWarningsService>() },
-        { provide: ConfigService, useValue: mock<ConfigService>() },
+        { provide: Vfo1TerminologyService, useValue: { enabled: vfo1Enabled } },
       ],
     }).compileComponents();
 
@@ -115,7 +139,7 @@ describe("VaultFilterComponent", () => {
     describe("when there are no restrictions", () => {
       it("shows all type filters", async () => {
         restrictedSubject.next([]);
-        cipherService.cipherListViews$.mockReturnValue(of([]));
+        cipherService.cipherListViewsIncludingRestricted$.mockReturnValue(of([]));
 
         const section = await component.addTypeFilter();
         const ids = await getTypeFilterIds(section);
@@ -132,7 +156,7 @@ describe("VaultFilterComponent", () => {
       });
 
       it("hides the restricted type even with CipherListView ciphers present", async () => {
-        cipherService.cipherListViews$.mockReturnValue(
+        cipherService.cipherListViewsIncludingRestricted$.mockReturnValue(
           of([cipherStub({ type: { card: { brand: "" } }, organizationId: ORG_ID_1 })]),
         );
 
@@ -144,7 +168,7 @@ describe("VaultFilterComponent", () => {
       });
 
       it("hides the restricted type even with CipherView ciphers present", async () => {
-        cipherService.cipherListViews$.mockReturnValue(
+        cipherService.cipherListViewsIncludingRestricted$.mockReturnValue(
           of([cipherStub({ type: CipherType.Card, organizationId: ORG_ID_1 })]),
         );
 
@@ -163,7 +187,7 @@ describe("VaultFilterComponent", () => {
       });
 
       it("shows the type when a CipherListView cipher exists in an allowed org", async () => {
-        cipherService.cipherListViews$.mockReturnValue(
+        cipherService.cipherListViewsIncludingRestricted$.mockReturnValue(
           of([cipherStub({ type: { card: { brand: "Visa" } }, organizationId: ORG_ID_1 })]),
         );
 
@@ -174,7 +198,7 @@ describe("VaultFilterComponent", () => {
       });
 
       it("shows the type when a CipherView cipher exists in an allowed org", async () => {
-        cipherService.cipherListViews$.mockReturnValue(
+        cipherService.cipherListViewsIncludingRestricted$.mockReturnValue(
           of([cipherStub({ type: CipherType.Card, organizationId: ORG_ID_1 })]),
         );
 
@@ -185,7 +209,7 @@ describe("VaultFilterComponent", () => {
       });
 
       it("hides the type when a CipherListView cipher exists but in a non-allowed org", async () => {
-        cipherService.cipherListViews$.mockReturnValue(
+        cipherService.cipherListViewsIncludingRestricted$.mockReturnValue(
           of([cipherStub({ type: { card: { brand: "" } }, organizationId: ORG_ID_2 })]),
         );
 
@@ -196,7 +220,7 @@ describe("VaultFilterComponent", () => {
       });
 
       it("hides the type when there are no ciphers of that type", async () => {
-        cipherService.cipherListViews$.mockReturnValue(
+        cipherService.cipherListViewsIncludingRestricted$.mockReturnValue(
           of([cipherStub({ type: { login: {} } as CipherListViewType, organizationId: ORG_ID_1 })]),
         );
 
@@ -208,7 +232,7 @@ describe("VaultFilterComponent", () => {
       });
 
       it("hides the type when a matching cipher exists but is deleted", async () => {
-        cipherService.cipherListViews$.mockReturnValue(
+        cipherService.cipherListViewsIncludingRestricted$.mockReturnValue(
           of([
             cipherStub({
               type: { card: { brand: "" } },
@@ -225,7 +249,7 @@ describe("VaultFilterComponent", () => {
       });
 
       it("hides the type when a matching cipher has no organizationId", async () => {
-        cipherService.cipherListViews$.mockReturnValue(
+        cipherService.cipherListViewsIncludingRestricted$.mockReturnValue(
           of([cipherStub({ type: { card: { brand: "" } } })]),
         );
 
@@ -247,7 +271,7 @@ describe("VaultFilterComponent", () => {
       });
 
       it("shows the type when a cipher belongs to the filtered org", async () => {
-        cipherService.cipherListViews$.mockReturnValue(
+        cipherService.cipherListViewsIncludingRestricted$.mockReturnValue(
           of([cipherStub({ type: { card: { brand: "" } }, organizationId: ORG_ID_1 })]),
         );
 
@@ -258,7 +282,7 @@ describe("VaultFilterComponent", () => {
       });
 
       it("hides the type when a cipher exists but belongs to a different org than filtered", async () => {
-        cipherService.cipherListViews$.mockReturnValue(
+        cipherService.cipherListViewsIncludingRestricted$.mockReturnValue(
           of([cipherStub({ type: { card: { brand: "" } }, organizationId: ORG_ID_2 })]),
         );
 
@@ -267,6 +291,101 @@ describe("VaultFilterComponent", () => {
 
         expect(ids).not.toContain("card");
       });
+    });
+  });
+
+  describe("addOrganizationFilter", () => {
+    describe("add label", () => {
+      it('uses "newOrganization" when the VFO1 flag is off', async () => {
+        const section = await component.addOrganizationFilter();
+
+        expect(section.add?.text).toBe("newOrganization");
+      });
+
+      it('uses "newVault" when the VFO1 flag is on', async () => {
+        vfo1Enabled.mockReturnValue(true);
+
+        const section = await component.addOrganizationFilter();
+
+        expect(section.add?.text).toBe("newVault");
+      });
+
+      it("omits the add action when the SingleOrg policy applies", async () => {
+        policyService.policyAppliesToUser$.mockReturnValue(of(true));
+
+        const section = await component.addOrganizationFilter();
+
+        expect(section.add).toBeUndefined();
+      });
+    });
+  });
+  describe("addControlledAccessFilter", () => {
+    function providerWith(options: ControlledAccessFilterOption[]): VaultControlledAccessFilter {
+      return { options$: of(options), narrow$: jest.fn() } as VaultControlledAccessFilter;
+    }
+
+    it("builds one child per option offered, under a translatable group heading", async () => {
+      const section = component.addControlledAccessFilter(
+        providerWith([{ id: "privileged", name: "Privileged", icon: "bwi-key" }]),
+      );
+
+      const tree = await firstValueFrom(section.data$);
+
+      expect(tree.node.name).toBe("controlledAccess");
+      expect(tree.children.map((c) => ({ id: c.node.id, name: c.node.name }))).toEqual([
+        { id: "privileged", name: "Privileged" },
+      ]);
+    });
+
+    it("emits no children when the host offers none, which is how the group stays hidden", async () => {
+      const section = component.addControlledAccessFilter(providerWith([]));
+
+      const tree = await firstValueFrom(section.data$);
+
+      expect(tree.children).toEqual([]);
+    });
+
+    it("is omitted entirely when no host fills the seam", async () => {
+      const cipherArchiveService = TestBed.inject(
+        CipherArchiveService,
+      ) as MockProxy<CipherArchiveService>;
+      cipherArchiveService.archivedCiphers$.mockReturnValue(of([]));
+      cipherArchiveService.userHasPremium$.mockReturnValue(of(true));
+
+      const filters = await component.buildAllFilters();
+
+      expect(filters.controlledAccessFilter).toBeUndefined();
+    });
+
+    it("is added when a host fills the seam", async () => {
+      const cipherArchiveService = TestBed.inject(
+        CipherArchiveService,
+      ) as MockProxy<CipherArchiveService>;
+      cipherArchiveService.archivedCiphers$.mockReturnValue(of([]));
+      cipherArchiveService.userHasPremium$.mockReturnValue(of(true));
+      (component as any).controlledAccessFilter = providerWith([
+        { id: "privileged", name: "Privileged", icon: "bwi-key" },
+      ]);
+
+      const filters = await component.buildAllFilters();
+
+      expect(filters.controlledAccessFilter).toBeDefined();
+    });
+  });
+
+  describe("applyControlledAccessFilter", () => {
+    it("clears the other filters before selecting the node", async () => {
+      const node = new TreeNode<ControlledAccessFilter>(
+        { id: "privileged", name: "Privileged" },
+        null,
+      );
+      const resetFilter = jest.fn();
+      component.activeFilter = { resetFilter } as unknown as VaultFilter;
+
+      await component.applyControlledAccessFilter(node);
+
+      expect(resetFilter).toHaveBeenCalled();
+      expect(component.activeFilter.selectedControlledAccessNode).toBe(node);
     });
   });
 });

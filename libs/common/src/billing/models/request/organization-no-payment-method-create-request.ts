@@ -1,6 +1,5 @@
 import { OrganizationKeysRequest } from "../../../admin-console/models/request/organization-keys.request";
-import { InitiationPath } from "../../../models/request/reference-event.request";
-import { PlanType } from "../../enums";
+import { InitiationPath, PlanType } from "../../enums";
 
 export class OrganizationNoPaymentMethodCreateRequest {
   name: string = "";
@@ -25,7 +24,10 @@ export class OrganizationNoPaymentMethodCreateRequest {
   additionalSmSeats: number = 0;
   additionalServiceAccounts: number = 0;
   isFromSecretsManagerTrial: boolean = false;
+  usePrivilegedControls: boolean = false;
+  pamSeats?: number;
   initiationPath!: InitiationPath;
+  trialLength?: number;
 
   constructor(key: string, keys: OrganizationKeysRequest, collectionName: string) {
     if (!key) {

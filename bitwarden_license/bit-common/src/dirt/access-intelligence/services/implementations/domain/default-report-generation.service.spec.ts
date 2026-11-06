@@ -45,7 +45,7 @@ describe("DefaultReportGenerationService", () => {
 
   // ==================== Integration Tests ====================
 
-  describe("generateReport - Integration", () => {
+  describe("generateReport$ - Integration", () => {
     it("should generate complete report with valid data", async () => {
       // Arrange
       const ciphers = [
@@ -84,11 +84,11 @@ describe("DefaultReportGenerationService", () => {
         { id: "u1", name: "Alice", email: "alice@example.com" },
         { id: "u2", name: "Bob", email: "bob@example.com" },
       ]);
-      memberCipherMappingService.mapCiphersToMembers.mockReturnValue(of({ mapping, registry }));
+      memberCipherMappingService.mapCiphersToMembers$.mockReturnValue(of({ mapping, registry }));
 
       // Act
       const result = await firstValueFrom(
-        service.generateReport(ciphers, members, collectionAccess, groupMemberships),
+        service.generateReport$(ciphers, members, collectionAccess, groupMemberships),
       );
 
       // Assert
@@ -107,12 +107,12 @@ describe("DefaultReportGenerationService", () => {
       const groupMemberships: GroupMembershipDetails[] = [];
 
       cipherHealthService.checkCipherHealth.mockReturnValue(of(new Map()));
-      memberCipherMappingService.mapCiphersToMembers.mockReturnValue(
+      memberCipherMappingService.mapCiphersToMembers$.mockReturnValue(
         of({ mapping: new Map(), registry: {} }),
       );
 
       const result = await firstValueFrom(
-        service.generateReport(ciphers, members, collectionAccess, groupMemberships),
+        service.generateReport$(ciphers, members, collectionAccess, groupMemberships),
       );
 
       expect(result.reports.length).toBe(0);
@@ -129,12 +129,12 @@ describe("DefaultReportGenerationService", () => {
 
       const healthMap = new Map([["c1", createCipherHealth(false)]]);
       cipherHealthService.checkCipherHealth.mockReturnValue(of(healthMap));
-      memberCipherMappingService.mapCiphersToMembers.mockReturnValue(
+      memberCipherMappingService.mapCiphersToMembers$.mockReturnValue(
         of({ mapping: new Map([["c1", []]]), registry: {} }),
       );
 
       const result = await firstValueFrom(
-        service.generateReport(ciphers, members, collectionAccess, groupMemberships),
+        service.generateReport$(ciphers, members, collectionAccess, groupMemberships),
       );
 
       expect(result.reports.length).toBe(1);
@@ -173,10 +173,10 @@ describe("DefaultReportGenerationService", () => {
       const registry = createMemberRegistry([
         { id: "u1", name: "Alice", email: "alice@example.com" },
       ]);
-      memberCipherMappingService.mapCiphersToMembers.mockReturnValue(of({ mapping, registry }));
+      memberCipherMappingService.mapCiphersToMembers$.mockReturnValue(of({ mapping, registry }));
 
       const result = await firstValueFrom(
-        service.generateReport(ciphers, members, collectionAccess, groupMemberships),
+        service.generateReport$(ciphers, members, collectionAccess, groupMemberships),
       );
 
       // Both c1 and c2 should be grouped under github.com
@@ -213,10 +213,10 @@ describe("DefaultReportGenerationService", () => {
       const registry = createMemberRegistry([
         { id: "u1", name: "Alice", email: "alice@example.com" },
       ]);
-      memberCipherMappingService.mapCiphersToMembers.mockReturnValue(of({ mapping, registry }));
+      memberCipherMappingService.mapCiphersToMembers$.mockReturnValue(of({ mapping, registry }));
 
       const result = await firstValueFrom(
-        service.generateReport(ciphers, members, collectionAccess, groupMemberships),
+        service.generateReport$(ciphers, members, collectionAccess, groupMemberships),
       );
 
       const report = result.reports[0];
@@ -257,10 +257,10 @@ describe("DefaultReportGenerationService", () => {
         { id: "u1", name: "Alice", email: "alice@example.com" },
         { id: "u2", name: "Bob", email: "bob@example.com" },
       ]);
-      memberCipherMappingService.mapCiphersToMembers.mockReturnValue(of({ mapping, registry }));
+      memberCipherMappingService.mapCiphersToMembers$.mockReturnValue(of({ mapping, registry }));
 
       const result = await firstValueFrom(
-        service.generateReport(ciphers, members, collectionAccess, groupMemberships),
+        service.generateReport$(ciphers, members, collectionAccess, groupMemberships),
       );
 
       const report = result.reports[0];
@@ -286,10 +286,10 @@ describe("DefaultReportGenerationService", () => {
       const registry = createMemberRegistry([
         { id: "u1", name: "Alice", email: "alice@example.com" },
       ]);
-      memberCipherMappingService.mapCiphersToMembers.mockReturnValue(of({ mapping, registry }));
+      memberCipherMappingService.mapCiphersToMembers$.mockReturnValue(of({ mapping, registry }));
 
       const result = await firstValueFrom(
-        service.generateReport(ciphers, members, collectionAccess, groupMemberships),
+        service.generateReport$(ciphers, members, collectionAccess, groupMemberships),
       );
 
       // Cipher should appear in both github.com and gitlab.com
@@ -332,10 +332,10 @@ describe("DefaultReportGenerationService", () => {
       const registry = createMemberRegistry([
         { id: "u1", name: "Alice", email: "alice@example.com" },
       ]);
-      memberCipherMappingService.mapCiphersToMembers.mockReturnValue(of({ mapping, registry }));
+      memberCipherMappingService.mapCiphersToMembers$.mockReturnValue(of({ mapping, registry }));
 
       const result = await firstValueFrom(
-        service.generateReport(ciphers, members, collectionAccess, groupMemberships),
+        service.generateReport$(ciphers, members, collectionAccess, groupMemberships),
       );
 
       const report = result.reports[0];
@@ -344,6 +344,34 @@ describe("DefaultReportGenerationService", () => {
       expect(report.memberRefs["u1"]).toBe(true); // At-risk because c1 is at-risk
       expect(report.memberCount).toBe(1);
       expect(report.atRiskMemberCount).toBe(1);
+    });
+
+    it("should build iconCipher into report from first cipher available", async () => {
+      const ciphers = [
+        createCipher("c1", ["https://github.com/login"], ["coll-1"]), // u1 has access
+        createCipher("c2", ["https://github.com/some-other-url/test"], ["coll-1"]), // u1 has access
+      ];
+
+      const members = [createMember("u1", "Alice", "alice@example.com")];
+      const collectionAccess = [createCollectionAccess("coll-1", ["u1"], [])];
+      const groupMemberships: GroupMembershipDetails[] = [];
+
+      const healthMap = new Map([["c1", createCipherHealth(false)]]);
+      cipherHealthService.checkCipherHealth.mockReturnValue(of(healthMap));
+
+      const mapping = new Map([["c1", ["u1"]]]);
+      const registry = createMemberRegistry([
+        { id: "u1", name: "Alice", email: "alice@example.com" },
+      ]);
+      memberCipherMappingService.mapCiphersToMembers$.mockReturnValue(of({ mapping, registry }));
+
+      const result = await firstValueFrom(
+        service.generateReport$(ciphers, members, collectionAccess, groupMemberships),
+      );
+
+      const report = result.reports[0];
+      expect(report.iconCipher).toBeDefined();
+      expect(report.iconCipher?.login.uris[0].uri).toBe("https://github.com/login");
     });
   });
 
@@ -363,12 +391,12 @@ describe("DefaultReportGenerationService", () => {
       const registry = createMemberRegistry([
         { id: "u1", name: "Alice", email: "alice@example.com" },
       ]);
-      memberCipherMappingService.mapCiphersToMembers.mockReturnValue(of({ mapping, registry }));
+      memberCipherMappingService.mapCiphersToMembers$.mockReturnValue(of({ mapping, registry }));
 
       const previousApplications = [createApplication("github.com", true)];
 
       const result = await firstValueFrom(
-        service.generateReport(
+        service.generateReport$(
           ciphers,
           members,
           collectionAccess,
@@ -394,13 +422,13 @@ describe("DefaultReportGenerationService", () => {
       const registry = createMemberRegistry([
         { id: "u1", name: "Alice", email: "alice@example.com" },
       ]);
-      memberCipherMappingService.mapCiphersToMembers.mockReturnValue(of({ mapping, registry }));
+      memberCipherMappingService.mapCiphersToMembers$.mockReturnValue(of({ mapping, registry }));
 
       const reviewedDate = new Date("2024-01-15");
       const previousApplications = [createApplication("github.com", false, reviewedDate)];
 
       const result = await firstValueFrom(
-        service.generateReport(
+        service.generateReport$(
           ciphers,
           members,
           collectionAccess,
@@ -426,11 +454,11 @@ describe("DefaultReportGenerationService", () => {
       const registry = createMemberRegistry([
         { id: "u1", name: "Alice", email: "alice@example.com" },
       ]);
-      memberCipherMappingService.mapCiphersToMembers.mockReturnValue(of({ mapping, registry }));
+      memberCipherMappingService.mapCiphersToMembers$.mockReturnValue(of({ mapping, registry }));
 
       // No previous applications
       const result = await firstValueFrom(
-        service.generateReport(ciphers, members, collectionAccess, groupMemberships),
+        service.generateReport$(ciphers, members, collectionAccess, groupMemberships),
       );
 
       const app = result.applications.find((a) => a.applicationName === "github.com");
@@ -451,7 +479,7 @@ describe("DefaultReportGenerationService", () => {
       const registry = createMemberRegistry([
         { id: "u1", name: "Alice", email: "alice@example.com" },
       ]);
-      memberCipherMappingService.mapCiphersToMembers.mockReturnValue(of({ mapping, registry }));
+      memberCipherMappingService.mapCiphersToMembers$.mockReturnValue(of({ mapping, registry }));
 
       // Previous report had gitlab.com which no longer exists
       const previousApplications = [
@@ -460,7 +488,7 @@ describe("DefaultReportGenerationService", () => {
       ];
 
       const result = await firstValueFrom(
-        service.generateReport(
+        service.generateReport$(
           ciphers,
           members,
           collectionAccess,
@@ -508,10 +536,10 @@ describe("DefaultReportGenerationService", () => {
         { id: "u1", name: "Alice", email: "alice@example.com" },
         { id: "u2", name: "Bob", email: "bob@example.com" },
       ]);
-      memberCipherMappingService.mapCiphersToMembers.mockReturnValue(of({ mapping, registry }));
+      memberCipherMappingService.mapCiphersToMembers$.mockReturnValue(of({ mapping, registry }));
 
       const result = await firstValueFrom(
-        service.generateReport(ciphers, members, collectionAccess, groupMemberships),
+        service.generateReport$(ciphers, members, collectionAccess, groupMemberships),
       );
 
       expect(result.summary.totalApplicationCount).toBe(2);
@@ -547,10 +575,10 @@ describe("DefaultReportGenerationService", () => {
       const registry = createMemberRegistry([
         { id: "u1", name: "Alice", email: "alice@example.com" },
       ]);
-      memberCipherMappingService.mapCiphersToMembers.mockReturnValue(of({ mapping, registry }));
+      memberCipherMappingService.mapCiphersToMembers$.mockReturnValue(of({ mapping, registry }));
 
       const result = await firstValueFrom(
-        service.generateReport(ciphers, members, collectionAccess, groupMemberships),
+        service.generateReport$(ciphers, members, collectionAccess, groupMemberships),
       );
 
       // u1 appears in both applications, but should be counted once
@@ -588,13 +616,13 @@ describe("DefaultReportGenerationService", () => {
         { id: "u1", name: "Alice", email: "alice@example.com" },
         { id: "u2", name: "Bob", email: "bob@example.com" },
       ]);
-      memberCipherMappingService.mapCiphersToMembers.mockReturnValue(of({ mapping, registry }));
+      memberCipherMappingService.mapCiphersToMembers$.mockReturnValue(of({ mapping, registry }));
 
       // Mark github.com as critical
       const previousApplications = [createApplication("github.com", true)];
 
       const result = await firstValueFrom(
-        service.generateReport(
+        service.generateReport$(
           ciphers,
           members,
           collectionAccess,
@@ -644,10 +672,10 @@ describe("DefaultReportGenerationService", () => {
         { id: "u1", name: "Alice", email: "alice@example.com" },
         { id: "u2", name: "Bob", email: "bob@example.com" },
       ]);
-      memberCipherMappingService.mapCiphersToMembers.mockReturnValue(of({ mapping, registry }));
+      memberCipherMappingService.mapCiphersToMembers$.mockReturnValue(of({ mapping, registry }));
 
       const result = await firstValueFrom(
-        service.generateReport(ciphers, members, collectionAccess, groupMemberships),
+        service.generateReport$(ciphers, members, collectionAccess, groupMemberships),
       );
 
       expect(Object.keys(result.memberRegistry).length).toBe(2);
@@ -676,10 +704,10 @@ describe("DefaultReportGenerationService", () => {
       const registry = createMemberRegistry([
         { id: "u1", name: "Alice", email: "alice@example.com" },
       ]);
-      memberCipherMappingService.mapCiphersToMembers.mockReturnValue(of({ mapping, registry }));
+      memberCipherMappingService.mapCiphersToMembers$.mockReturnValue(of({ mapping, registry }));
 
       const result = await firstValueFrom(
-        service.generateReport(ciphers, members, collectionAccess, groupMemberships),
+        service.generateReport$(ciphers, members, collectionAccess, groupMemberships),
       );
 
       // All member IDs in reports should exist in registry

@@ -1,8 +1,11 @@
 //! Inter-process communication for native messaging and IPC server/client.
 
+use std::vec;
+
 use tokio::io::{AsyncRead, AsyncWrite};
 use tokio_util::codec::{Framed, LengthDelimitedCodec};
 
+pub mod announcement;
 pub mod client;
 pub mod server;
 
@@ -21,6 +24,25 @@ pub const NATIVE_MESSAGING_BUFFER_SIZE: usize = 1024 * 1024;
 /// but ideally the messages should be processed as quickly as possible.
 pub const MESSAGE_CHANNEL_BUFFER: usize = 32;
 
+/// The paths to where the native messaging files live on flatpak environments.
+#[cfg(target_os = "linux")]
+pub const FLATPAK_PATHS: [&str; 4] = [
+    "org.mozilla.firefox/.mozilla/native-messaging-hosts",
+    "com.google.Chrome/config/google-chrome/NativeMessagingHosts",
+    "org.chromium.Chromium/config/chromium/NativeMessagingHosts",
+    "com.microsoft.Edge/config/microsoft-edge/NativeMessagingHosts",
+];
+
+/// The paths to where the native messaging files live on unsandboxed (deb, rpm, appimage)
+/// environments.
+#[cfg(target_os = "linux")]
+pub const UNSANDBOXED_PATHS: [&str; 4] = [
+    ".config/chromium/NativeMessagingHosts",
+    ".config/google-chrome/NativeMessagingHosts",
+    ".config/microsoft-edge/NativeMessagingHosts",
+    ".mozilla/native-messaging-hosts",
+];
+
 /// This is the codec used for communication through the UNIX socket / Windows named pipe.
 /// It's an internal implementation detail, but we want to make sure that both the client
 ///  and the server use the same one.
@@ -31,60 +53,166 @@ fn internal_ipc_codec<T: AsyncRead + AsyncWrite>(inner: T) -> Framed<T, LengthDe
         .new_framed(inner)
 }
 
-/// Resolve the path to the IPC socket.
-// FIXME: Remove unwraps! They panic and terminate the whole application.
-#[allow(clippy::unwrap_used)]
+#[cfg(debug_assertions)]
+const ENV_BITWARDEN_IPC_SOCKET_DIR: &str = "BITWARDEN_IPC_SOCKET_DIR";
+
+/// The debug-only socket directory override, used to isolate a debug instance from an installed
+/// client.
+///
+/// Release builds must never move their socket, or it would end up outside the macOS app group
+/// container, so the override is compiled out entirely.
+#[cfg(debug_assertions)]
+fn socket_dir_override() -> Option<std::path::PathBuf> {
+    std::env::var_os(ENV_BITWARDEN_IPC_SOCKET_DIR).map(std::path::PathBuf::from)
+}
+
+#[cfg(not(debug_assertions))]
+fn socket_dir_override() -> Option<std::path::PathBuf> {
+    None
+}
+
+/// Builds a `\\.\pipe\<hash>.s.<name>` pipe name, unique per `scope` (s for socket).
+/// Hashing prevents problems with reserved characters and file length limitations.
+#[cfg(target_os = "windows")]
+fn pipe_path(scope: &std::ffi::OsStr, name: &str) -> std::path::PathBuf {
+    use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine};
+    use sha2::Digest;
+
+    let hash = sha2::Sha256::digest(scope.as_encoded_bytes());
+    let hash_b64 = URL_SAFE_NO_PAD.encode(hash.as_slice());
+
+    format!(r"\\.\pipe\{hash_b64}.s.{name}").into()
+}
+
+/// The shared App Group container declared in this bundle's Info.plist, if resolvable.
+///
+/// Reads the group identifier stamped into the Info.plist per build variant and asks the
+/// OS for its container, creating it if needed. Returns `None` outside a signed bundle
+/// entitled to the group (e.g. an unsigned dev build). Resolving the group at runtime
+/// rather than hardcoding it lets a single native binary serve both production and beta
+/// without the two channels sharing a socket.
+#[cfg(target_os = "macos")]
+fn app_group_container() -> Option<std::path::PathBuf> {
+    let group_id = desktop_objc::app_group_id()?;
+    desktop_objc::app_group_container_path(&group_id).map(std::path::PathBuf::from)
+}
+
+/// The directory under the user's cache directory that holds the sockets when no App Group
+/// container is used.
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+fn cache_dir_name() -> String {
+    #[cfg(target_os = "macos")]
+    {
+        // A packaged Bitwarden bundle -- one that declares its App Group in its Info.plist --
+        // is named after its own bundle identifier, so beta and stable do not share a socket.
+        // Anything else, such as an `npm start` dev build running inside Electron.app or a dev
+        // proxy outside any bundle, keeps the stable name so the dev app and dev proxy still
+        // find each other.
+        let is_packaged = desktop_objc::app_group_id().is_some();
+        if is_packaged {
+            if let Some(bundle_id) = desktop_objc::bundle_identifier() {
+                return bundle_id;
+            }
+        }
+    }
+
+    "com.bitwarden.desktop".to_owned()
+}
+
+/// The main path to the IPC socket.
 pub fn path(name: &str) -> std::path::PathBuf {
+    if let Some(dir) = socket_dir_override() {
+        // Windows named pipes must live under \\.\pipe\, so the override cannot be used as a
+        // directory there. Hashing it into the pipe name isolates the instance just the same.
+        #[cfg(target_os = "windows")]
+        return pipe_path(dir.as_os_str(), name);
+
+        #[cfg(not(target_os = "windows"))]
+        {
+            let _ = std::fs::create_dir_all(&dir);
+            return dir.join(format!("s.{name}"));
+        }
+    }
+
     #[cfg(target_os = "windows")]
     {
         // Use a unique IPC pipe //./pipe/xxxxxxxxxxxxxxxxx.s.bw per user (s for socket).
-        // Hashing prevents problems with reserved characters and file length limitations.
-        use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine};
-        use sha2::Digest;
-        let home = dirs::home_dir().unwrap();
-        let hash = sha2::Sha256::digest(home.as_os_str().as_encoded_bytes());
-        let hash_b64 = URL_SAFE_NO_PAD.encode(hash.as_slice());
-
-        format!(r"\\.\pipe\{hash_b64}.s.{name}").into()
+        let home = dirs::home_dir().expect("Could not find user home directory");
+        pipe_path(home.as_os_str(), name)
     }
 
     #[cfg(target_os = "macos")]
     {
-        // When running in an unsandboxed environment, path is: /Users/<user>/
-        // While running sandboxed, it's different:
-        // /Users/<user>/Library/Containers/com.bitwarden.desktop/Data
-        let mut home = dirs::home_dir().unwrap();
-
-        // Check if the app is sandboxed by looking for the Containers directory
-        let containers_position = home
-            .components()
-            .position(|c| c.as_os_str() == "Containers");
-
-        // If the app is sanboxed, we need to use the App Group directory
-        if let Some(position) = containers_position {
-            // We want to use App Groups in /Users/<user>/Library/Group
-            // Containers/LTZ2PFU5D6.com.bitwarden.desktop, so we need to remove all the
-            // components after the user. We can use the previous position to do this.
-            while home.components().count() > position - 1 {
-                home.pop();
+        // Every socket lives in the shared App Group container, sandboxed or not. The
+        // autofill extension is always sandboxed and can only reach sockets there, and
+        // routing the desktop proxy through the same container keeps a single socket path
+        // per channel instead of one per sandbox status.
+        //
+        // The container may not exist yet if this process is the first to look it up, so
+        // create it rather than assume the OS already has. A process that cannot create
+        // or reach it (an unsigned dev build, which is not entitled to the group) falls
+        // through to the cache directory below.
+        if let Some(container) = app_group_container() {
+            let _ = std::fs::create_dir_all(&container);
+            if container.exists() {
+                return container.join(format!("s.{name}"));
             }
-
-            let tmp = home.join("Library/Group Containers/LTZ2PFU5D6.com.bitwarden.desktop");
-
-            // The tmp directory might not exist, so create it
-            let _ = std::fs::create_dir_all(&tmp);
-            return tmp.join(format!("s.{name}"));
         }
     }
 
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     {
-        // On Linux and unsandboxed Mac, we use the user's cache directory.
-        let home = dirs::cache_dir().unwrap();
-        let path_dir = home.join("com.bitwarden.desktop");
+        // On Linux, and on Mac when no App Group container is available (unsigned dev
+        // builds), we use the user's cache directory.
+        let home = dirs::cache_dir().expect("Could not find user cache directory");
+        let path_dir = home.join(cache_dir_name());
 
         // The cache directory might not exist, so create it
         let _ = std::fs::create_dir_all(&path_dir);
         path_dir.join(format!("s.{name}"))
+    }
+}
+
+/// Paths to the ipc sockets including alternative paths.
+/// For flatpak, a path per sandbox is created.
+pub fn all_paths(name: &str) -> Vec<std::path::PathBuf> {
+    // An isolated debug instance must not take over the installed client's browser-facing
+    // sockets, so the shared alternative paths are skipped.
+    if socket_dir_override().is_some() {
+        return vec![path(name)];
+    }
+
+    #[cfg(target_os = "linux")]
+    {
+        use std::env;
+
+        // On Linux, in flatpak, we mount sockets in each app's sandboxed directory.
+        let user_home = dirs::home_dir().expect("Could not find user home directory");
+        let flatpak_path = user_home.join(".var/app/");
+        let flatpak_paths = FLATPAK_PATHS
+            .iter()
+            .map(|path| flatpak_path.join(path).join(format!(".app.{name}.socket")));
+        let mut paths = vec![path(name)];
+        paths.extend(flatpak_paths);
+
+        // Additionally, we add the host home directory path, to mount sockets into the unsandboxed
+        // apps.
+        let username = env::var("USER").unwrap_or_else(|_| "unknown".to_string());
+        // The HOME env variable is changed / mapped inside of snap sandbox but we need the host
+        // home directory here.
+        let host_home = homedir::home(username.clone()).ok().flatten();
+        if let Some(host_home) = host_home {
+            // Add the host home directory paths for unsandboxed apps.
+            let unsandboxed_paths = UNSANDBOXED_PATHS
+                .iter()
+                .map(|path| host_home.join(path).join(format!(".app.{name}.socket")));
+            paths.extend(unsandboxed_paths);
+        }
+
+        paths
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        vec![path(name)]
     }
 }

@@ -1,7 +1,8 @@
 import { MemberDecryptionType } from "../../../auth/enums/sso";
 import { ProductTierType } from "../../../billing/enums";
 import { BaseResponse } from "../../../models/response/base.response";
-import { OrganizationUserStatusType, OrganizationUserType, ProviderType } from "../../enums";
+import { ProviderType } from "../../../provider/enums";
+import { OrganizationUserStatusType, OrganizationUserType } from "../../enums";
 import { PermissionsApi } from "../api/permissions.api";
 
 export class ProfileOrganizationResponse extends BaseResponse {
@@ -22,6 +23,8 @@ export class ProfileOrganizationResponse extends BaseResponse {
   useResetPassword: boolean;
   useSecretsManager: boolean;
   usePasswordManager: boolean;
+  usePam: boolean;
+  accessPam: boolean;
   useActivateAutofillPolicy: boolean;
   useAutomaticUserConfirmation: boolean;
   selfHost: boolean;
@@ -56,7 +59,7 @@ export class ProfileOrganizationResponse extends BaseResponse {
   limitCollectionDeletion: boolean;
   limitItemDeletion: boolean;
   allowAdminAccessToAllCollectionItems: boolean;
-  userIsManagedByOrganization: boolean;
+  userIsClaimedByOrganization: boolean;
   useAccessIntelligence: boolean;
   useAdminSponsoredFamilies: boolean;
   useDisableSMAdsForUsers: boolean;
@@ -86,6 +89,8 @@ export class ProfileOrganizationResponse extends BaseResponse {
     this.useResetPassword = this.getResponseProperty("UseResetPassword");
     this.useSecretsManager = this.getResponseProperty("UseSecretsManager");
     this.usePasswordManager = this.getResponseProperty("UsePasswordManager");
+    this.usePam = this.getResponseProperty("UsePam") ?? false;
+    this.accessPam = this.getResponseProperty("AccessPam") ?? false;
     this.useActivateAutofillPolicy = this.getResponseProperty("UseActivateAutofillPolicy");
     this.useAutomaticUserConfirmation = this.getResponseProperty("UseAutomaticUserConfirmation");
     this.selfHost = this.getResponseProperty("SelfHost");
@@ -132,7 +137,7 @@ export class ProfileOrganizationResponse extends BaseResponse {
     this.allowAdminAccessToAllCollectionItems = this.getResponseProperty(
       "AllowAdminAccessToAllCollectionItems",
     );
-    this.userIsManagedByOrganization = this.getResponseProperty("UserIsManagedByOrganization");
+    this.userIsClaimedByOrganization = this.getResponseProperty("UserIsClaimedByOrganization");
     // Map from backend API property (UseRiskInsights) to domain model property (useAccessIntelligence)
     this.useAccessIntelligence = this.getResponseProperty("UseRiskInsights");
     this.useAdminSponsoredFamilies = this.getResponseProperty("UseAdminSponsoredFamilies");

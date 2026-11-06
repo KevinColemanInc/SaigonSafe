@@ -1,6 +1,3 @@
-import { hasModifierKey } from "@angular/cdk/keycodes";
-import { Overlay, OverlayConfig, OverlayRef } from "@angular/cdk/overlay";
-import { TemplatePortal } from "@angular/cdk/portal";
 import {
   Directive,
   ElementRef,
@@ -12,39 +9,46 @@ import {
   input,
   model,
   signal,
+  untracked,
 } from "@angular/core";
-import { Observable, Subscription, filter, mergeWith } from "rxjs";
 
-import { PositionIdentifier, defaultPositions } from "./default-positions";
+import { PositionIdentifier } from "./default-positions";
+import { PopoverPanelComponent } from "./popover-panel.component";
+import { PopoverRef } from "./popover-ref";
 import { PopoverComponent } from "./popover.component";
-import { SpotlightService } from "./spotlight.service";
+import { PopoverService } from "./popover.service";
+
+/** Implement and provide as `useExisting` to redirect `[bitPopoverAnchorFor]` from the host to another element. */
+export abstract class PopoverElementProvider {
+  abstract readonly popoverAnchorElementRef: ElementRef<HTMLElement>;
+}
 
 /**
- * Directive that anchors a popover to any element for programmatic control.
- * Ideal for guided tours, tooltips, and contextual help.
- * Use `[(popoverOpen)]` for two-way binding to control visibility.
+ * Directive that anchors a popover to any element with programmatic open/close control.
+ * Use `[(popoverOpen)]` for two-way binding to control visibility from the host component.
  *
  * @example
  * Basic usage:
  * ```html
- * <div [bitPopoverAnchorFor]="tourStep" [(popoverOpen)]="showTour">
- *   Element to highlight
+ * <div [bitPopoverAnchorFor]="myPopover" [(popoverOpen)]="isOpen">
+ *   Anchor element
  * </div>
- * <bit-popover #tourStep>Tour content</bit-popover>
+ * <bit-popover #myPopover>Popover content</bit-popover>
  * ```
  *
  * @example
- * With spotlight effect for guided tours:
+ * With spotlight effect:
  * ```html
- * <div [bitPopoverAnchorFor]="tourStep"
- *      [(popoverOpen)]="showTour"
+ * <div [bitPopoverAnchorFor]="myPopover"
+ *      [(popoverOpen)]="isOpen"
  *      [spotlight]="true"
- *      [spotlightPadding]="12">
- *   Element to highlight
+ * >
+ *   Anchor element
  * </div>
  * ```
  *
- * Use `PopoverTriggerForDirective` instead if the popover is meant to be manually opened by the user clicking a button.
+ * Use `PopoverTriggerForDirective` instead if the popover should open on user click, or
+ * `PopoverService` to open one from code.
  */
 @Directive({
   selector: "[bitPopoverAnchorFor]",
@@ -55,8 +59,11 @@ export class PopoverAnchorForDirective implements OnDestroy {
   readonly popoverOpen = model(false);
 
   /** The popover component to display */
-  readonly popover = input.required<PopoverComponent>({ alias: "bitPopoverAnchorFor" });
+  readonly popover = input.required<PopoverComponent | PopoverPanelComponent>({
+    alias: "bitPopoverAnchorFor",
+  });
 
+  /** Whether clicking the backdrop closes the popover. Defaults to true. */
   readonly closeOnBackdropClick = input<boolean>(true);
 
   /** Preferred popover position (e.g., "right-start", "below-center") */
@@ -65,53 +72,22 @@ export class PopoverAnchorForDirective implements OnDestroy {
   /** Enable spotlight effect that dims everything except the anchor element */
   readonly spotlight = input<boolean>(false);
 
-  /** Padding around the spotlight cutout in pixels */
-  readonly spotlightPadding = input<number>(0);
+  private readonly popoverElementProvider = inject<PopoverElementProvider>(PopoverElementProvider, {
+    host: true,
+    optional: true,
+  });
+  private readonly hostElementRef = this.popoverElementProvider
+    ? this.popoverElementProvider.popoverAnchorElementRef
+    : inject<ElementRef<HTMLElement>>(ElementRef);
 
-  private overlayRef: OverlayRef | null = null;
-  private closedEventsSub: Subscription | null = null;
+  private readonly viewContainerRef = inject(ViewContainerRef);
+  private readonly popoverService = inject(PopoverService);
+
+  private ref: PopoverRef | null = null;
   private readonly hasInitialized = signal(false);
   private isDestroyed = false;
-  private spotlightService = inject(SpotlightService);
 
-  get positions() {
-    if (!this.position()) {
-      return defaultPositions;
-    }
-
-    const preferredPosition = defaultPositions.find((position) => position.id === this.position());
-
-    if (preferredPosition) {
-      return [preferredPosition, ...defaultPositions];
-    }
-
-    return defaultPositions;
-  }
-
-  get defaultPopoverConfig(): OverlayConfig {
-    return {
-      hasBackdrop: !this.spotlight(), // Spotlight manages its own backdrop
-      backdropClass: "cdk-overlay-transparent-backdrop",
-      scrollStrategy: this.overlay.scrollStrategies.reposition(),
-      positionStrategy: this.overlay
-        .position()
-        .flexibleConnectedTo(
-          this.spotlight() && this.spotlightService.overlayElement
-            ? new ElementRef(this.spotlightService.overlayElement)
-            : this.elementRef,
-        )
-        .withPositions(this.positions)
-        .withLockedPosition(true)
-        .withFlexibleDimensions(false)
-        .withPush(true),
-    };
-  }
-
-  constructor(
-    private elementRef: ElementRef<HTMLElement>,
-    private viewContainerRef: ViewContainerRef,
-    private overlay: Overlay,
-  ) {
+  constructor() {
     // Wait for the first render to complete so layout is stable before opening.
     // Sets a signal so the effect below re-evaluates once the layout is ready.
     afterNextRender(() => this.hasInitialized.set(true));
@@ -120,96 +96,53 @@ export class PopoverAnchorForDirective implements OnDestroy {
       if (this.isDestroyed) {
         return;
       }
-
-      // Handle closing
-      if (!this.popoverOpen() && this.overlayRef) {
-        this.disposeAll();
+      if (!this.popoverOpen()) {
+        untracked(() => this.disposeRef());
         return;
       }
-
-      // Handle opening — hasInitialized() ensures layout is stable on first open
-      if (!this.popoverOpen() || this.overlayRef || !this.hasInitialized()) {
-        return;
+      if (this.hasInitialized()) {
+        untracked(() => this.openPopover());
       }
-
-      this.openPopover();
     });
   }
 
   /** Programmatically opens the popover */
   openPopover() {
-    if (this.overlayRef) {
+    if (this.ref) {
       return;
     }
-
-    // Create the spotlight border overlay first so the popover overlay sits above it in DOM order
-    if (this.spotlight()) {
-      this.spotlightService.register(this);
-      this.spotlightService.showSpotlight(this.elementRef.nativeElement, this.spotlightPadding());
-    }
-
     this.popoverOpen.set(true);
-    this.overlayRef = this.overlay.create(this.defaultPopoverConfig);
 
-    const templatePortal = new TemplatePortal(this.popover().templateRef(), this.viewContainerRef);
-
-    this.overlayRef.attach(templatePortal);
-    this.closedEventsSub = this.getClosedEvents().subscribe((event) => {
-      // Closing the popover is handled in this.destroyPopover, so we want to prevent the escape
-      // key from doing its normal default action, which would otherwise cause a parent component
-      // (like a dialog) or extension window to close
-      if (event instanceof KeyboardEvent && event.key === "Escape" && !hasModifierKey(event)) {
-        event.preventDefault();
-      }
-      this.destroyPopover();
+    // The host is read at open time, since a `PopoverElementProvider` may rebind it after init
+    const ref = this.popoverService.open(this.popover(), this.hostElementRef.nativeElement, {
+      position: this.position(),
+      spotlight: this.spotlight(),
+      closeOnBackdropClick: this.closeOnBackdropClick(),
+      viewContainerRef: this.viewContainerRef,
     });
-  }
-
-  private getClosedEvents(): Observable<any> {
-    if (!this.overlayRef) {
-      throw new Error("Overlay reference is not available");
-    }
-
-    const detachments = this.overlayRef.detachments();
-    const escKey = this.overlayRef
-      .keydownEvents()
-      .pipe(filter((event: KeyboardEvent) => event.key === "Escape" && !this.spotlight()));
-    const backdrop = this.overlayRef
-      .backdropClick()
-      .pipe(filter(() => !this.spotlight() && this.closeOnBackdropClick()));
-    const popoverClosed = this.popover().closed;
-
-    return detachments.pipe(mergeWith(escKey, backdrop, popoverClosed));
-  }
-
-  private destroyPopover() {
-    if (!this.popoverOpen()) {
-      return;
-    }
-
-    this.popoverOpen.set(false);
-    this.disposeAll();
-  }
-
-  private disposeAll() {
-    this.closedEventsSub?.unsubscribe();
-    this.closedEventsSub = null;
-    this.overlayRef?.dispose();
-    this.overlayRef = null;
-
-    if (this.spotlight()) {
-      this.spotlightService.unregister(this);
-      this.spotlightService.hideSpotlight();
-    }
-  }
-
-  ngOnDestroy() {
-    this.isDestroyed = true;
-    this.disposeAll();
+    this.ref = ref;
+    ref.closed.subscribe(() => {
+      if (this.ref === ref) {
+        this.ref = null;
+        this.popoverOpen.set(false);
+      }
+    });
   }
 
   /** Programmatically closes the popover */
   closePopover() {
-    this.destroyPopover();
+    this.popoverOpen.set(false);
+    this.disposeRef();
+  }
+
+  ngOnDestroy() {
+    this.isDestroyed = true;
+    this.disposeRef();
+  }
+
+  private disposeRef() {
+    const ref = this.ref;
+    this.ref = null;
+    ref?.close();
   }
 }

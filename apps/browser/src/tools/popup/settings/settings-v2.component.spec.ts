@@ -4,7 +4,6 @@ import { RouterTestingModule } from "@angular/router/testing";
 import { mock, MockProxy } from "jest-mock-extended";
 import { BehaviorSubject, firstValueFrom, of, Subject } from "rxjs";
 
-import { PremiumUpgradeDialogComponent } from "@bitwarden/angular/billing/components";
 import { NudgesService, NudgeType } from "@bitwarden/angular/vault";
 import { AutomaticUserConfirmationService } from "@bitwarden/auto-confirm";
 import { AutofillBrowserSettingsService } from "@bitwarden/browser/autofill/services/autofill-browser-settings.service";
@@ -49,7 +48,6 @@ describe("SettingsV2Component", () => {
   };
   let mockAutofillSettingsService: Partial<AutofillSettingsServiceAbstraction>;
   let dialogService: MockProxy<DialogService>;
-  let openSpy: jest.SpyInstance;
 
   beforeEach(waitForAsync(async () => {
     dialogService = mock<DialogService>();
@@ -124,7 +122,7 @@ describe("SettingsV2Component", () => {
     return acct;
   }
 
-  it("shows the premium callout when user does NOT have premium", async () => {
+  it("shows free local tools without promotions for a free account", async () => {
     mockBillingState.hasPremiumFromAnySource$.mockReturnValue(of(false));
     pushActiveAccount();
 
@@ -134,7 +132,9 @@ describe("SettingsV2Component", () => {
 
     const el: HTMLElement = fixture.nativeElement;
 
-    expect(el.querySelector("bit-callout")).toBeTruthy();
+    expect(el.querySelector("bit-callout")).toBeFalsy();
+    expect(el.querySelector('[routerLink="/local-security"]')).toBeTruthy();
+    expect(el.querySelector('[routerLink="/more-from-bitwarden"]')).toBeFalsy();
   });
 
   it("hides the premium callout when user HAS premium", async () => {
@@ -147,21 +147,6 @@ describe("SettingsV2Component", () => {
 
     const el: HTMLElement = fixture.nativeElement;
     expect(el.querySelector("bit-callout")).toBeFalsy();
-  });
-
-  it("openUpgradeDialog calls PremiumUpgradeDialogComponent.open with the DialogService", async () => {
-    openSpy = jest.spyOn(PremiumUpgradeDialogComponent, "open").mockImplementation();
-    mockBillingState.hasPremiumFromAnySource$.mockReturnValue(of(false));
-    pushActiveAccount();
-
-    const fixture = TestBed.createComponent(SettingsV2Component);
-    const component = fixture.componentInstance;
-    fixture.detectChanges();
-    await fixture.whenStable();
-
-    component["openUpgradeDialog"]();
-    expect(openSpy).toHaveBeenCalledTimes(1);
-    expect(openSpy).toHaveBeenCalledWith(dialogService);
   });
 
   it("showAutofillBadge$ emits true when showNudgeBadge is true", async () => {
@@ -243,20 +228,14 @@ describe("SettingsV2Component", () => {
     expect(mockNudges.dismissNudge).not.toHaveBeenCalled();
   });
 
-  it("showDownloadBitwardenNudge$ proxies to nudges service for the active account", async () => {
-    const acct = pushActiveAccount("user-xyz");
-
-    mockNudges.showNudgeBadge$.mockImplementation((type: NudgeType) =>
-      of(type === NudgeType.DownloadBitwarden),
-    );
-
+  it("does not request promotional download nudges", async () => {
+    pushActiveAccount();
     const fixture = TestBed.createComponent(SettingsV2Component);
-    const component = fixture.componentInstance;
     fixture.detectChanges();
     await fixture.whenStable();
-
-    const val = await firstValueFrom(component.showDownloadBitwardenNudge$);
-    expect(val).toBe(true);
-    expect(mockNudges.showNudgeBadge$).toHaveBeenCalledWith(NudgeType.DownloadBitwarden, acct.id);
+    expect(mockNudges.showNudgeBadge$).not.toHaveBeenCalledWith(
+      NudgeType.DownloadBitwarden,
+      expect.anything(),
+    );
   });
 });

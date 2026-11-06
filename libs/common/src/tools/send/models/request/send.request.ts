@@ -1,9 +1,10 @@
 // FIXME: Update this file to be type safe and remove this and next line
 // @ts-strict-ignore
-import { AuthType } from "@bitwarden/common/tools/send/types/auth-type";
-
+import { AuthType } from "../../types/auth-type";
 import { SendType } from "../../types/send-type";
 import { SendFileApi } from "../api/send-file.api";
+import { SendItemMetadataApi } from "../api/send-item-metadata.api";
+import { SendItemApi } from "../api/send-item.api";
 import { SendTextApi } from "../api/send-text.api";
 import { Send } from "../domain/send";
 
@@ -18,11 +19,12 @@ export class SendRequest {
   deletionDate: string;
   text: SendTextApi;
   file: SendFileApi;
+  data: SendItemApi;
   password: string;
   emails: string;
   disabled: boolean;
   hideEmail: boolean;
-  authTYpe: AuthType;
+  authType: AuthType;
 
   constructor(send: Send, fileLength?: number) {
     this.type = send.type;
@@ -37,7 +39,7 @@ export class SendRequest {
     this.emails = send.emails;
     this.disabled = send.disabled;
     this.hideEmail = send.hideEmail;
-    this.authTYpe = send.authType;
+    this.authType = send.authType;
 
     switch (this.type) {
       case SendType.Text:
@@ -49,6 +51,33 @@ export class SendRequest {
         this.file = new SendFileApi();
         this.file.fileName = send.file.fileName != null ? send.file.fileName.encryptedString : null;
         break;
+      case SendType.Item: {
+        if (send.data?.data == null) {
+          throw new Error("Item Send is missing its item data");
+        }
+        if (send.data.metadata == null) {
+          throw new Error("Item Send is missing its item metadata");
+        }
+        this.data = new SendItemApi();
+        this.data.encryptionVersion = send.data.encryptionVersion;
+        // The sealed blob is opaque to the client; send it exactly as the SDK produced it.
+        this.data.data = send.data.data;
+        const metadata = new SendItemMetadataApi();
+        metadata.itemId = send.data.metadata.itemId;
+        metadata.folderName =
+          send.data.metadata.folderName != null
+            ? send.data.metadata.folderName.encryptedString
+            : null;
+        metadata.collectionNames =
+          send.data.metadata.collectionNames != null
+            ? send.data.metadata.collectionNames.map((cn) => cn.encryptedString)
+            : null;
+        metadata.organizationName = send.data.metadata.organizationName;
+        metadata.creationDate = send.data.metadata.creationDate;
+        metadata.revisionDate = send.data.metadata.revisionDate;
+        this.data.metadata = metadata;
+        break;
+      }
       default:
         break;
     }

@@ -1,8 +1,10 @@
 import { Observable, of } from "rxjs";
 
 import { CipherView } from "@bitwarden/common/vault/models/view/cipher.view";
+import { LogService } from "@bitwarden/logging";
 
 import { MemberRegistryEntryView, MemberRegistry } from "../../../models";
+import { flowTimer } from "../../../utils/measure-flow-step.operator";
 import {
   CollectionAccessDetails,
   GroupMembershipDetails,
@@ -15,21 +17,27 @@ import {
  * Default implementation of MemberCipherMappingService
  *
  * Computes cipher-to-member mappings client-side via collection and group resolution.
- * This is a pure transformation service with no external dependencies.
+ * This is a pure transformation service that makes no API calls.
  */
 export class DefaultMemberCipherMappingService extends MemberCipherMappingService {
+  constructor(private logService: LogService) {
+    super();
+  }
+
   /**
    * Maps ciphers to organization members via collection and group resolution.
    *
    * This is a synchronous operation wrapped in an Observable for consistency
    * with the service pattern. No async operations are performed.
    */
-  mapCiphersToMembers(
+  mapCiphersToMembers$(
     ciphers: CipherView[],
     members: OrganizationUserView[],
     collectionAccess: CollectionAccessDetails[],
     groupMemberships: GroupMembershipDetails[],
   ): Observable<MemberCipherMappingResult> {
+    const measureStep = flowTimer(this.logService);
+
     // Build lookup maps for O(1) access
     const collectionAccessMap = this.buildCollectionAccessMap(collectionAccess);
     const groupMembershipMap = this.buildGroupMembershipMap(groupMemberships);
@@ -70,13 +78,21 @@ export class DefaultMemberCipherMappingService extends MemberCipherMappingServic
       mapping.set(cipherId, Array.from(memberIds));
     });
 
+    measureStep("Generate: ciphers mapped to members", [
+      ["itemCount", ciphers.length],
+      ["orgMemberCount", members.length],
+      ["collectionCount", collectionAccess.length],
+      ["groupCount", groupMemberships.length],
+      ["mappedMemberCount", allMemberIds.size],
+    ]);
+
     return of({ mapping, registry });
   }
 
   /**
    * Builds a member registry from an array of members.
    */
-  buildMemberRegistry(members: OrganizationUserView[]): Observable<MemberRegistry> {
+  buildMemberRegistry$(members: OrganizationUserView[]): Observable<MemberRegistry> {
     const registry: MemberRegistry = {};
 
     members.forEach((member) => {
