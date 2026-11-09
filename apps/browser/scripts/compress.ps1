@@ -6,10 +6,12 @@
 
 param (
     [Parameter(Mandatory = $true)]
-    [String] $fileName
+    [String] $fileName,
+    [Parameter(Mandatory = $true)]
+    [String] $browser
 )
 
-$buildDir = Join-Path $PSScriptRoot "../build"
+$buildDir = Join-Path $PSScriptRoot "../build/$browser"
 $distDir = Join-Path $PSScriptRoot "../dist"
 
 # Create dist directory if it doesn't exist

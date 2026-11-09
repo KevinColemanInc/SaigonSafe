@@ -10,7 +10,7 @@ set -x
 set -o pipefail
 
 SCRIPT_ROOT="$(dirname "$0")"
-BUILD_DIR="$SCRIPT_ROOT/../build"
+BUILD_DIR="$SCRIPT_ROOT/../build/chrome"
 
 # Check if build directory exists
 if [ -d "$BUILD_DIR" ]; then

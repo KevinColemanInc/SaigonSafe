@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 ////
-// Launch Chrome for Testing with the unpacked extension from build/.
+// Launch Chrome for Testing with the unpacked extension from build/chrome/.
 //
 // Chrome restricts --load-extension on the stable channel, so this
 // deliberately uses a Chrome for Testing binary, where the flag still
@@ -22,7 +22,7 @@ import { fileURLToPath } from "node:url";
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const BROWSER_DIR = resolve(SCRIPT_DIR, "..");
-const BUILD_DIR = join(BROWSER_DIR, "build");
+const BUILD_DIR = join(BROWSER_DIR, "build", "chrome");
 const REPO_ROOT = resolve(BROWSER_DIR, "../..");
 
 // Shared with `npm run debug:desktop`, which writes the desktop client's native messaging

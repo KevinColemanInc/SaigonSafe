@@ -19,10 +19,6 @@ module.exports.getEnv = function getEnv(params) {
   return { ENV, manifestVersion, browser };
 };
 
-const DEFAULT_PARAMS = {
-  outputPath: path.resolve(__dirname, "build"),
-};
-
 /**
  * @param {{
  *  configName: string;
@@ -42,13 +38,13 @@ const DEFAULT_PARAMS = {
  * }} params - The input parameters for building the config.
  */
 module.exports.buildConfig = function buildConfig(params) {
-  params = { ...DEFAULT_PARAMS, ...params };
-
   if (process.env.NODE_ENV == null) {
     process.env.NODE_ENV = "development";
   }
 
   const { ENV, manifestVersion, browser } = module.exports.getEnv(params);
+  const outputPath = params.outputPath ?? path.resolve(__dirname, "build", browser);
+  const cacheName = `${browser}-mv${manifestVersion}-${params.configName}`;
 
   console.log(`Building Manifest Version ${manifestVersion} app - ${params.configName} version`);
 
@@ -318,7 +314,7 @@ module.exports.buildConfig = function buildConfig(params) {
         ? false
         : {
             type: "filesystem",
-            name: "main-cache",
+            name: `main-${cacheName}`,
             cacheDirectory: path.resolve(
               __dirname,
               "../../node_modules/.cache/webpack-browser-main",
@@ -395,7 +391,7 @@ module.exports.buildConfig = function buildConfig(params) {
       filename: "[name].js",
       chunkFilename: "assets/[name].js",
       webassemblyModuleFilename: "assets/[modulehash].wasm",
-      path: params.outputPath,
+      path: outputPath,
       clean: true,
       environment: {
         asyncFunction: true,
@@ -485,7 +481,7 @@ module.exports.buildConfig = function buildConfig(params) {
       target: target,
       output: {
         filename: "background.js",
-        path: params.outputPath,
+        path: outputPath,
       },
       module: {
         rules: [
@@ -500,7 +496,7 @@ module.exports.buildConfig = function buildConfig(params) {
           ? false
           : {
               type: "filesystem",
-              name: "background-cache",
+              name: `background-${cacheName}`,
               cacheDirectory: path.resolve(
                 __dirname,
                 "../../node_modules/.cache/webpack-browser-background",

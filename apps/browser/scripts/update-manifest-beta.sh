@@ -13,7 +13,7 @@ set -u
 set -o pipefail
 
 SCRIPT_ROOT="$(dirname "$0")"
-BUILD_DIR="$SCRIPT_ROOT/../build"
+BUILD_DIR="$SCRIPT_ROOT/../build/chrome"
 MANIFEST_PATH="$BUILD_DIR/manifest.json"
 
 if [[ ! "${BETA_NUMBER:-}" =~ ^[0-9]+$ ]]; then

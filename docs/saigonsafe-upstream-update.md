@@ -61,18 +61,30 @@ server. SaigonSafe does not claim to provide cloud storage or server capabilitie
    Preserve actual third-party product names and upstream notices.
 4. Run `node scripts/branding/generate-browser-assets.cjs` if artwork sources change.
 5. Verify text/artwork using both scripts' `--check` modes. Run affected tests and build
-   Chrome and Firefox sequentially because they share `apps/browser/build`.
+   Chrome and Firefox. Their outputs are isolated in `apps/browser/build/chrome`
+   and `apps/browser/build/firefox`.
 
 Nothing is pushed or published by this update.
 
 ## Loading local browser builds
 
-The standard build commands share `apps/browser/build`; whichever browser builds last
-replaces that folder's manifest and bundles. Loading a Chrome build in Firefox produces
-the `background.service_worker is currently disabled` error. Do not edit the generated
-manifest to work around this: the browser-specific JavaScript bundles also differ.
+Standard builds write to `apps/browser/build/<browser>`:
 
-Use these commands for separate unpacked builds:
+- `make build-firefox` (or `npm run build:firefox --workspace @bitwarden/browser`)
+  writes to `apps/browser/build/firefox`.
+- `make build-chrome` (or `npm run build:chrome --workspace @bitwarden/browser`)
+  writes to `apps/browser/build/chrome`.
+
+Development, watch, production, and commercial builds use the same browser-specific
+layout. Packaging reads the matching browser directory and still writes zip files
+to `apps/browser/dist`. Nx builds retain their explicit `dist/apps/browser/*` paths.
+
+Load the matching browser directory rather than the old shared `apps/browser/build`
+folder. Loading a Chrome build in Firefox produces the
+`background.service_worker is currently disabled` error; the browser-specific bundles
+also differ, so do not edit a generated manifest to switch browsers.
+
+The existing unpacked commands retain their explicit output paths:
 
 - `npm run build:unpacked:firefox --workspace @bitwarden/browser` writes to
   `apps/browser/dist/firefox`. Load its `manifest.json` through Firefox's

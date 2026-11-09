@@ -4,7 +4,7 @@
 # Builds the safari appex.
 ####
 
-$buildDir = Join-Path $PSScriptRoot "../build"
+$buildDir = Join-Path $PSScriptRoot "../build/safari"
 $distDir = Join-Path $PSScriptRoot "../dist"
 
 Write-Output $PSScriptRoot
@@ -77,7 +77,7 @@ foreach ($subBuildPath in $subBuildPaths) {
         (Get-Content $infoFile).Replace('0.0.1', $jsonObject.version).Replace('0.0.2', $jsonObject.version) | Set-Content $infoFile
 
     $projectFile = Join-Path -Path $safariBuildPath -ChildPath "desktop.xcodeproj/project.pbxproj"
-        (Get-Content $projectFile).Replace('../../../build', "../safari/app") | Set-Content $projectFile
+        (Get-Content $projectFile).Replace('../../../build/safari', "../safari/app") | Set-Content $projectFile
 
     # Build using xcode
     $xcodeBuildArgs = @(

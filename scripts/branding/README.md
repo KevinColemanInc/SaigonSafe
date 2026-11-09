@@ -28,8 +28,8 @@ npm run build:chrome --workspace=apps/browser
 `build:prod:firefox`, `build:prod:chrome`, and the production `dist:*` commands
 keep the jade icons. Webpack swaps the packaged icon bytes, so manifest and
 runtime status icon paths always agree. Source production images are never
-overwritten by local builds. Firefox and Chrome share `apps/browser/build`,
-so build them sequentially.
+overwritten by local builds. Firefox and Chrome write to separate directories:
+`apps/browser/build/firefox` and `apps/browser/build/chrome`.
 
 Both builds verify artwork checksums before running. Upstream export names
 are compatibility aliases for the SaigonSafe artwork. Official third-party

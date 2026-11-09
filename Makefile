@@ -1,7 +1,5 @@
 .DEFAULT_GOAL := help
 
-# Both browser builds share apps/browser/build, so run them sequentially.
-.NOTPARALLEL:
 .PHONY: help build-firefox build-chrome deploy-firefox deploy-chrome
 
 help:
@@ -13,11 +11,11 @@ help:
 
 build-firefox:
 	npm run build:firefox --workspace=apps/browser
-	@printf '%s\n' 'Firefox build: apps/browser/build'
+	@printf '%s\n' 'Firefox build: apps/browser/build/firefox'
 
 build-chrome:
 	npm run build:chrome --workspace=apps/browser
-	@printf '%s\n' 'Chrome build: apps/browser/build'
+	@printf '%s\n' 'Chrome build: apps/browser/build/chrome'
 
 deploy-firefox:
 	npm run dist:firefox --workspace=apps/browser
